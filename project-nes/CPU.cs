@@ -134,6 +134,5 @@ namespace project_nes
             throw new NotImplementedException();
         }
 
-        string t = "Test";
     }
 }

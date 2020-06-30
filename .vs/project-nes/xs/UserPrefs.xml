@@ -4,7 +4,7 @@
     <Files>
       <File FileName="project-nes/Program.cs" Line="8" Column="1" />
       <File FileName="project-nes/iBus.cs" />
-      <File FileName="project-nes/Bus.cs" Line="10" Column="1" />
+      <File FileName="project-nes/Bus.cs" Line="7" Column="45" />
       <File FileName="project-nes/iCPU.cs" Line="18" Column="25" />
       <File FileName="project-nes/CPU.cs" Line="136" Column="1" />
     </Files>
@@ -13,7 +13,7 @@
         <State name="__root__">
           <Node name="project-nes" expanded="True">
             <Node name="project-nes" expanded="True">
-              <Node name="CPU.cs" selected="True" />
+              <Node name="Bus.cs" selected="True" />
             </Node>
           </Node>
         </State>

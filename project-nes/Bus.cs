@@ -7,8 +7,6 @@ namespace project_nes
         byte[] CpuRam = new byte[64 * 1024];
 
 
-
-
         public Bus()
         {
         }
