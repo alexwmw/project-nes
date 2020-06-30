@@ -6,6 +6,9 @@ namespace project_nes
         // Fake ram for testing - 64kb for the full 16-bit addressable range
         byte[] CpuRam = new byte[64 * 1024];
 
+
+
+
         public Bus()
         {
         }

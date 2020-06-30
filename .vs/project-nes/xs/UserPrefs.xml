@@ -1,12 +1,12 @@
 ﻿<Properties StartupConfiguration="{69F7735C-0F17-4CF8-8B95-3A644DA32123}|Default">
   <MonoDevelop.Ide.ItemProperties.project-nes FirstBuild="True" PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="project-nes/CPU.cs">
+  <MonoDevelop.Ide.Workbench>
     <Files>
       <File FileName="project-nes/Program.cs" Line="8" Column="1" />
       <File FileName="project-nes/iBus.cs" />
       <File FileName="project-nes/Bus.cs" Line="10" Column="1" />
       <File FileName="project-nes/iCPU.cs" Line="18" Column="25" />
-      <File FileName="project-nes/CPU.cs" Line="1" Column="1" />
+      <File FileName="project-nes/CPU.cs" Line="136" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
