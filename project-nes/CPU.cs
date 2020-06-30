@@ -1,4 +1,6 @@
 ﻿using System;
+using i = project_nes.Instruction;
+
 namespace project_nes
 {
     public class CPU : iCPU
@@ -7,7 +9,6 @@ namespace project_nes
         {
         }
 
-
         public byte A { get; set; }        // Accumulator
         public byte X { get; set; }        // X Register
         public byte Y { get; set; }        // Y register
@@ -15,9 +16,10 @@ namespace project_nes
         public ushort Pc { get; set; }     // Program counter
         public byte Status { get; set; }   // Status byte
 
-
         private byte fetched;               // Fetched value
+
         private int clock_count;            // Absolute number of clock cycles
+
         private iBus bus;
 
         private enum Flags
@@ -57,10 +59,8 @@ namespace project_nes
             throw new NotImplementedException();
         }
 
-
         private void Read(ushort address)
             => bus.Read(address);
-
 
         private void Write(ushort address, byte data)
             => bus.Write(address, data);
@@ -79,60 +79,65 @@ namespace project_nes
 
         // Addressing modes
 
-        private byte Immediate()
+        private static Func<byte> Immediate = () =>
         {
-            throw new NotImplementedException();
-        }
+            return 0;
+        };
 
-        private byte ZeroPage()
+        private static Func<byte> ZeroPage = () =>
         {
-            throw new NotImplementedException();
-        }
+            return 0;
+        };
 
-        private byte Absolute()
+        private static Func<byte> Absolute = () =>
         {
-            throw new NotImplementedException();
-        }
+            return 0;
+        };
 
-        private byte Implied()
+        private static Func<byte> Implied = () =>
         {
-            throw new NotImplementedException();
-        }
+            return 0;
+        };
 
-        private byte Accumulator()
+        private static Func<byte> Accumulator = () =>
         {
-            throw new NotImplementedException();
-        }
+            return 0;
+        };
 
-        private byte Indexed()
+        private static Func<byte> Indexed = () =>
         {
-            throw new NotImplementedException();
-        }
+            return 0;
+        };
 
-        private byte ZeroPageIndexed()
+        private static Func<byte> ZeroPageIndexed = () =>
         {
-            throw new NotImplementedException();
-        }
+            return 0;
+        };
 
-        private byte Indirect()
+        private static Func<byte> Indirect = () =>
         {
-            throw new NotImplementedException();
-        }
+            return 0;
+        };
 
-        private byte PreIndexedIndirect()
+        private static Func<byte> PreIndexedIndirect = () =>
         {
-            throw new NotImplementedException();
-        }
+            return 0;
+        };
 
-        private byte PostIndexedIndirect()
+        private static Func<byte> PostIndexedIndirect = () =>
         {
-            throw new NotImplementedException();
-        }
+            return 0;
+        };
 
-        private byte Relative()
+        private static Func<byte> Relative = () =>
         {
-            throw new NotImplementedException();
-        }
+            return 0;
+        };
+
+            
+
+
+
 
     }
 }
