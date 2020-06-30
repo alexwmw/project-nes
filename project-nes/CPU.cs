@@ -82,7 +82,7 @@ namespace project_nes
         private static Func<byte> Immediate = () =>
         {
             return 0;
-        };
+        }; 
 
         private static Func<byte> ZeroPage = () =>
         {
@@ -134,9 +134,345 @@ namespace project_nes
             return 0;
         };
 
-            
 
 
+        // Opcodes
+
+        //Add with Carry
+        private static Func<byte> ADC = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> AND = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> ASL = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> BCC = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> BCS = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> BEQ = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> BIT = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> BMI = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> BNE = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> BPL = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> BRK = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> BVC = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> BVS = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> CLC = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> CLD = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> CID = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> CLV = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> CMP = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> CPX = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> CPY = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> DEC = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> DEX = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> DEY = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> EOR = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> INC = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> INX = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> INY = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> JMP = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> JSR = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> LDA = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> LDX = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> LDY = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> LSR = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> NOP = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> ORA = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> PHA = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> PHP = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> PLA = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> PLP = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> ROL = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> ROR = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> RFI = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> RTS = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> SBC = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> SEC = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> SED = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> SEI = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> STA = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> STX = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> STY = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> TAX = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> TAY = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> TSX = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> TXA = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> TXS = () =>
+        {
+            return 0;
+        };
+
+        //Add with Carry
+        private static Func<byte> TYA = () =>
+        {
+            return 0;
+        };
 
 
     }

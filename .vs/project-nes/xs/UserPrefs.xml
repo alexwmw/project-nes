@@ -7,7 +7,7 @@
       <File FileName="project-nes/Bus.cs" Line="22" Column="42" />
       <File FileName="project-nes/iCPU.cs" Line="18" Column="25" />
       <File FileName="project-nes/EmptyStruct.cs" Line="19" Column="1" />
-      <File FileName="project-nes/CPU.cs" Line="137" Column="13" />
+      <File FileName="project-nes/CPU.cs" Line="476" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
