@@ -76,7 +76,6 @@ namespace project_nes
                 Status &= (byte)~f;
         }
 
-
         // Addressing modes
 
         private static Func<byte> Immediate = () =>
@@ -474,6 +473,8 @@ namespace project_nes
             return 0;
         };
 
+        //Unofficial/unknown opcode
+        private static Func<byte> UNK = () => NOP();
 
     }
 }

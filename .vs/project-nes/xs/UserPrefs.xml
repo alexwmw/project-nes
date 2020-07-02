@@ -1,21 +1,26 @@
 ﻿<Properties StartupConfiguration="{69F7735C-0F17-4CF8-8B95-3A644DA32123}|Default">
   <MonoDevelop.Ide.ItemProperties.project-nes FirstBuild="True" PreferredExecutionTarget="MonoDevelop.Default" />
+  <MonoDevelop.Ide.ItemProperties.project-nes-tests FirstBuild="True" />
   <MonoDevelop.Ide.Workbench>
     <Files>
       <File FileName="project-nes/Program.cs" Line="8" Column="1" />
-      <File FileName="project-nes/iBus.cs" />
-      <File FileName="project-nes/Bus.cs" Line="22" Column="42" />
-      <File FileName="project-nes/iCPU.cs" Line="18" Column="25" />
+      <File FileName="project-nes/iBus.cs" Line="10" Column="1" />
+      <File FileName="project-nes/Bus.cs" Line="10" Column="83" />
+      <File FileName="project-nes/iCPU.cs" Line="9" Column="53" />
       <File FileName="project-nes/EmptyStruct.cs" Line="19" Column="1" />
-      <File FileName="project-nes/CPU.cs" Line="476" Column="1" />
+      <File FileName="project-nes/CPU.cs" Line="25" Column="19" />
+      <File FileName="project-nes-tests/UnitTest1.cs" Line="1" Column="1" />
+      <File FileName="project-nes-tests/InstructionTests.cs" Line="13" Column="2" />
+      <File FileName="project-nes-tests/EmptyClass.cs" Line="6" Column="21" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="project-nes" expanded="True">
             <Node name="project-nes" expanded="True">
-              <Node name="CPU.cs" selected="True" />
+              <Node name="Bus.cs" selected="True" />
             </Node>
+            <Node name="project-nes-tests" expanded="True" />
           </Node>
         </State>
       </Pad>
