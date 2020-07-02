@@ -14,8 +14,8 @@ namespace project_nes
         void Irq();
         void Nmi();
         void Clock();
-
         void ConnectBus(iBus bus);
-
+        byte TestOpCode(string opcode);
+        byte TestAddrMode(string addrmode);
     }
 }

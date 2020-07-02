@@ -7,7 +7,7 @@ namespace project_nes
 
         public Bus()
         {
-            // RAM initially set to 64kb to test the full 16-bit addressable range
+            // RAM initially set to 64kb to test the full 16-bit addressable rangev
             cpuRam = new byte[64 * 1024];
         }
 

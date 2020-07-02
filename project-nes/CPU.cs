@@ -1,13 +1,40 @@
 ﻿using System;
-using i = project_nes.Instruction;
+using System.Reflection;
 
 namespace project_nes
 {
     public class CPU : iCPU
     {
+
+        // Fields
+
+        private byte fetched;               // Fetched value
+        private int clock_count;            // Absolute number of clock cycles
+        private iBus bus;
+        private Instruction[] instructionSet;
+
+        // Constructors
+
         public CPU()
         {
+
         }
+
+        // Enums
+
+        private enum Flags
+        {
+            C = 1 << 0, // Carry Bit
+            Z = 1 << 1, // Zero
+            I = 1 << 2, // Disable Interrupts
+            D = 1 << 3, // Decimal Mode
+            B = 1 << 4, // Break
+            U = 1 << 5, // Unused
+            V = 1 << 6, // Overflow
+            N = 1 << 7, // Negative
+        };
+
+        // Properties
 
         public byte A { get; set; }        // Accumulator
         public byte X { get; set; }        // X Register
@@ -16,119 +43,86 @@ namespace project_nes
         public ushort Pc { get; set; }     // Program counter
         public byte Status { get; set; }   // Status byte
 
-        private byte fetched;               // Fetched value
 
-        private int clock_count;            // Absolute number of clock cycles
-
-        private iBus bus;
-
-        private enum Flags
-        {
-            C = 1 << 0, // Carry Bit
-            Z = 1 << 1, // Zero
-            I = 1 << 2, // Disable Interrupts
-            D = 1 << 3, // Decimal Mode (unused in this implementation)
-            B = 1 << 4, // Break
-            U = 1 << 5, // Unused
-            V = 1 << 6, // Overflow
-            N = 1 << 7, // Negative
-        };
-
-        public void Clock()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ConnectBus(iBus bus)
-        {
-            this.bus = bus;
-        }
-
-        public void Irq()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Nmi()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Reset()
-        {
-            throw new NotImplementedException();
-        }
-
-        private void Read(ushort address)
-            => bus.Read(address);
-
-        private void Write(ushort address, byte data)
-            => bus.Write(address, data);
-
-        private byte GetFlag(Flags f)
-            => (byte)(Status & (byte)f);
-
-        private void SetFlag(Flags f, bool b)
-        {
-            if (b)
-                Status |= (byte)f;
-            else
-                Status &= (byte)~f;
-        }
+        // (Static) Delegates
 
         // Addressing modes
 
-        private static Func<byte> Immediate = () =>
-        {
-            return 0;
-        }; 
-
-        private static Func<byte> ZeroPage = () =>
+        //Absolute          a       Cycles:
+        private static Func<byte> ABS = () =>
         {
             return 0;
         };
 
-        private static Func<byte> Absolute = () =>
+        //Absolute Indexed  a,x     Cycles: 4+
+        private static Func<byte> ABX = () =>
         {
             return 0;
         };
 
-        private static Func<byte> Implied = () =>
+        //Absolute Indexed  a,y     Cycles: 4+
+        private static Func<byte> ABY = () =>
         {
             return 0;
         };
 
-        private static Func<byte> Accumulator = () =>
+        //Accumulator       A       Cycles:
+        private static Func<byte> ACC = () =>
         {
             return 0;
         };
 
-        private static Func<byte> Indexed = () =>
+        //Immediate         #v      Cycles:
+        private static Func<byte> IMM = () =>
         {
             return 0;
         };
 
-        private static Func<byte> ZeroPageIndexed = () =>
+
+        //Implicit                  Cycles:
+        private static Func<byte> IMP = () =>
         {
             return 0;
         };
 
-        private static Func<byte> Indirect = () =>
+        //Indirect          (a)     Cycles:
+        private static Func<byte> IND = () =>
         {
             return 0;
         };
 
-        private static Func<byte> PreIndexedIndirect = () =>
+        //Indexed Indirect  (d,x)   Cycles: 6
+        private static Func<byte> IIX = () =>
         {
             return 0;
         };
 
-        private static Func<byte> PostIndexedIndirect = () =>
+        //Indirect Indexed  (d),y   Cycles: 5+
+        private static Func<byte> IIY = () =>
         {
             return 0;
         };
 
-        private static Func<byte> Relative = () =>
+        //Relative         label    Cycles:
+        private static Func<byte> REL = () =>
+        {
+            return 0;
+        };
+
+        //Zero Page         d       Cycles:
+        private static Func<byte> ZPG = () =>
+        {
+            return 0;
+        };
+
+        //Zero Page Indexed d,x     Cycles: 4
+        private static Func<byte> ZPX = () =>
+        {
+            return 0;
+        };
+
+        //Zero Page Indexed d,y     Cycles: 4   
+        private static Func<byte> ZPY = () =>
         {
             return 0;
         };
@@ -475,6 +469,103 @@ namespace project_nes
 
         //Unofficial/unknown opcode
         private static Func<byte> UNK = () => NOP();
+
+
+        // Methods
+
+        public void Clock()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ConnectBus(iBus bus)
+        {
+            this.bus = bus;
+        }
+
+        public void Irq()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Nmi()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Reset()
+        {
+            throw new NotImplementedException();
+        }
+
+
+        //Public TestOpCode function for testing
+        public byte TestOpCode(string opcode)
+        {
+            try
+            {
+                MethodInfo mi = this.GetType().GetMethod(opcode);
+                return (byte)mi.Invoke(null, null);
+            }
+            catch (AmbiguousMatchException e)
+            {
+                Console.WriteLine("Unknown Opcode");
+                throw e;
+            }
+        }
+
+        //Public AddrMode function for testing
+        public byte TestAddrMode(string addrmode)
+        {
+            try
+            {
+                MethodInfo mi = this.GetType().GetMethod(addrmode);
+                return (byte)mi.Invoke(null, null);
+            }
+            catch (AmbiguousMatchException e)
+            {
+                Console.WriteLine("Unknown Addressing Mode");
+                throw e;
+            }
+        }
+
+        private void Read(ushort address)
+            => bus.Read(address);
+
+        private void Write(ushort address, byte data)
+            => bus.Write(address, data);
+
+        private byte GetFlag(Flags f)
+            => (byte)(Status & (byte)f);
+
+        private void SetFlag(Flags f, bool b)
+        {
+            if (b)
+                Status |= (byte)f;
+            else
+                Status &= (byte)~f;
+        }
+
+
+        private struct Instruction
+        {
+            public Instruction(Func<byte> op, Func<byte> addrm, int cycles)
+            {
+                Operation = op;
+                AddrMode = addrm;
+                Cycles = cycles;
+                Name = nameof(this.Operation);
+            }
+
+            public string Name { get; }
+
+            public Func<byte> Operation { get; }
+
+            public Func<byte> AddrMode { get; }
+
+            public int Cycles { get; }
+        }
+
 
     }
 }
