@@ -1,4 +1,6 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Diagnostics;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using project_nes;
 
 namespace project_nes_tests
 {
@@ -6,8 +8,17 @@ namespace project_nes_tests
     public class CpuTests
     {
         [TestMethod]
-        public void TestMethod1()
+        public void TestTestOpcode()
         {
+            CPU cpu = new CPU();
+
+            var temp = cpu.TestOpCode("ADC");
+
+            Assert.AreEqual(temp, 0);
+
+
+
+
         }
     }
 }

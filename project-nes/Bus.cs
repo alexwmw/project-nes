@@ -3,11 +3,11 @@ namespace project_nes
 {
     public class Bus : iBus
     {
-        byte[] cpuRam;
+        private byte[] cpuRam;
 
         public Bus()
         {
-            // RAM initially set to 64kb to test the full 16-bit addressable rangev
+            // RAM initially set to 64kb to test the full 16-bit addressable range
             cpuRam = new byte[64 * 1024];
         }
 
@@ -26,7 +26,8 @@ namespace project_nes
         }
 
 
-        public void Write(ushort address, byte data) {
+        public void Write(ushort address, byte data)
+        {
             if (address < 0)
                 throw new ArgumentOutOfRangeException($"Invalid address < 0: {address}");
 

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace project_nes
@@ -8,17 +10,39 @@ namespace project_nes
 
         // Fields
 
-        private byte fetched;               // Fetched value
+        private byte fetched;               // Fetched data
+        private byte fetchedAddr;           // Fetched Address
         private int clock_count;            // Absolute number of clock cycles
         private iBus bus;
-        private Instruction[] instructionSet;
+        private InstructionSet instructionSet;
 
         // Constructors
 
         public CPU()
         {
+            A = 0;
+            X = 0;
+            Y = 0;
+            Stkp = 0;
+            Pc = 0;
+            Status = 0;
 
+            /* This will be a 16 * 16 length list 
+             * (inside an IEnumerable class object 'InstructionSet')
+             * 
+             * The Add method of InstructionSet allows the list to be initialised 
+             * using initializer lists - which should make this long section much
+             * easier to read instead of repeating new Instruction(...) 256 times. 
+             * But I did have to use a List<Instruction> instead 
+             * of an array Instruction[], and create an indexer
+             */
+            instructionSet = new InstructionSet()
+            {
+                {ADC, Imp, 4}
+            };
         }
+
+
 
         // Enums
 
@@ -49,426 +73,429 @@ namespace project_nes
         // Addressing modes
 
         //Absolute          a       Cycles:
-        private static Func<byte> ABS = () =>
+        private byte Abs()
         {
             return 0;
-        };
+        }
 
         //Absolute Indexed  a,x     Cycles: 4+
-        private static Func<byte> ABX = () =>
+        private byte AbsX()
         {
             return 0;
-        };
+        }
 
         //Absolute Indexed  a,y     Cycles: 4+
-        private static Func<byte> ABY = () =>
+        private byte AbsY()
         {
             return 0;
-        };
+        }
 
         //Accumulator       A       Cycles:
-        private static Func<byte> ACC = () =>
+        private byte Acc()
         {
             return 0;
-        };
+        }
 
         //Immediate         #v      Cycles:
-        private static Func<byte> IMM = () =>
+        private byte Imm()
         {
             return 0;
-        };
+        }
 
 
         //Implicit                  Cycles:
-        private static Func<byte> IMP = () =>
+        private byte Imp()
         {
+            fetched = A;
             return 0;
-        };
+        }
+
 
         //Indirect          (a)     Cycles:
-        private static Func<byte> IND = () =>
+        private byte Ind()
         {
             return 0;
-        };
+        }
 
         //Indexed Indirect  (d,x)   Cycles: 6
-        private static Func<byte> IIX = () =>
+        private byte IndexIndX()
         {
             return 0;
-        };
+        }
 
         //Indirect Indexed  (d),y   Cycles: 5+
-        private static Func<byte> IIY = () =>
+        private byte IndIndexY()
         {
             return 0;
-        };
+        }
 
         //Relative         label    Cycles:
-        private static Func<byte> REL = () =>
+        private byte Rel()
         {
             return 0;
-        };
+        }
 
         //Zero Page         d       Cycles:
-        private static Func<byte> ZPG = () =>
+        private byte Zpg()
         {
             return 0;
-        };
+        }
 
         //Zero Page Indexed d,x     Cycles: 4
-        private static Func<byte> ZPX = () =>
+        private byte ZpX()
         {
             return 0;
-        };
+        }
 
         //Zero Page Indexed d,y     Cycles: 4   
-        private static Func<byte> ZPY = () =>
+        private byte ZpY()
         {
             return 0;
-        };
+        }
+
 
 
 
         // Opcodes
 
         //Add with Carry
-        private static Func<byte> ADC = () =>
+        private byte ADC()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> AND = () =>
+        private byte AND()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> ASL = () =>
+        private byte ASL()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> BCC = () =>
+        private byte BCC()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> BCS = () =>
+        private byte BCS()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> BEQ = () =>
+        private byte BEQ()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> BIT = () =>
+        private byte BIT()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> BMI = () =>
+        private byte BMI()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> BNE = () =>
+        private byte BNE()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> BPL = () =>
+        private byte BPL()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> BRK = () =>
+        private byte BRK()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> BVC = () =>
+        private byte BVC()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> BVS = () =>
+        private byte BVS()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> CLC = () =>
+        private byte CLC()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> CLD = () =>
+        private byte CLD()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> CID = () =>
+        private byte CID()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> CLV = () =>
+        private byte CLV()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> CMP = () =>
+        private byte CMP()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> CPX = () =>
+        private byte CPX()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> CPY = () =>
+        private byte CPY()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> DEC = () =>
+        private byte DEC()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> DEX = () =>
+        private byte DEX()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> DEY = () =>
+        private byte DEY()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> EOR = () =>
+        private byte EOR()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> INC = () =>
+        private byte INC()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> INX = () =>
+        private byte INX()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> INY = () =>
+        private byte INY()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> JMP = () =>
+        private byte JMP()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> JSR = () =>
+        private byte JSR()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> LDA = () =>
+        private byte LDA()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> LDX = () =>
+        private byte LDX()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> LDY = () =>
+        private byte LDY()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> LSR = () =>
+        private byte LSR()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> NOP = () =>
+        private byte NOP()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> ORA = () =>
+        private byte ORA()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> PHA = () =>
+        private byte PHA()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> PHP = () =>
+        private byte PHP()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> PLA = () =>
+        private byte PLA()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> PLP = () =>
+        private byte PLP()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> ROL = () =>
+        private byte ROL()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> ROR = () =>
+        private byte ROR()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> RFI = () =>
+        private byte RFI()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> RTS = () =>
+        private byte RTS()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> SBC = () =>
+        private byte SBC()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> SEC = () =>
+        private byte SEC()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> SED = () =>
+        private byte SED()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> SEI = () =>
+        private byte SEI()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> STA = () =>
+        private byte STA()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> STX = () =>
+        private byte STX()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> STY = () =>
+        private byte STY()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> TAX = () =>
+        private byte TAX()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> TAY = () =>
+        private byte TAY()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> TSX = () =>
+        private byte TSX()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> TXA = () =>
+        private byte TXA()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> TXS = () =>
+        private byte TXS()
         {
             return 0;
-        };
+        }
 
         //Add with Carry
-        private static Func<byte> TYA = () =>
+        private byte TYA()
         {
             return 0;
-        };
+        }
 
         //Unofficial/unknown opcode
-        private static Func<byte> UNK = () => NOP();
+        private byte UNK() => NOP();
 
 
         // Methods
@@ -505,7 +532,7 @@ namespace project_nes
             try
             {
                 MethodInfo mi = this.GetType().GetMethod(opcode);
-                return (byte)mi.Invoke(null, null);
+                return (byte)mi.Invoke(this, null);
             }
             catch (AmbiguousMatchException e)
             {
@@ -528,6 +555,7 @@ namespace project_nes
                 throw e;
             }
         }
+
 
         private void Read(ushort address)
             => bus.Read(address);
@@ -567,5 +595,26 @@ namespace project_nes
         }
 
 
+        private class InstructionSet : IEnumerable<Instruction>
+        {
+            private List<Instruction> ins = new List<Instruction>();
+
+            public IEnumerator<Instruction> GetEnumerator()
+                => ins.GetEnumerator();
+            
+
+            IEnumerator IEnumerable.GetEnumerator()
+                =>ins.GetEnumerator();
+            
+
+            public void Add(Func<byte> op, Func<byte> addrm, int cycles)
+                => ins.Add(new Instruction(op, addrm, cycles));
+
+            public Instruction this[int i]    // Indexer declaration  
+            {
+                get { return this.ins[i]; }
+                set { this.ins[i] = value; }
+            }
+        }
     }
 }
