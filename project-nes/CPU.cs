@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using ExtensionMethods;
 
 namespace project_nes
 {
@@ -148,13 +149,32 @@ namespace project_nes
         private byte GetFlag(Flags f)
             => (byte)(Status & (byte)f);
 
-        private void SetFlag(Flags f, bool b)
+        private void SetFlags(Flags f, bool b)
         {
             if (b)
                 Status |= (byte)f;
             else
                 Status &= (byte)~f;
         }
+
+        private void SetFlags(Flags f1, bool b1, Flags f2, bool b2)
+        {
+            if (b1) Status |= (byte)f1;
+            else    Status &= (byte)~f1;
+            if (b2) Status |= (byte)f2;
+            else    Status &= (byte)~f2;
+        }
+
+        private void SetFlags(Flags f1, bool b1, Flags f2, bool b2, Flags f3, bool b3)
+        {
+            if (b1) Status |= (byte)f1;
+            else    Status &= (byte)~f1;
+            if (b2) Status |= (byte)f2;
+            else    Status &= (byte)~f2;
+            if (b3) Status |= (byte)f3;
+            else    Status &= (byte)~f3;
+        }
+
 
         //todo: change from 0
         private void Fetch()
@@ -284,7 +304,7 @@ namespace project_nes
         private void Rel()
         {
             address = Read(Pc++);
-            if (address >= 0x80)
+            if (address.isNegative())
                 address |= 0x00FF;
         }
 
@@ -320,10 +340,22 @@ namespace project_nes
             return 0;
         }
 
-        //Add with Carry
-        private byte AND()
+        /**
+         * Logical AND
+         * A = A & M
+         * Flags: N, Z 
+         */
+        private void AND()
         {
-            return 0;
+            Fetch();
+            A &= data;
+
+            SetFlags(
+                Flags.Z, A == 0,
+                Flags.N, A.isNegative()
+                );
+
+            additionalCycles++;
         }
 
         //Add with Carry
