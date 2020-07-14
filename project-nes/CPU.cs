@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace project_nes
@@ -139,8 +140,7 @@ namespace project_nes
             => address >= 0 & address <= 0xFFFF
             ? bus.Read((ushort)address)
             : throw new ArgumentOutOfRangeException(
-                $"Invalid address in CPU Read(int address). Address must be between 0 and 0xFFFF. Argument: {address}"
-                );
+                $"Invalid address in CPU Read(int address). Address must be between 0 and 0xFFFF. Argument: {address}");
 
         private void Write(ushort address, byte data)
             => bus.Write(address, data);
@@ -154,6 +154,14 @@ namespace project_nes
                 Status |= (byte)f;
             else
                 Status &= (byte)~f;
+        }
+
+        //todo: change from 0
+        private void Fetch()
+        {
+            Action currentMode = instructionSet[0].AddrMode;
+            if (currentMode != Imp & currentMode != Acc)
+                data = Read(address);
         }
 
 
@@ -201,7 +209,7 @@ namespace project_nes
         //Accumulator       A       Cycles:
         private void Acc()
         {
-            address = A;
+            data = A;
         }
 
         //Immediate         #v      Cycles:
