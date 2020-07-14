@@ -10,9 +10,10 @@ namespace project_nes
 
         // Fields
 
-        private byte fetched;               // Fetched data
-        private byte fetchedAddr;           // Fetched Address
-        private int clock_count;            // Absolute number of clock cycles
+        private byte data;                  // Fetched data
+        private ushort address;             // Fetched Address
+        private byte additionalCycles;      // Additional cycles required for current instruction
+        private int clock_count;            // Total number of clock cycles passed
         private iBus bus;
         private InstructionSet instructionSet;
 
@@ -43,7 +44,6 @@ namespace project_nes
         }
 
 
-
         // Enums
 
         private enum Flags
@@ -58,99 +58,247 @@ namespace project_nes
             N = 1 << 7, // Negative
         };
 
+
         // Properties
 
-        public byte A { get; set; }        // Accumulator
-        public byte X { get; set; }        // X Register
-        public byte Y { get; set; }        // Y register
-        public byte Stkp { get; set; }     // Stack pointer
-        public ushort Pc { get; set; }     // Program counter
-        public byte Status { get; set; }   // Status byte
+        private byte A { get; set; }        // Accumulator
+        private byte X { get; set; }        // X Register
+        private byte Y { get; set; }        // Y register
+        private byte Stkp { get; set; }     // Stack pointer
+        private ushort Pc { get; set; }     // Program counter
+        private byte Status { get; set; }   // Status byte
 
 
-        // (Static) Delegates
+
+        // Public Methods
+
+        public void Clock()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void ConnectBus(iBus bus)
+        {
+            this.bus = bus;
+        }
+
+        public void Irq()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Nmi()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Reset()
+        {
+            throw new NotImplementedException();
+        }
+
+
+        //Public TestOpCode function for testing
+        public byte TestOpCode(string opcode)
+        {
+            try
+            {
+                MethodInfo mi = this.GetType().GetMethod(opcode);
+                return (byte)mi.Invoke(this, null);
+            }
+            catch (AmbiguousMatchException e)
+            {
+                Console.WriteLine("Unknown Opcode");
+                throw e;
+            }
+        }
+
+        //Public AddrMode function for testing
+        public byte TestAddrMode(string addrmode)
+        {
+            try
+            {
+                MethodInfo mi = this.GetType().GetMethod(addrmode);
+                return (byte)mi.Invoke(null, null);
+            }
+            catch (AmbiguousMatchException e)
+            {
+                Console.WriteLine("Unknown Addressing Mode");
+                throw e;
+            }
+        }
+
+
+        // Private Methods
+
+        private byte Read(ushort address)
+            => bus.Read(address);
+
+
+        private byte Read(int address)
+            => address >= 0 & address <= 0xFFFF
+            ? bus.Read((ushort)address)
+            : throw new ArgumentOutOfRangeException(
+                $"Invalid address in CPU Read(int address). Address must be between 0 and 0xFFFF. Argument: {address}"
+                );
+
+        private void Write(ushort address, byte data)
+            => bus.Write(address, data);
+
+        private byte GetFlag(Flags f)
+            => (byte)(Status & (byte)f);
+
+        private void SetFlag(Flags f, bool b)
+        {
+            if (b)
+                Status |= (byte)f;
+            else
+                Status &= (byte)~f;
+        }
+
+
 
         // Addressing modes
 
         //Absolute          a       Cycles:
-        private byte Abs()
+        // The operand is a memory address
+        // Addresses are little-endian
+        private void Abs()
         {
-            return 0;
+            byte lowByte = Read(Pc++);
+            byte highByte = Read(Pc++);
+            address = (ushort)((highByte << 8) | lowByte);
         }
 
         //Absolute Indexed  a,x     Cycles: 4+
-        private byte AbsX()
+        private void AbsX()
         {
-            return 0;
+            byte lowByte = Read(Pc++);
+            byte highByte = Read(Pc++);
+            address = (ushort)
+                (
+                ((highByte << 8) | lowByte) + X
+                );
+
+            if ((address & 0xFF00) != (highByte << 8))
+                additionalCycles++;
         }
 
         //Absolute Indexed  a,y     Cycles: 4+
-        private byte AbsY()
+        private void AbsY()
         {
-            return 0;
+            byte lowByte = Read(Pc++);
+            byte highByte = Read(Pc++);
+            address = (ushort)
+                (
+                ((highByte << 8) | lowByte) + Y
+                );
+
+            if ((address & 0xFF00) != (highByte << 8))
+                additionalCycles++;
         }
 
         //Accumulator       A       Cycles:
-        private byte Acc()
+        private void Acc()
         {
-            return 0;
+            address = A;
         }
 
         //Immediate         #v      Cycles:
-        private byte Imm()
+        // Data expected in the next (immediate) byte.
+        private void Imm()
         {
-            return 0;
+            address = Read(Pc++);
         }
 
 
         //Implicit                  Cycles:
-        private byte Imp()
+        // No additional data required for the instruction
+        private void Imp()
         {
-            fetched = A;
-            return 0;
+            //do nothing
         }
 
 
         //Indirect          (a)     Cycles:
-        private byte Ind()
+        private void Ind()
         {
-            return 0;
+            byte lowByte = Read(Pc++);
+            byte highByte = Read(Pc++);
+
+            ushort tempAddress = (ushort)((highByte << 8) | lowByte);
+
+            if (tempAddress == 0x00FF) // Simulate hardware bug
+                address = (ushort)
+                    (Read(tempAddress & 0xFF00) << 8 | Read(tempAddress));
+            else
+                address = (ushort)
+                    (Read(tempAddress + 1) << 8 | Read(tempAddress));
+            
         }
 
         //Indexed Indirect  (d,x)   Cycles: 6
-        private byte IndexIndX()
+        private void IndX()
         {
-            return 0;
+            byte temp = Read(Pc++);
+            byte lowByte  = Read(temp + X & 0x00FF);
+            byte highByte = Read(temp + X + 1 & 0x00FF);
+
+            address = (ushort)((highByte << 8) | lowByte);
         }
 
         //Indirect Indexed  (d),y   Cycles: 5+
-        private byte IndIndexY()
+        private void IndY()
         {
-            return 0;
+            byte temp = Read(Pc++);
+            byte lowByte = Read(temp & 0x00FF);
+            byte highByte = Read(temp + 1 & 0x00FF);
+
+            address = (ushort)(((highByte << 8) | lowByte) + Y);
+
+            if ((address & 0xFF00) != (highByte << 8))
+                additionalCycles++;
         }
 
         //Relative         label    Cycles:
-        private byte Rel()
+        /*
+        Relative Addressing is used on the various Branch-On-Condition instructions.
+        A 1 byte signed operand is added to the program counter, and the program continues execution
+        from the new address.
+        Because this value is signed, values #00-#7F are positive, and values #FF-#80 are negative.
+        Keep in mind that the program counter will be set to the address after the branch instruction,
+        so take this into account when calculating your new position.
+        Since branching works by checking a relevant status bit, make sure it is set to the proper value
+        prior to calling the branch instruction. This is usually done with a CMP instruction.
+        If you need to move the program counter to a location greater or less than 127 bytes away from
+        the current location, make a nearby JMP instruction, and move the program counter to the JMP line.
+        */
+        private void Rel()
         {
-            return 0;
+            address = Read(Pc++);
+            if (address >= 0x80)
+                address |= 0x00FF;
         }
 
         //Zero Page         d       Cycles:
-        private byte Zpg()
+        private void Zpg()
         {
-            return 0;
+            address = Read(Pc++);
+            address &= 0x00FF;
         }
 
         //Zero Page Indexed d,x     Cycles: 4
-        private byte ZpX()
+        private void ZpX()
         {
-            return 0;
+            address = (ushort)(Read(Pc++) + X);
+            address &= 0x00FF;
         }
 
-        //Zero Page Indexed d,y     Cycles: 4   
-        private byte ZpY()
+        //Zero Page Indexed d,y     Cycles: 4
+        private void ZpY()
         {
-            return 0;
+            address = (ushort)(Read(Pc++) + Y);
+            address &= 0x00FF;
         }
 
 
@@ -498,86 +646,12 @@ namespace project_nes
         private byte UNK() => NOP();
 
 
-        // Methods
 
-        public void Clock()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void ConnectBus(iBus bus)
-        {
-            this.bus = bus;
-        }
-
-        public void Irq()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Nmi()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Reset()
-        {
-            throw new NotImplementedException();
-        }
-
-
-        //Public TestOpCode function for testing
-        public byte TestOpCode(string opcode)
-        {
-            try
-            {
-                MethodInfo mi = this.GetType().GetMethod(opcode);
-                return (byte)mi.Invoke(this, null);
-            }
-            catch (AmbiguousMatchException e)
-            {
-                Console.WriteLine("Unknown Opcode");
-                throw e;
-            }
-        }
-
-        //Public AddrMode function for testing
-        public byte TestAddrMode(string addrmode)
-        {
-            try
-            {
-                MethodInfo mi = this.GetType().GetMethod(addrmode);
-                return (byte)mi.Invoke(null, null);
-            }
-            catch (AmbiguousMatchException e)
-            {
-                Console.WriteLine("Unknown Addressing Mode");
-                throw e;
-            }
-        }
-
-
-        private void Read(ushort address)
-            => bus.Read(address);
-
-        private void Write(ushort address, byte data)
-            => bus.Write(address, data);
-
-        private byte GetFlag(Flags f)
-            => (byte)(Status & (byte)f);
-
-        private void SetFlag(Flags f, bool b)
-        {
-            if (b)
-                Status |= (byte)f;
-            else
-                Status &= (byte)~f;
-        }
-
+        // Structs
 
         private struct Instruction
         {
-            public Instruction(Func<byte> op, Func<byte> addrm, int cycles)
+            public Instruction(Func<byte> op, Action addrm, int cycles)
             {
                 Operation = op;
                 AddrMode = addrm;
@@ -589,11 +663,13 @@ namespace project_nes
 
             public Func<byte> Operation { get; }
 
-            public Func<byte> AddrMode { get; }
+            public Action AddrMode { get; }
 
             public int Cycles { get; }
         }
 
+
+        // Classes
 
         private class InstructionSet : IEnumerable<Instruction>
         {
@@ -607,7 +683,7 @@ namespace project_nes
                 =>ins.GetEnumerator();
             
 
-            public void Add(Func<byte> op, Func<byte> addrm, int cycles)
+            public void Add(Func<byte> op, Action addrm, int cycles)
                 => ins.Add(new Instruction(op, addrm, cycles));
 
             public Instruction this[int i]    // Indexer declaration  
