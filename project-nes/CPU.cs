@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using ExtensionMethods;
 
+
 namespace project_nes
 {
     public class CPU : iCPU
@@ -12,9 +13,11 @@ namespace project_nes
 
         // Fields
 
+        private const ushort stkBase = 0x0100;
+        private byte opcode;                // Current instruction byte
         private byte data;                  // Fetched data
+        private int cycles;                 // Cycles required by current instruction
         private ushort address;             // Fetched Address
-        private byte additionalCycles;      // Additional cycles required for current instruction
         private int clock_count;            // Total number of clock cycles passed
         private iBus bus;
         private InstructionSet instructionSet;
@@ -76,7 +79,20 @@ namespace project_nes
 
         public void Clock()
         {
-            throw new NotImplementedException();
+            if(cycles == 0)
+            {
+                opcode = Read(Pc);
+                Instruction current = instructionSet[opcode];
+
+                cycles += current.Cycles;
+                bool addrm = current.AddrMode();
+                bool operation = current.Operation();
+
+                if (addrm & operation)
+                    cycles++;
+            }
+            clock_count++;
+            cycles--;
         }
 
         public void ConnectBus(iBus bus)
@@ -176,14 +192,23 @@ namespace project_nes
         }
 
 
-        //todo: change from 0
         private void Fetch()
         {
-            Action currentMode = instructionSet[0].AddrMode;
-            if (currentMode != Imp & currentMode != Acc)
+            if (CurrentModeImplicit())
+                data = A;
+            else
                 data = Read(address);
         }
 
+
+        private Func<bool> CurrentMode()
+            => instructionSet[opcode].AddrMode;
+
+        private bool CurrentModeImplicit()
+            => CurrentMode() == Imp | CurrentMode() == Acc;
+
+
+     
 
 
         // Addressing modes
@@ -191,15 +216,16 @@ namespace project_nes
         //Absolute          a       Cycles:
         // The operand is a memory address
         // Addresses are little-endian
-        private void Abs()
+        private bool Abs()
         {
             byte lowByte = Read(Pc++);
             byte highByte = Read(Pc++);
             address = (ushort)((highByte << 8) | lowByte);
+            return false;
         }
 
         //Absolute Indexed  a,x     Cycles: 4+
-        private void AbsX()
+        private bool AbsX()
         {
             byte lowByte = Read(Pc++);
             byte highByte = Read(Pc++);
@@ -209,11 +235,13 @@ namespace project_nes
                 );
 
             if ((address & 0xFF00) != (highByte << 8))
-                additionalCycles++;
+                return true;
+            else
+                return false;
         }
 
         //Absolute Indexed  a,y     Cycles: 4+
-        private void AbsY()
+        private bool AbsY()
         {
             byte lowByte = Read(Pc++);
             byte highByte = Read(Pc++);
@@ -223,33 +251,37 @@ namespace project_nes
                 );
 
             if ((address & 0xFF00) != (highByte << 8))
-                additionalCycles++;
+                return true;
+            else
+                return false;
         }
 
         //Accumulator       A       Cycles:
-        private void Acc()
+        private bool Acc()
         {
-            data = A;
+            return false;
         }
 
         //Immediate         #v      Cycles:
         // Data expected in the next (immediate) byte.
-        private void Imm()
+        private bool Imm()
         {
             address = Read(Pc++);
+            return false;
         }
 
 
         //Implicit                  Cycles:
         // No additional data required for the instruction
-        private void Imp()
+        private bool Imp()
         {
-            //do nothing
+            return false;
         }
 
 
+
         //Indirect          (a)     Cycles:
-        private void Ind()
+        private bool Ind()
         {
             byte lowByte = Read(Pc++);
             byte highByte = Read(Pc++);
@@ -262,21 +294,25 @@ namespace project_nes
             else
                 address = (ushort)
                     (Read(tempAddress + 1) << 8 | Read(tempAddress));
+
+            return false;
             
         }
 
         //Indexed Indirect  (d,x)   Cycles: 6
-        private void IndX()
+        private bool IndX()
         {
             byte temp = Read(Pc++);
             byte lowByte  = Read(temp + X & 0x00FF);
             byte highByte = Read(temp + X + 1 & 0x00FF);
 
             address = (ushort)((highByte << 8) | lowByte);
+
+            return false;
         }
 
         //Indirect Indexed  (d),y   Cycles: 5+
-        private void IndY()
+        private bool IndY()
         {
             byte temp = Read(Pc++);
             byte lowByte = Read(temp & 0x00FF);
@@ -285,7 +321,9 @@ namespace project_nes
             address = (ushort)(((highByte << 8) | lowByte) + Y);
 
             if ((address & 0xFF00) != (highByte << 8))
-                additionalCycles++;
+                return true;
+            else
+                return false;
         }
 
         //Relative         label    Cycles:
@@ -301,32 +339,40 @@ namespace project_nes
         If you need to move the program counter to a location greater or less than 127 bytes away from
         the current location, make a nearby JMP instruction, and move the program counter to the JMP line.
         */
-        private void Rel()
+        private bool Rel()
         {
             address = Read(Pc++);
-            if (address.isNegative())
+            if (address.IsNegative())
                 address |= 0x00FF;
+
+            return false;
         }
 
         //Zero Page         d       Cycles:
-        private void Zpg()
+        private bool Zpg()
         {
             address = Read(Pc++);
             address &= 0x00FF;
+
+            return false;
         }
 
         //Zero Page Indexed d,x     Cycles: 4
-        private void ZpX()
+        private bool ZpX()
         {
             address = (ushort)(Read(Pc++) + X);
             address &= 0x00FF;
+
+            return false;
         }
 
         //Zero Page Indexed d,y     Cycles: 4
-        private void ZpY()
+        private bool ZpY()
         {
             address = (ushort)(Read(Pc++) + Y);
             address &= 0x00FF;
+
+            return false;
         }
 
 
@@ -335,183 +381,456 @@ namespace project_nes
         // Opcodes
 
         //Add with Carry
-        private byte ADC()
+        private bool ADC()
         {
-            return 0;
+            return false;
         }
 
-        /**
-         * Logical AND
-         * A = A & M
-         * Flags: N, Z 
+        /** ANS - Logical AND
+         * 
+         * A logical AND is performed, bit by bit, on the accumulator 
+         * contents using the contents of a byte of memory.
          */
-        private void AND()
+        private bool AND()
         {
             Fetch();
             A &= data;
 
             SetFlags(
-                Flags.Z, A == 0,
-                Flags.N, A.isNegative()
+                Flags.Z, A.IsZero(),
+                Flags.N, A.IsNegative()
                 );
 
-            additionalCycles++;
+            return true;
         }
 
-        //Add with Carry
-        private byte ASL()
+        /** ASL - Artihmetic Shift Left
+         * 
+         * This operation shifts all the bits of the accumulator or memory contents one bit left. 
+         * Bit 0 is set to 0 and bit 7 is placed in the carry flag. 
+         * Flags: C, N, Z 
+         */
+        private bool ASL()
         {
-            return 0;
+            Fetch();
+            ushort temp = (ushort)(data << 1); 
+            SetFlags(
+                Flags.C, temp.GetPage() > 0,
+                Flags.Z, (temp & 0x00FF) == 0,
+                Flags.N, temp.IsNegative()
+                );
+
+            if (CurrentModeImplicit())
+                A = (byte)(temp & 0x00FF);
+            else
+                Write(address, (byte)(temp & 0x00FF));
+
+            return false;
         }
 
-        //Add with Carry
-        private byte BCC()
+        /** BCC - Branch if Carry Clear
+         * 
+         * If the carry flag is clear then add the relative displacement to the 
+         * program counter to cause a branch to a new location.
+         */
+        private bool BCC()
         {
-            return 0;
+            if (GetFlag(Flags.C) == 0)
+            {
+                Pc += address;
+
+                // Add one cycle if same page, two for page change
+                cycles += address.GetPage() == Pc.GetPage()
+                    ? 1
+                    : 2;
+            }
+            return false;
         }
 
-        //Add with Carry
-        private byte BCS()
+        /** BCS - Branch if Carry Set
+         * 
+         * If the carry flag is set then add the relative displacement to the 
+         * program counter to cause a branch to a new location.
+         */
+        private bool BCS()
         {
-            return 0;
+            if (GetFlag(Flags.C) == 1)
+            {
+                cycles++;
+                address += Pc;
+
+                if (address.GetPage() != Pc.GetPage())
+                    cycles++;
+
+                Pc = address;
+            }
+            return false;
         }
 
-        //Add with Carry
-        private byte BEQ()
+
+        /** BEQ - Branch if Equal
+         * 
+         * If the zero flag is set then add the relative displacement to the 
+         * program counter to cause a branch to a new location.
+         */
+        private bool BEQ()
         {
-            return 0;
+            if (GetFlag(Flags.Z) == 1)
+            {
+                cycles++;
+                address += Pc;
+
+                if (address.GetPage() != Pc.GetPage())
+                    cycles++;
+
+                Pc = address;
+            }
+            return false;
         }
 
-        //Add with Carry
-        private byte BIT()
+        /** BIT - Bit Test
+         * 
+         * This instructions is used to test if one or more bits are set in a target memory location. 
+         * The mask pattern in A is ANDed with the value in memory to set or clear the zero flag, 
+         * but the result is not kept. 
+         * 
+         * Bits 7 and 6 of the value from memory are copied into the N and V flags.
+         */
+        private bool BIT()
         {
-            return 0;
+            Fetch();
+            byte temp = (byte)(A & data);
+
+            SetFlags(
+                Flags.Z, temp.IsZero(),
+                Flags.N, data.IsNegative(),
+                Flags.V, (data & 1 << 6) > 0
+                );
+            return false;
         }
 
-        //Add with Carry
-        private byte BMI()
+        /** BMI - Branch if Minus
+         * 
+         * If the negative flag is set then add the relative displacement to the 
+         * program counter to cause a branch to a new location.
+         */
+        private bool BMI()
         {
-            return 0;
+            if (GetFlag(Flags.N) == 1)
+            {
+                cycles++;
+                address += Pc;
+
+                if (address.GetPage() != Pc.GetPage())
+                    cycles++;
+
+                Pc = address;
+            }
+            return false;
         }
 
-        //Add with Carry
-        private byte BNE()
+        /** BNE - Branch if Not Equal
+         * 
+         * If the zero flag is clear then add the relative displacement to the 
+         * program counter to cause a branch to a new location.
+         */
+        private bool BNE()
         {
-            return 0;
+            if (GetFlag(Flags.Z) == 1)
+            {
+                cycles++;
+                address += Pc;
+
+                if (address.GetPage() != Pc.GetPage())
+                    cycles++;
+
+                Pc = address;
+            }
+            return false;
         }
 
-        //Add with Carry
-        private byte BPL()
+        /** BPL - Branch if Positive
+         * 
+         * If the negative flag is clear then add the relative displacement to the 
+         * program counter to cause a branch to a new location.
+         */
+        private bool BPL()
         {
-            return 0;
+            if (GetFlag(Flags.N) == 0)
+            {
+                cycles++;
+                address += Pc;
+
+                if (address.GetPage() != Pc.GetPage())
+                    cycles++;
+
+                Pc = address;
+            }
+            return false;
         }
 
-        //Add with Carry
-        private byte BRK()
+        /** BRK - Force Interrupt
+         * 
+         * The BRK instruction forces the generation of an interrupt request. 
+         * The program counter and processor status are pushed on the stack 
+         * then the IRQ interrupt vector at $FFFE/F is loaded into the PC 
+         * and the break flag in the status set to one.
+         */
+        private bool BRK()
         {
-            return 0;
+            Pc++;
+            SetFlags(Flags.I, true);
+            byte highByte  = (byte)((Pc & 0xFF00) >> 8);
+            byte lowByte = (byte)(Pc & 0x00FF);
+            Write(((ushort)(stkBase + Stkp--)), highByte);
+            Write(((ushort)(stkBase + Stkp--)), lowByte);
+            Write(((ushort)(stkBase + Stkp--)), Status);
+
+            Pc = (ushort)(Read(0xFFFE) | Read(0xFFF) << 8);
+
+            SetFlags(Flags.B, true);
+
+            return false;
         }
 
-        //Add with Carry
-        private byte BVC()
+        /** BVC - Branch if Overflow Clear
+         * 
+         * If the overflow flag is clear then add the relative displacement to the 
+         * program counter to cause a branch to a new location.
+         */
+        private bool BVC()
         {
-            return 0;
+            if (GetFlag(Flags.V) == 0)
+            {
+                cycles++;
+                address += Pc;
+
+                if (address.GetPage() != Pc.GetPage())
+                    cycles++;
+
+                Pc = address;
+            }
+            return false;
         }
 
-        //Add with Carry
-        private byte BVS()
+        /** BVS - Branch if Overflow Set
+         * 
+         * If the overflow flag is set then add the relative displacement to the 
+         * program counter to cause a branch to a new location.
+         */
+        private bool BVS()
         {
-            return 0;
+            if (GetFlag(Flags.V) == 1)
+            {
+                cycles++;
+                address += Pc;
+
+                if (address.GetPage() != Pc.GetPage())
+                    cycles++;
+
+                Pc = address;
+            }
+            return false;
         }
 
-        //Add with Carry
-        private byte CLC()
+        /** CLC - Clear Carry Flag
+         * 
+         * Set the carry flag to zero.
+         */
+        private bool CLC()
         {
-            return 0;
+            SetFlags(Flags.C, false);
+            return false;
         }
 
-        //Add with Carry
-        private byte CLD()
+        /** CLD - Clear Decimal Flag
+         */
+        private bool CLD()
         {
-            return 0;
+            SetFlags(Flags.D, false);
+            return false;
         }
 
-        //Add with Carry
-        private byte CID()
+        /**
+         * CID - Clear Interrupt Flag
+         */
+        private bool CID()
         {
-            return 0;
+            SetFlags(Flags.I, false);
+            return false;
         }
 
-        //Add with Carry
-        private byte CLV()
+        /** CLV - Clear Overflow Flag
+         */
+        private bool CLV()
         {
-            return 0;
+            SetFlags(Flags.V, false);
+            return false;
         }
 
-        //Add with Carry
-        private byte CMP()
+        /** CMP - compare
+         * 
+         * This instruction compares the contents of the accumulator with another memory 
+         * held value and sets the zero and carry flags as appropriate.
+         */
+        private bool CMP()
         {
-            return 0;
+            Fetch();
+            SetFlags(
+                Flags.C, A >= data,
+                Flags.Z, A == data,
+                Flags.N, data.IsNegative()
+                );
+
+            return true;
         }
 
-        //Add with Carry
-        private byte CPX()
+        /** CPX - Compare X Register
+         * 
+         * This instruction compares the contents of the X register with another memory 
+         * held value and sets the zero and carry flags as appropriate.
+         */
+        private bool CPX()
         {
-            return 0;
+            Fetch();
+            SetFlags(
+                Flags.C, X >= data,
+                Flags.Z, X == data,
+                Flags.N, data.IsNegative()
+                );
+
+            return false;
         }
 
-        //Add with Carry
-        private byte CPY()
+        /** CPY - Compare X Register
+         * 
+         * This instruction compares the contents of the X register with another memory 
+         * held value and sets the zero and carry flags as appropriate.
+         */
+        private bool CPY()
         {
-            return 0;
+            Fetch();
+            SetFlags(
+                Flags.C, Y >= data,
+                Flags.Z, Y == data,
+                Flags.N, data.IsNegative()
+                );
+
+            return false;
         }
 
-        //Add with Carry
-        private byte DEC()
+        /** DEC Decrement Memory
+         * 
+         * Subtracts one from the value held at a specified memory location setting 
+         * the zero and negative flags as appropriate.
+         */
+        private bool DEC()
         {
-            return 0;
+            Fetch();
+            Write(address, (byte)(data - 1));
+            SetFlags(
+                Flags.Z, Read(address).IsZero(),
+                Flags.N, Read(address).IsNegative()
+                );
+            return false;
         }
 
-        //Add with Carry
-        private byte DEX()
+        /** Decrement X
+         * Subtracts one from the value held at X setting 
+         * the zero and negative flags as appropriate.
+         */
+        private bool DEX()
         {
-            return 0;
+            X--;
+            SetFlags(
+                Flags.Z, X.IsZero(),
+                Flags.N, X.IsNegative()
+                );
+            return false;
         }
 
-        //Add with Carry
-        private byte DEY()
+        /** DEY Decrement Y
+         * 
+         * Subtracts one from the value held at Y setting 
+         * the zero and negative flags as appropriate.
+         */
+        private bool DEY()
         {
-            return 0;
+            Y--;
+            SetFlags(
+                Flags.Z, Y.IsZero(),
+                Flags.N, Y.IsNegative()
+                );
+            return false;
         }
 
-        //Add with Carry
-        private byte EOR()
+
+        private bool EOR()
         {
-            return 0;
+            Fetch();
+            A = (byte)(A ^ data);
+            SetFlags(
+                Flags.Z, A.IsZero(),
+                Flags.N, A.IsNegative()
+                );
+            return true;
         }
 
-        //Add with Carry
-        private byte INC()
+        /** INC - Increment Memory
+         * 
+         * Adds one to the value held at a specified memory location setting 
+         * the zero and negative flags as appropriate.
+         */
+        private bool INC()
         {
-            return 0;
+            Fetch();
+            Write(address, (byte)(data + 1));
+            SetFlags(
+                Flags.Z, Read(address).IsZero(),
+                Flags.N, Read(address).IsNegative()
+                );
+            return false;
         }
 
-        //Add with Carry
-        private byte INX()
+        /** INX - Increment X
+         * 
+         * Adds one to the value held at X setting 
+         * the zero and negative flags as appropriate.
+         */
+        private bool INX()
         {
-            return 0;
+            X++;
+            SetFlags(
+                Flags.Z, X.IsZero(),
+                Flags.N, X.IsNegative()
+                );
+            return false;
         }
 
-        //Add with Carry
-        private byte INY()
+        /** INY - Increment Y
+         * 
+         * Adds one to the value held at Y setting 
+         * the zero and negative flags as appropriate.
+         */
+        private bool INY()
         {
-            return 0;
+            Y++;
+            SetFlags(
+                Flags.Z, Y.IsZero(),
+                Flags.N, Y.IsNegative()
+                );
+            return false;
         }
 
-        //Add with Carry
-        private byte JMP()
+        /** JMP - Jump
+         * 
+         * Sets the program counter to the address specified by the operand.
+         */
+        private bool JMP()
         {
-            return 0;
+            Fetch();
+            Pc = data;
+            return false;
         }
 
         //Add with Carry
@@ -520,170 +839,357 @@ namespace project_nes
             return 0;
         }
 
-        //Add with Carry
-        private byte LDA()
+        /** Load the Accumuator
+         */
+        private bool LDA()
         {
-            return 0;
+            Fetch();
+            A = data;
+            SetFlags(
+                Flags.Z, A.IsZero(),
+                Flags.N, A.IsNegative()
+                );
+            return true;
+
         }
 
-        //Add with Carry
-        private byte LDX()
+        /** Load X
+         */
+        private bool LDX()
         {
-            return 0;
+            Fetch();
+            X = data;
+            SetFlags(
+                Flags.Z, X.IsZero(),
+                Flags.N, X.IsNegative()
+                );
+            return true;
+
         }
 
-        //Add with Carry
-        private byte LDY()
+        /** Load Y
+         */
+        private bool LDY()
         {
-            return 0;
+            Fetch();
+            Y = data;
+            SetFlags(
+                Flags.Z, Y.IsZero(),
+                Flags.N, Y.IsNegative()
+                );
+            return true;
         }
 
-        //Add with Carry
-        private byte LSR()
+        /** LSR - Logical Shift Right
+         * 
+         * Each of the bits in A or M is shift one place to the right. 
+         * The bit that was in bit 0 is shifted into the carry flag. 
+         * Bit 7 is set to zero.
+         * 
+         */
+        private bool LSR()
         {
-            return 0;
+            Fetch();
+            byte temp = (byte)(data >> 1);
+            SetFlags(
+                Flags.C, (data & 0x01) == 1,
+                Flags.Z, temp.IsZero(),
+                Flags.N, temp.IsNegative()
+                );
+
+            if (CurrentModeImplicit())
+                A = temp;
+            else
+                Write(address, temp);
+
+            return false;
         }
 
-        //Add with Carry
-        private byte NOP()
+        /** No Op
+         */
+        private bool NOP()
         {
-            return 0;
+            return false;
         }
 
-        //Add with Carry
-        private byte ORA()
+        /** ORA - Logical Inclusive OR
+         * 
+         * An inclusive OR is performed, bit by bit, on the accumulator 
+         * contents using the contents of a byte of memory.
+         */
+        private bool ORA()
         {
-            return 0;
+            Fetch();
+            A |= data;
+            SetFlags(
+                Flags.Z, A.IsZero(),
+                Flags.N, A.IsNegative()
+                );
+            return true;
         }
 
-        //Add with Carry
-        private byte PHA()
+        /** PHA - Push Accumulator
+         * 
+         * Pushes a copy of the accumulator on to the stack
+         */
+        private bool PHA()
         {
-            return 0;
+            Write((ushort)(stkBase + Stkp--), A);
+            return false;
         }
 
-        //Add with Carry
-        private byte PHP()
+        /** PHP - Push Status
+         * 
+         * Pushes a copy of the staus register on to the stack
+         * todo: Read that break flag is set to 1 before push - investigate
+         */
+        private bool PHP()
         {
-            return 0;
+            Write((ushort)(stkBase + Stkp--), Status);
+            return false;
         }
 
-        //Add with Carry
-        private byte PLA()
+
+        /** PLA - Pop Accumulator
+         * 
+         * Pop the accumulator off of the stack
+         */
+        private bool PLA()
         {
-            return 0;
+            A = Read(stkBase + ++Stkp);
+            SetFlags(
+                Flags.Z, A.IsZero(),
+                Flags.N, A.IsNegative()
+                );
+            return false;
         }
 
-        //Add with Carry
-        private byte PLP()
+        /** PLP - Pop Status
+         * 
+         * Pop the staus register off of the stack
+         * todo: Read that U flag is set to 1 after pull - investigate
+         */
+        private bool PLP()
         {
-            return 0;
+            Status = Read(stkBase + ++Stkp);
+            return false;
         }
 
-        //Add with Carry
-        private byte ROL()
+        /** ROL - Rotate Left
+         * 
+         * Move each of the bits in either A or M one place to the left. 
+         * Bit 0 is filled with the current value of the carry flag whilst 
+         * the old bit 7 becomes the new carry flag value.
+         */
+        private bool ROL()
         {
-            return 0;
+            Fetch();
+            ushort temp = (ushort)((data << 1) | GetFlag(Flags.C));
+            SetFlags(
+                Flags.C, (temp & 0xFF00) > 0,
+                Flags.N, (temp & 0x00FF) == 0,
+                Flags.Z, temp.IsNegative()
+                );
+            if (CurrentModeImplicit())
+                A = (byte)(temp & 0x00FF);
+            else
+                Write(address, (byte)(temp & 0x00FF));
+            return false;
         }
 
-        //Add with Carry
-        private byte ROR()
+        /** ROR - Rotate Right
+         * 
+         * Move each of the bits in either A or M one place to the right. 
+         * Bit 7 is filled with the current value of the carry flag 
+         * whilst the old bit 0 becomes the new carry flag value.
+         * 
+         */
+        private bool ROR()
         {
-            return 0;
+            Fetch();
+            ushort temp = (ushort)(GetFlag(Flags.C) << 7 | data >> 1);
+            SetFlags(
+                Flags.C, (data & 0x0001) == 1,
+                Flags.N, (temp & 0x00FF) == 0,
+                Flags.Z, temp.IsNegative()
+                );
+            if (CurrentModeImplicit())
+                A = (byte)(temp & 0x00FF);
+            else
+                Write(address, (byte)(temp & 0x00FF));
+            return false;
         }
 
-        //Add with Carry
-        private byte RFI()
+        /** RTI - Return from Interrupt
+         * 
+         * The RTI instruction is used at the end of an interrupt processing routine. 
+         * It pulls the processor flags from the stack followed by the program counter.
+         * todo: set U and B to not U and B?
+         */
+        private bool RFI()
         {
-            return 0;
+            Status = Read(stkBase + ++Stkp);
+            Pc = Read(stkBase + ++Stkp);
+            Pc |= (ushort)(Read(stkBase + ++Stkp) << 8);
+            return false;
         }
 
-        //Add with Carry
-        private byte RTS()
+        /** RTS - Return from Subroutine
+         * 
+         * The RTS instruction is used at the end of a subroutine to 
+         * return to the calling routine. 
+         * It pulls the program counter (minus one) from the stack.
+         */
+        private bool RTS()
         {
-            return 0;
+            Pc = Read(stkBase + ++Stkp);
+            Pc |= (ushort)(Read(stkBase + ++Stkp) << 8);
+            Pc++;
+            return false;
         }
 
-        //Add with Carry
-        private byte SBC()
+        /** SBC - Subtract with Carry
+         * 
+         */
+        private bool SBC()
         {
-            return 0;
+            return false;
         }
 
-        //Add with Carry
-        private byte SEC()
+        /** SEC - Set Carry Flag
+         * 
+         */
+        private bool SEC()
         {
-            return 0;
+            SetFlags(Flags.C, true);
+            return false;
         }
 
-        //Add with Carry
-        private byte SED()
+        /** SED - Set Decimal Flag
+         * 
+         */
+        private bool SED()
         {
-            return 0;
+            SetFlags(Flags.D, true);
+            return false;
         }
 
-        //Add with Carry
-        private byte SEI()
+        /** SEI - Set Interrupt Disable Flag
+         * 
+         */
+        private bool SEI()
         {
-            return 0;
+            SetFlags(Flags.I, true);
+            return false;
         }
 
-        //Add with Carry
-        private byte STA()
+        /** STA - Store Accumulator
+         * 
+         * Stores the contents of the accumulator into memory.
+         */
+        private bool STA()
         {
-            return 0;
+            Write(address, A);
+            return false;
         }
 
-        //Add with Carry
-        private byte STX()
+        /** STX - Store X
+         * 
+         */
+        private bool STX()
         {
-            return 0;
+            Write(address, X);
+            return false;
         }
 
-        //Add with Carry
-        private byte STY()
+        /** STY - Store Y
+         * 
+         */
+        private bool STY()
         {
-            return 0;
+            Write(address, Y);
+            return false;
         }
 
-        //Add with Carry
-        private byte TAX()
+        /** TAX - Transfer A to X
+         * 
+         */
+        private bool TAX()
         {
-            return 0;
+            X = A;
+            SetFlags(
+                Flags.N, X == 0,
+                Flags.Z, X.IsNegative()
+                );
+            return false;
         }
 
-        //Add with Carry
-        private byte TAY()
+        /** TAY - Transfer A to Y
+         * 
+         */
+        private bool TAY()
         {
-            return 0;
+            Y = A;
+            SetFlags(
+                Flags.N, Y == 0,
+                Flags.Z, Y.IsNegative()
+                );
+            return false;
         }
 
-        //Add with Carry
-        private byte TSX()
+        /** TSX - Transfer Stackp to X
+         * 
+         */
+        private bool TSX()
         {
-            return 0;
+            X = Stkp;
+            SetFlags(
+                Flags.N, X == 0,
+                Flags.Z, X.IsNegative()
+                );
+            return false;
         }
 
-        //Add with Carry
-        private byte TXA()
+        /** TXA - Transfer X to A
+         * 
+         */
+        private bool TXA()
         {
-            return 0;
+            A = X;
+            SetFlags(
+                Flags.N, A == 0,
+                Flags.Z, A.IsNegative()
+                );
+            return false;
         }
 
-        //Add with Carry
-        private byte TXS()
+        /** TXS - Transfer X to Stackp
+         * 
+         */
+        private bool TXS()
         {
-            return 0;
+            Stkp = X;
+            return false;
         }
 
-        //Add with Carry
-        private byte TYA()
+        /** TYA - Transfer Y to A
+         * 
+         */
+        private bool TYA()
         {
-            return 0;
+            A = Y;
+            SetFlags(
+                Flags.N, A == 0,
+                Flags.Z, A.IsNegative()
+                );
+            return false;
         }
 
-        //Unofficial/unknown opcode
-        private byte UNK() => NOP();
+
+        /**UNK - Unofficial/unknown opcode
+         * 
+         */
+        private bool UNK() => NOP();
 
 
 
@@ -691,7 +1197,7 @@ namespace project_nes
 
         private struct Instruction
         {
-            public Instruction(Func<byte> op, Action addrm, int cycles)
+            public Instruction(Func<bool> op, Func<bool> addrm, int cycles)
             {
                 Operation = op;
                 AddrMode = addrm;
@@ -701,9 +1207,9 @@ namespace project_nes
 
             public string Name { get; }
 
-            public Func<byte> Operation { get; }
+            public Func<bool> Operation { get; }
 
-            public Action AddrMode { get; }
+            public Func<bool> AddrMode { get; }
 
             public int Cycles { get; }
         }
@@ -723,7 +1229,7 @@ namespace project_nes
                 =>ins.GetEnumerator();
             
 
-            public void Add(Func<byte> op, Action addrm, int cycles)
+            public void Add(Func<bool> op, Func<bool> addrm, int cycles)
                 => ins.Add(new Instruction(op, addrm, cycles));
 
             public Instruction this[int i]    // Indexer declaration  

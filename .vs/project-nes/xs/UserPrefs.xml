@@ -3,10 +3,11 @@
   <MonoDevelop.Ide.Workbench>
     <Files>
       <File FileName="project-nes/Program.cs" Line="20" Column="26" />
-      <File FileName="project-nes/iBus.cs" Line="14" Column="11" />
-      <File FileName="project-nes/iCPU.cs" Line="9" Column="20" />
-      <File FileName="project-nes/Bus.cs" Line="32" Column="55" />
-      <File FileName="project-nes/CPU.cs" Line="208" Column="1" />
+      <File FileName="project-nes/iBus.cs" />
+      <File FileName="project-nes/iCPU.cs" />
+      <File FileName="project-nes/Bus.cs" />
+      <File FileName="project-nes/CPU.cs" Line="1166" Column="21" />
+      <File FileName="project-nes/ExtensionMethods.cs" Line="16" Column="80" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -17,11 +18,6 @@
             </Node>
             <Node name="project-nes-tests" expanded="True" />
           </Node>
-        </State>
-      </Pad>
-      <Pad Id="MonoDevelop.UnitTesting.TestPad">
-        <State name="__root__">
-          <Node name="project-nes" expanded="True" selected="True" />
         </State>
       </Pad>
     </Pads>
