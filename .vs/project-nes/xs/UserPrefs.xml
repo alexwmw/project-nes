@@ -2,19 +2,18 @@
   <MonoDevelop.Ide.ItemProperties.project-nes PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.Workbench>
     <Files>
-      <File FileName="project-nes/Program.cs" Line="20" Column="26" />
-      <File FileName="project-nes/iBus.cs" />
-      <File FileName="project-nes/iCPU.cs" />
-      <File FileName="project-nes/Bus.cs" />
-      <File FileName="project-nes/CPU.cs" Line="1166" Column="21" />
-      <File FileName="project-nes/ExtensionMethods.cs" Line="16" Column="80" />
+      <File FileName="project-nes/Program.cs" Line="14" Column="39" />
+      <File FileName="project-nes/Cartridge.cs" Line="9" Column="6" />
+      <File FileName="project-nes/Bus.cs" Line="19" Column="53" />
+      <File FileName="project-nes/CPU.cs" Line="192" Column="22" />
+      <File FileName="project-nes/HelperMethods.cs" Line="20" Column="75" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="project-nes" expanded="True">
             <Node name="project-nes" expanded="True">
-              <Node name="CPU.cs" selected="True" />
+              <Node name="Cartridge.cs" selected="True" />
             </Node>
             <Node name="project-nes-tests" expanded="True" />
           </Node>

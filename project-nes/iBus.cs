@@ -6,6 +6,7 @@ namespace project_nes
         void Write(ushort address, byte data);
         byte Read(ushort address);
 
+
         /*
         void ConnectRam(byte[] ram);
         void ConnectApu();

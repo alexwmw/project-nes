@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using ExtensionMethods;
+using HelperMethods;
+using static HelperMethods.StaticMethods;
 
 
 namespace project_nes
@@ -13,12 +12,22 @@ namespace project_nes
 
         // Fields
 
-        private const ushort stkBase = 0x0100;
+        //6502 Registers
+        private byte A;                     // Accumulator
+        private byte X;                     // X Register
+        private byte Y;                     // Y register
+        private byte status;                // Status byte
+        private byte stkp;                  // Stack pointer
+        private ushort PC;                  // Program counter
+
+        //Emulation variables
         private byte opcode;                // Current instruction byte
         private byte data;                  // Fetched data
+        private ushort address;             // Fetched address
+        private ushort branch;              // Fetched branch operand
         private int cycles;                 // Cycles required by current instruction
-        private ushort address;             // Fetched Address
         private int clock_count;            // Total number of clock cycles passed
+
         private iBus bus;
         private InstructionSet instructionSet;
 
@@ -26,13 +35,6 @@ namespace project_nes
 
         public CPU()
         {
-            A = 0;
-            X = 0;
-            Y = 0;
-            Stkp = 0;
-            Pc = 0;
-            Status = 0;
-
             /* This will be a 16 * 16 length list 
              * (inside an IEnumerable class object 'InstructionSet')
              * 
@@ -44,7 +46,23 @@ namespace project_nes
              */
             instructionSet = new InstructionSet()
             {
-                {ADC, Imp, 4}
+              //----- 0 -----  ----- 1 -----  ----- 2 -----  ----- 3 -----  ----- 4 -----  ----- 5 -----  ----- 6 -----  ----- 7 -----  ----- 8 -----  ----- 9 -----  ----- A -----  ----- B -----  ----- C -----  ----- D -----  ----- E -----  ----- F -----  
+                {BRK, Imm, 7}, {ORA, InX, 6}, {UNK, Imp, 2}, {UNK, Imp, 8}, {NOP, Imp, 3}, {ORA, Zpg, 3}, {ASL, Zpg, 5}, {UNK, Imp, 5}, {PHP, Imp, 3}, {ORA, Imm, 2}, {ASL, Imp, 2}, {UNK, Imp, 2}, {NOP, Imp, 4}, {ORA, Abs, 4}, {ASL, Abs, 6}, {UNK, Imp, 6}, // 0
+                {BPL, Rel, 2}, {ORA, InY, 5}, {UNK, Imp, 2}, {UNK, Imp, 8}, {NOP, Imp, 4}, {ORA, ZpX, 4}, {ASL, ZpX, 6}, {UNK, Imp, 6}, {CLC, Imp, 2}, {ORA, AbY, 4}, {NOP, Imp, 2}, {UNK, Imp, 7}, {NOP, Imp, 4}, {ORA, AbX, 4}, {ASL, AbX, 7}, {UNK, Imp, 7}, // 1
+                {JSR, Abs, 6}, {AND, InX, 6}, {UNK, Imp, 2}, {UNK, Imp, 8}, {BIT, Zpg, 3}, {AND, Zpg, 3}, {ROL, Zpg, 5}, {UNK, Imp, 5}, {PLP, Imp, 4}, {AND, Imm, 2}, {ROL, Imp, 2}, {UNK, Imp, 2}, {BIT, Abs, 4}, {AND, Abs, 4}, {ROL, Abs, 6}, {UNK, Imp, 6}, // 2
+                {BMI, Rel, 2}, {AND, InY, 5}, {UNK, Imp, 2}, {UNK, Imp, 8}, {NOP, Imp, 4}, {AND, ZpX, 4}, {ROL, ZpX, 6}, {UNK, Imp, 6}, {SEC, Imp, 2}, {AND, AbY, 4}, {NOP, Imp, 2}, {UNK, Imp, 7}, {NOP, Imp, 4}, {AND, AbX, 4}, {ROL, AbX, 7}, {UNK, Imp, 7}, // 3
+                {RTI, Imp, 6}, {EOR, InX, 6}, {UNK, Imp, 2}, {UNK, Imp, 8}, {NOP, Imp, 3}, {EOR, Zpg, 3}, {LSR, Zpg, 5}, {UNK, Imp, 5}, {PHA, Imp, 3}, {EOR, Imm, 2}, {LSR, Imp, 2}, {UNK, Imp, 2}, {JMP, Abs, 3}, {EOR, Abs, 4}, {LSR, Abs, 6}, {UNK, Imp, 6}, // 4
+                {BVC, Rel, 2}, {EOR, InY, 5}, {UNK, Imp, 2}, {UNK, Imp, 8}, {NOP, Imp, 4}, {EOR, ZpX, 4}, {LSR, ZpX, 6}, {UNK, Imp, 6}, {CLI, Imp, 2}, {EOR, AbY, 4}, {NOP, Imp, 2}, {UNK, Imp, 7}, {NOP, Imp, 4}, {EOR, AbX, 4}, {LSR, AbX, 7}, {UNK, Imp, 7}, // 5
+                {RTS, Imp, 6}, {ADC, InX, 6}, {UNK, Imp, 2}, {UNK, Imp, 8}, {NOP, Imp, 3}, {ADC, Zpg, 3}, {ROR, Zpg, 5}, {UNK, Imp, 5}, {PLA, Imp, 4}, {ADC, Imm, 2}, {ROR, Imp, 2}, {UNK, Imp, 2}, {JMP, Ind, 5}, {ADC, Abs, 4}, {ROR, Abs, 6}, {UNK, Imp, 6}, // 6
+                {BVS, Rel, 2}, {ADC, InY, 5}, {UNK, Imp, 2}, {UNK, Imp, 8}, {NOP, Imp, 4}, {ADC, ZpX, 4}, {ROR, ZpX, 6}, {UNK, Imp, 6}, {SEI, Imp, 2}, {ADC, AbY, 4}, {NOP, Imp, 2}, {UNK, Imp, 7}, {NOP, Imp, 4}, {ADC, AbX, 4}, {ROR, AbX, 7}, {UNK, Imp, 7}, // 7
+                {NOP, Imp, 2}, {STA, InX, 6}, {NOP, Imp, 2}, {UNK, Imp, 6}, {STY, Zpg, 3}, {STA, Zpg, 3}, {STX, Zpg, 3}, {UNK, Imp, 3}, {DEY, Imp, 2}, {NOP, Imp, 2}, {TXA, Imp, 2}, {UNK, Imp, 2}, {STY, Abs, 4}, {STA, Abs, 4}, {STX, Abs, 4}, {UNK, Imp, 4}, // 8
+                {BCC, Rel, 2}, {STA, InY, 6}, {UNK, Imp, 2}, {UNK, Imp, 6}, {STY, ZpX, 4}, {STA, ZpX, 4}, {STX, ZpY, 4}, {UNK, Imp, 4}, {TYA, Imp, 2}, {STA, AbY, 5}, {TXS, Imp, 2}, {UNK, Imp, 5}, {NOP, Imp, 5}, {STA, AbX, 5}, {UNK, Imp, 5}, {UNK, Imp, 5}, // 9
+                {LDY, Imm, 2}, {LDA, InX, 6}, {LDX, Imm, 2}, {UNK, Imp, 6}, {LDY, Zpg, 3}, {LDA, Zpg, 3}, {LDX, Zpg, 3}, {UNK, Imp, 3}, {TAY, Imp, 2}, {LDA, Imm, 2}, {TAX, Imp, 2}, {UNK, Imp, 2}, {LDY, Abs, 4}, {LDA, Abs, 4}, {LDX, Abs, 4}, {UNK, Imp, 4}, // A
+                {BCS, Rel, 2}, {LDA, InY, 5}, {UNK, Imp, 2}, {UNK, Imp, 5}, {LDY, ZpX, 4}, {LDA, ZpX, 4}, {LDX, ZpY, 4}, {UNK, Imp, 4}, {CLV, Imp, 2}, {LDA, AbY, 4}, {TSX, Imp, 2}, {UNK, Imp, 4}, {LDY, AbX, 4}, {LDA, AbX, 4}, {LDX, AbY, 4}, {UNK, Imp, 4}, // B
+                {CPY, Imm, 2}, {CMP, InX, 6}, {NOP, Imp, 2}, {UNK, Imp, 8}, {CPY, Zpg, 3}, {CMP, Zpg, 3}, {DEC, Zpg, 5}, {UNK, Imp, 5}, {INY, Imp, 2}, {CMP, Imm, 2}, {DEX, Imp, 2}, {UNK, Imp, 2}, {CPY, Abs, 4}, {CMP, Abs, 4}, {DEC, Abs, 6}, {UNK, Imp, 6}, // C
+                {BNE, Rel, 2}, {CMP, InY, 5}, {UNK, Imp, 2}, {UNK, Imp, 8}, {NOP, Imp, 4}, {CMP, ZpX, 4}, {DEC, ZpX, 6}, {UNK, Imp, 6}, {CLD, Imp, 2}, {CMP, AbY, 4}, {NOP, Imp, 2}, {UNK, Imp, 7}, {NOP, Imp, 4}, {CMP, AbX, 4}, {DEC, AbX, 7}, {UNK, Imp, 7}, // D
+                {CPX, Imm, 2}, {SBC, InX, 6}, {NOP, Imp, 2}, {UNK, Imp, 8}, {CPX, Zpg, 3}, {SBC, Zpg, 3}, {INC, Zpg, 5}, {UNK, Imp, 5}, {INX, Imp, 2}, {SBC, Imm, 2}, {NOP, Imp, 2}, {SBC, Imp, 2}, {CPX, Abs, 4}, {SBC, Abs, 4}, {INC, Abs, 6}, {UNK, Imp, 6}, // E
+                {BEQ, Rel, 2}, {SBC, InY, 5}, {UNK, Imp, 2}, {UNK, Imp, 8}, {NOP, Imp, 4}, {SBC, ZpX, 4}, {INC, ZpX, 6}, {UNK, Imp, 6}, {SED, Imp, 2}, {SBC, AbY, 4}, {NOP, Imp, 2}, {UNK, Imp, 7}, {NOP, Imp, 4}, {SBC, AbX, 4}, {INC, AbX, 7}, {UNK, Imp, 7}, // F
             };
         }
 
@@ -64,24 +82,13 @@ namespace project_nes
         };
 
 
-        // Properties
-
-        private byte A { get; set; }        // Accumulator
-        private byte X { get; set; }        // X Register
-        private byte Y { get; set; }        // Y register
-        private byte Stkp { get; set; }     // Stack pointer
-        private ushort Pc { get; set; }     // Program counter
-        private byte Status { get; set; }   // Status byte
-
-
-
         // Public Methods
 
         public void Clock()
         {
             if(cycles == 0)
             {
-                opcode = Read(Pc);
+                opcode = Read(PC);
                 Instruction current = instructionSet[opcode];
 
                 cycles += current.Cycles;
@@ -95,56 +102,75 @@ namespace project_nes
             cycles--;
         }
 
+
+        public void Irq()
+        {
+            if (GetFlag(Flags.I) == 0)
+            {
+                //Push PC to stack
+                Write(((ushort)(0x0100 + stkp--)), PC.GetPage());
+                Write(((ushort)(0x0100 + stkp--)), PC.GetOffset());
+
+                //Clear B, set I, U; and push status to stack
+                SetFlags(
+                    Flags.B, false,
+                    Flags.I, true,
+                    Flags.U, true);
+                Write(((ushort)(0x0100 + stkp--)), status);
+
+                //Load interrupt vector from $FFFE/F 
+                PC = LittleEndian(Read(0xFFFE), Read(0xFFFF));
+
+                cycles += 7;
+            }
+        }
+
+        public void Nmi()
+        {
+            //Push PC to stack
+            Write(((ushort)(0x0100 + stkp--)), PC.GetPage());
+            Write(((ushort)(0x0100 + stkp--)), PC.GetOffset());
+
+            //Clear B, set I, U; and push status to stack
+            SetFlags(
+                Flags.B, false,
+                Flags.I, true,
+                Flags.U, true);
+            Write(((ushort)(0x0100 + stkp--)), status);
+
+            //Load interrupt vector from $FFFE/F 
+            PC = LittleEndian(Read(0xFFFA), Read(0xFFFB));
+
+            cycles += 8;
+        }
+
+        public void Reset()
+        {
+            //Set PC
+            PC = LittleEndian(Read(0xFFFC), Read(0xFFFD));
+
+            //Reset registers
+            A = X = Y = 0;
+            stkp = 0xFF;
+            status |= (byte)(Flags.U);
+
+            //Reset variables
+            address = branch = data = 0;
+
+            cycles += 8;
+        }
+
+        public void PowerOn()
+        {
+            throw new NotImplementedException();
+        }
+
         public void ConnectBus(iBus bus)
         {
             this.bus = bus;
         }
 
-        public void Irq()
-        {
-            throw new NotImplementedException();
-        }
 
-        public void Nmi()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Reset()
-        {
-            throw new NotImplementedException();
-        }
-
-
-        //Public TestOpCode function for testing
-        public byte TestOpCode(string opcode)
-        {
-            try
-            {
-                MethodInfo mi = this.GetType().GetMethod(opcode);
-                return (byte)mi.Invoke(this, null);
-            }
-            catch (AmbiguousMatchException e)
-            {
-                Console.WriteLine("Unknown Opcode");
-                throw e;
-            }
-        }
-
-        //Public AddrMode function for testing
-        public byte TestAddrMode(string addrmode)
-        {
-            try
-            {
-                MethodInfo mi = this.GetType().GetMethod(addrmode);
-                return (byte)mi.Invoke(null, null);
-            }
-            catch (AmbiguousMatchException e)
-            {
-                Console.WriteLine("Unknown Addressing Mode");
-                throw e;
-            }
-        }
 
 
         // Private Methods
@@ -154,43 +180,40 @@ namespace project_nes
 
 
         private byte Read(int address)
-            => address >= 0 & address <= 0xFFFF
-            ? bus.Read((ushort)address)
-            : throw new ArgumentOutOfRangeException(
-                $"Invalid address in CPU Read(int address). Address must be between 0 and 0xFFFF. Argument: {address}");
+            => bus.Read((ushort)((ushort)address & 0xFFFF));
+
 
         private void Write(ushort address, byte data)
             => bus.Write(address, data);
 
         private byte GetFlag(Flags f)
-            => (byte)(Status & (byte)f);
+            => (byte)(status & (byte)f);
 
         private void SetFlags(Flags f, bool b)
         {
             if (b)
-                Status |= (byte)f;
+                status |= (byte)f;
             else
-                Status &= (byte)~f;
+                status &= (byte)~f;
         }
 
         private void SetFlags(Flags f1, bool b1, Flags f2, bool b2)
         {
-            if (b1) Status |= (byte)f1;
-            else    Status &= (byte)~f1;
-            if (b2) Status |= (byte)f2;
-            else    Status &= (byte)~f2;
+            if (b1) status |= (byte)f1;
+            else    status &= (byte)~f1;
+            if (b2) status |= (byte)f2;
+            else    status &= (byte)~f2;
         }
 
         private void SetFlags(Flags f1, bool b1, Flags f2, bool b2, Flags f3, bool b3)
         {
-            if (b1) Status |= (byte)f1;
-            else    Status &= (byte)~f1;
-            if (b2) Status |= (byte)f2;
-            else    Status &= (byte)~f2;
-            if (b3) Status |= (byte)f3;
-            else    Status &= (byte)~f3;
+            if (b1) status |= (byte)f1;
+            else    status &= (byte)~f1;
+            if (b2) status |= (byte)f2;
+            else    status &= (byte)~f2;
+            if (b3) status |= (byte)f3;
+            else    status &= (byte)~f3;
         }
-
 
         private void Fetch()
         {
@@ -201,14 +224,22 @@ namespace project_nes
         }
 
 
+        private void Log(Instruction current)
+        {
+
+
+
+            Console.WriteLine(
+                $"{PC}  {Read(PC)} {Read(PC + 1)} {Read(PC + 2)}  {current.Name} {(!CurrentModeImplicit() ? address : '_')}                       A:{A} X:{X} Y:{Y} P:?? SP:?? PPU:  ?, ? CYC:{clock_count}"
+                );
+        }
+
+
         private Func<bool> CurrentMode()
             => instructionSet[opcode].AddrMode;
 
         private bool CurrentModeImplicit()
             => CurrentMode() == Imp | CurrentMode() == Acc;
-
-
-     
 
 
         // Addressing modes
@@ -218,42 +249,30 @@ namespace project_nes
         // Addresses are little-endian
         private bool Abs()
         {
-            byte lowByte = Read(Pc++);
-            byte highByte = Read(Pc++);
-            address = (ushort)((highByte << 8) | lowByte);
+            byte lowByte  = Read(PC++);
+            byte highByte = Read(PC++);
+            address = LittleEndian(lowByte, highByte);
             return false;
         }
 
         //Absolute Indexed  a,x     Cycles: 4+
-        private bool AbsX()
+        private bool AbX()
         {
-            byte lowByte = Read(Pc++);
-            byte highByte = Read(Pc++);
-            address = (ushort)
-                (
-                ((highByte << 8) | lowByte) + X
-                );
-
-            if ((address & 0xFF00) != (highByte << 8))
-                return true;
-            else
-                return false;
+            byte lowByte  = Read(PC++);
+            byte highByte = Read(PC++);
+            address = LittleEndian(lowByte, highByte);
+            address += X;
+            return address.GetPage() != highByte;
         }
 
         //Absolute Indexed  a,y     Cycles: 4+
-        private bool AbsY()
+        private bool AbY()
         {
-            byte lowByte = Read(Pc++);
-            byte highByte = Read(Pc++);
-            address = (ushort)
-                (
-                ((highByte << 8) | lowByte) + Y
-                );
-
-            if ((address & 0xFF00) != (highByte << 8))
-                return true;
-            else
-                return false;
+            byte lowByte  = Read(PC++);
+            byte highByte = Read(PC++);
+            address = LittleEndian(lowByte, highByte);
+            address += Y;
+            return address.GetPage() != highByte;
         }
 
         //Accumulator       A       Cycles:
@@ -266,7 +285,7 @@ namespace project_nes
         // Data expected in the next (immediate) byte.
         private bool Imm()
         {
-            address = Read(Pc++);
+            address = Read(PC++);
             return false;
         }
 
@@ -283,47 +302,40 @@ namespace project_nes
         //Indirect          (a)     Cycles:
         private bool Ind()
         {
-            byte lowByte = Read(Pc++);
-            byte highByte = Read(Pc++);
-
-            ushort tempAddress = (ushort)((highByte << 8) | lowByte);
-
-            if (tempAddress == 0x00FF) // Simulate hardware bug
-                address = (ushort)
-                    (Read(tempAddress & 0xFF00) << 8 | Read(tempAddress));
-            else
-                address = (ushort)
-                    (Read(tempAddress + 1) << 8 | Read(tempAddress));
-
+            byte lowByte  = Read(PC++);
+            byte highByte = Read(PC++);
+            ushort temp = LittleEndian(lowByte, highByte);
+            address = temp == 0x00FF
+                //simulate hardware bug
+                ? LittleEndian(
+                    Read(temp),
+                    Read(temp & 0xFF00))
+                //otherwise, correct behaviour
+                : LittleEndian(
+                    Read(temp),
+                    Read(temp + 1));
             return false;
-            
         }
 
         //Indexed Indirect  (d,x)   Cycles: 6
-        private bool IndX()
+        private bool InX()
         {
-            byte temp = Read(Pc++);
+            ushort temp = Read(PC++);
             byte lowByte  = Read(temp + X & 0x00FF);
             byte highByte = Read(temp + X + 1 & 0x00FF);
-
-            address = (ushort)((highByte << 8) | lowByte);
-
+            address = LittleEndian(lowByte, highByte);
             return false;
         }
 
         //Indirect Indexed  (d),y   Cycles: 5+
-        private bool IndY()
+        private bool InY()
         {
-            byte temp = Read(Pc++);
+            byte temp = Read(PC++);
             byte lowByte = Read(temp & 0x00FF);
             byte highByte = Read(temp + 1 & 0x00FF);
-
-            address = (ushort)(((highByte << 8) | lowByte) + Y);
-
-            if ((address & 0xFF00) != (highByte << 8))
-                return true;
-            else
-                return false;
+            address = LittleEndian(lowByte, highByte);
+            address += Y;
+            return address.GetPage() != highByte;
         }
 
         //Relative         label    Cycles:
@@ -341,9 +353,9 @@ namespace project_nes
         */
         private bool Rel()
         {
-            address = Read(Pc++);
-            if (address.IsNegative())
-                address |= 0x00FF;
+            branch = Read(PC++);
+            if (branch.IsNegative())
+                branch |= 0xFF00;
 
             return false;
         }
@@ -351,7 +363,7 @@ namespace project_nes
         //Zero Page         d       Cycles:
         private bool Zpg()
         {
-            address = Read(Pc++);
+            address = Read(PC++);
             address &= 0x00FF;
 
             return false;
@@ -360,7 +372,7 @@ namespace project_nes
         //Zero Page Indexed d,x     Cycles: 4
         private bool ZpX()
         {
-            address = (ushort)(Read(Pc++) + X);
+            address = (ushort)(Read(PC++) + X);
             address &= 0x00FF;
 
             return false;
@@ -369,21 +381,23 @@ namespace project_nes
         //Zero Page Indexed d,y     Cycles: 4
         private bool ZpY()
         {
-            address = (ushort)(Read(Pc++) + Y);
+            address = (ushort)(Read(PC++) + Y);
             address &= 0x00FF;
 
             return false;
         }
 
 
-
-
         // Opcodes
 
         //Add with Carry
+        //todo: oversimplified
         private bool ADC()
         {
-            return false;
+            Fetch();
+            A = (byte)((A + data) & 0x00FF);
+
+            return true;
         }
 
         /** ANS - Logical AND
@@ -395,12 +409,9 @@ namespace project_nes
         {
             Fetch();
             A &= data;
-
             SetFlags(
                 Flags.Z, A.IsZero(),
-                Flags.N, A.IsNegative()
-                );
-
+                Flags.N, A.IsNegative());
             return true;
         }
 
@@ -417,8 +428,7 @@ namespace project_nes
             SetFlags(
                 Flags.C, temp.GetPage() > 0,
                 Flags.Z, (temp & 0x00FF) == 0,
-                Flags.N, temp.IsNegative()
-                );
+                Flags.N, temp.IsNegative());
 
             if (CurrentModeImplicit())
                 A = (byte)(temp & 0x00FF);
@@ -437,12 +447,10 @@ namespace project_nes
         {
             if (GetFlag(Flags.C) == 0)
             {
-                Pc += address;
-
+                address = (ushort)(PC + branch);
                 // Add one cycle if same page, two for page change
-                cycles += address.GetPage() == Pc.GetPage()
-                    ? 1
-                    : 2;
+                cycles += address.GetPage() == PC.GetPage() ? 1 : 2;
+                PC = address;
             }
             return false;
         }
@@ -456,13 +464,9 @@ namespace project_nes
         {
             if (GetFlag(Flags.C) == 1)
             {
-                cycles++;
-                address += Pc;
-
-                if (address.GetPage() != Pc.GetPage())
-                    cycles++;
-
-                Pc = address;
+                address = (ushort)(PC + branch);
+                cycles += address.GetPage() == PC.GetPage() ? 1 : 2;
+                PC = address;
             }
             return false;
         }
@@ -477,13 +481,9 @@ namespace project_nes
         {
             if (GetFlag(Flags.Z) == 1)
             {
-                cycles++;
-                address += Pc;
-
-                if (address.GetPage() != Pc.GetPage())
-                    cycles++;
-
-                Pc = address;
+                address = (ushort)(PC + branch);
+                cycles += address.GetPage() == PC.GetPage() ? 1 : 2;
+                PC = address;
             }
             return false;
         }
@@ -500,12 +500,10 @@ namespace project_nes
         {
             Fetch();
             byte temp = (byte)(A & data);
-
             SetFlags(
                 Flags.Z, temp.IsZero(),
                 Flags.N, data.IsNegative(),
-                Flags.V, (data & 1 << 6) > 0
-                );
+                Flags.V, (data & (1 << 6)) > 0);
             return false;
         }
 
@@ -518,13 +516,9 @@ namespace project_nes
         {
             if (GetFlag(Flags.N) == 1)
             {
-                cycles++;
-                address += Pc;
-
-                if (address.GetPage() != Pc.GetPage())
-                    cycles++;
-
-                Pc = address;
+                address = (ushort)(PC + branch);
+                cycles += address.GetPage() == PC.GetPage() ? 1 : 2;
+                PC = address;
             }
             return false;
         }
@@ -536,15 +530,11 @@ namespace project_nes
          */
         private bool BNE()
         {
-            if (GetFlag(Flags.Z) == 1)
+            if (GetFlag(Flags.Z) == 0)
             {
-                cycles++;
-                address += Pc;
-
-                if (address.GetPage() != Pc.GetPage())
-                    cycles++;
-
-                Pc = address;
+                address = (ushort)(PC + branch);
+                cycles += address.GetPage() == PC.GetPage() ? 1 : 2;
+                PC = address;
             }
             return false;
         }
@@ -558,13 +548,9 @@ namespace project_nes
         {
             if (GetFlag(Flags.N) == 0)
             {
-                cycles++;
-                address += Pc;
-
-                if (address.GetPage() != Pc.GetPage())
-                    cycles++;
-
-                Pc = address;
+                address = (ushort)(PC + branch);
+                cycles += address.GetPage() == PC.GetPage() ? 1 : 2;
+                PC = address;
             }
             return false;
         }
@@ -578,18 +564,24 @@ namespace project_nes
          */
         private bool BRK()
         {
-            Pc++;
-            SetFlags(Flags.I, true);
-            byte highByte  = (byte)((Pc & 0xFF00) >> 8);
-            byte lowByte = (byte)(Pc & 0x00FF);
-            Write(((ushort)(stkBase + Stkp--)), highByte);
-            Write(((ushort)(stkBase + Stkp--)), lowByte);
-            Write(((ushort)(stkBase + Stkp--)), Status);
+            //Increment before break
+            PC++;
 
-            Pc = (ushort)(Read(0xFFFE) | Read(0xFFF) << 8);
+            SetFlags(Flags.I, true);
+
+            //Push PC to stack
+            byte highByte  = (byte)((PC & 0xFF00) >> 8);
+            byte lowByte = (byte)(PC & 0x00FF);
+            Write(((ushort)(0x0100 + stkp--)), highByte);
+            Write(((ushort)(0x0100 + stkp--)), lowByte);
+
+            //Push status to stack
+            Write(((ushort)(0x0100 + stkp--)), status);
+
+            //Load interrupt vector from $FFFE/F 
+            PC = LittleEndian(Read(0xFFFE), Read(0xFFFF));
 
             SetFlags(Flags.B, true);
-
             return false;
         }
 
@@ -602,13 +594,9 @@ namespace project_nes
         {
             if (GetFlag(Flags.V) == 0)
             {
-                cycles++;
-                address += Pc;
-
-                if (address.GetPage() != Pc.GetPage())
-                    cycles++;
-
-                Pc = address;
+                address = (ushort)(PC + branch);
+                cycles += address.GetPage() == PC.GetPage() ? 1 : 2;
+                PC = address;
             }
             return false;
         }
@@ -622,13 +610,9 @@ namespace project_nes
         {
             if (GetFlag(Flags.V) == 1)
             {
-                cycles++;
-                address += Pc;
-
-                if (address.GetPage() != Pc.GetPage())
-                    cycles++;
-
-                Pc = address;
+                address = (ushort)(PC + branch);
+                cycles += address.GetPage() == PC.GetPage() ? 1 : 2;
+                PC = address;
             }
             return false;
         }
@@ -652,9 +636,9 @@ namespace project_nes
         }
 
         /**
-         * CID - Clear Interrupt Flag
+         * CLI - Clear Interrupt Flag
          */
-        private bool CID()
+        private bool CLI()
         {
             SetFlags(Flags.I, false);
             return false;
@@ -679,9 +663,7 @@ namespace project_nes
             SetFlags(
                 Flags.C, A >= data,
                 Flags.Z, A == data,
-                Flags.N, data.IsNegative()
-                );
-
+                Flags.N, data.IsNegative());
             return true;
         }
 
@@ -696,9 +678,7 @@ namespace project_nes
             SetFlags(
                 Flags.C, X >= data,
                 Flags.Z, X == data,
-                Flags.N, data.IsNegative()
-                );
-
+                Flags.N, data.IsNegative());
             return false;
         }
 
@@ -713,9 +693,7 @@ namespace project_nes
             SetFlags(
                 Flags.C, Y >= data,
                 Flags.Z, Y == data,
-                Flags.N, data.IsNegative()
-                );
-
+                Flags.N, data.IsNegative());
             return false;
         }
 
@@ -730,8 +708,7 @@ namespace project_nes
             Write(address, (byte)(data - 1));
             SetFlags(
                 Flags.Z, Read(address).IsZero(),
-                Flags.N, Read(address).IsNegative()
-                );
+                Flags.N, Read(address).IsNegative());
             return false;
         }
 
@@ -744,8 +721,7 @@ namespace project_nes
             X--;
             SetFlags(
                 Flags.Z, X.IsZero(),
-                Flags.N, X.IsNegative()
-                );
+                Flags.N, X.IsNegative());
             return false;
         }
 
@@ -759,8 +735,7 @@ namespace project_nes
             Y--;
             SetFlags(
                 Flags.Z, Y.IsZero(),
-                Flags.N, Y.IsNegative()
-                );
+                Flags.N, Y.IsNegative());
             return false;
         }
 
@@ -771,8 +746,7 @@ namespace project_nes
             A = (byte)(A ^ data);
             SetFlags(
                 Flags.Z, A.IsZero(),
-                Flags.N, A.IsNegative()
-                );
+                Flags.N, A.IsNegative());
             return true;
         }
 
@@ -787,8 +761,7 @@ namespace project_nes
             Write(address, (byte)(data + 1));
             SetFlags(
                 Flags.Z, Read(address).IsZero(),
-                Flags.N, Read(address).IsNegative()
-                );
+                Flags.N, Read(address).IsNegative());
             return false;
         }
 
@@ -802,8 +775,7 @@ namespace project_nes
             X++;
             SetFlags(
                 Flags.Z, X.IsZero(),
-                Flags.N, X.IsNegative()
-                );
+                Flags.N, X.IsNegative());
             return false;
         }
 
@@ -817,8 +789,7 @@ namespace project_nes
             Y++;
             SetFlags(
                 Flags.Z, Y.IsZero(),
-                Flags.N, Y.IsNegative()
-                );
+                Flags.N, Y.IsNegative());
             return false;
         }
 
@@ -828,15 +799,20 @@ namespace project_nes
          */
         private bool JMP()
         {
-            Fetch();
-            Pc = data;
+            PC = address;
             return false;
         }
 
         //Add with Carry
-        private byte JSR()
+        private bool JSR()
         {
-            return 0;
+            //Previous PC (or else this instruction will be stored)
+            PC--;
+
+            Write((ushort)(0x0100 + stkp--), PC.GetPage());
+            Write((ushort)(0x0100 + stkp--), (byte)(PC & 0x00FF));
+            PC = address;
+            return false;
         }
 
         /** Load the Accumuator
@@ -847,10 +823,8 @@ namespace project_nes
             A = data;
             SetFlags(
                 Flags.Z, A.IsZero(),
-                Flags.N, A.IsNegative()
-                );
+                Flags.N, A.IsNegative());
             return true;
-
         }
 
         /** Load X
@@ -861,10 +835,8 @@ namespace project_nes
             X = data;
             SetFlags(
                 Flags.Z, X.IsZero(),
-                Flags.N, X.IsNegative()
-                );
+                Flags.N, X.IsNegative());
             return true;
-
         }
 
         /** Load Y
@@ -875,8 +847,7 @@ namespace project_nes
             Y = data;
             SetFlags(
                 Flags.Z, Y.IsZero(),
-                Flags.N, Y.IsNegative()
-                );
+                Flags.N, Y.IsNegative());
             return true;
         }
 
@@ -894,14 +865,12 @@ namespace project_nes
             SetFlags(
                 Flags.C, (data & 0x01) == 1,
                 Flags.Z, temp.IsZero(),
-                Flags.N, temp.IsNegative()
-                );
+                Flags.N, temp.IsNegative());
 
             if (CurrentModeImplicit())
                 A = temp;
             else
                 Write(address, temp);
-
             return false;
         }
 
@@ -923,8 +892,7 @@ namespace project_nes
             A |= data;
             SetFlags(
                 Flags.Z, A.IsZero(),
-                Flags.N, A.IsNegative()
-                );
+                Flags.N, A.IsNegative());
             return true;
         }
 
@@ -934,18 +902,18 @@ namespace project_nes
          */
         private bool PHA()
         {
-            Write((ushort)(stkBase + Stkp--), A);
+            Write((ushort)(0x0100 + stkp--), A);
             return false;
         }
 
         /** PHP - Push Status
          * 
          * Pushes a copy of the staus register on to the stack
-         * todo: Read that break flag is set to 1 before push - investigate
          */
         private bool PHP()
         {
-            Write((ushort)(stkBase + Stkp--), Status);
+            SetFlags(Flags.B, true);
+            Write((ushort)(0x0100 + stkp--), status);
             return false;
         }
 
@@ -956,11 +924,10 @@ namespace project_nes
          */
         private bool PLA()
         {
-            A = Read(stkBase + ++Stkp);
+            A = Read(0x0100 + ++stkp);
             SetFlags(
                 Flags.Z, A.IsZero(),
-                Flags.N, A.IsNegative()
-                );
+                Flags.N, A.IsNegative());
             return false;
         }
 
@@ -971,7 +938,7 @@ namespace project_nes
          */
         private bool PLP()
         {
-            Status = Read(stkBase + ++Stkp);
+            status = Read(0x0100 + ++stkp);
             return false;
         }
 
@@ -988,8 +955,8 @@ namespace project_nes
             SetFlags(
                 Flags.C, (temp & 0xFF00) > 0,
                 Flags.N, (temp & 0x00FF) == 0,
-                Flags.Z, temp.IsNegative()
-                );
+                Flags.Z, temp.IsNegative());
+
             if (CurrentModeImplicit())
                 A = (byte)(temp & 0x00FF);
             else
@@ -1011,8 +978,8 @@ namespace project_nes
             SetFlags(
                 Flags.C, (data & 0x0001) == 1,
                 Flags.N, (temp & 0x00FF) == 0,
-                Flags.Z, temp.IsNegative()
-                );
+                Flags.Z, temp.IsNegative());
+
             if (CurrentModeImplicit())
                 A = (byte)(temp & 0x00FF);
             else
@@ -1026,11 +993,11 @@ namespace project_nes
          * It pulls the processor flags from the stack followed by the program counter.
          * todo: set U and B to not U and B?
          */
-        private bool RFI()
+        private bool RTI()
         {
-            Status = Read(stkBase + ++Stkp);
-            Pc = Read(stkBase + ++Stkp);
-            Pc |= (ushort)(Read(stkBase + ++Stkp) << 8);
+            status = Read(0x0100 + ++stkp);
+            PC = Read(0x0100 + ++stkp);
+            PC |= (ushort)(Read(0x0100 + ++stkp) << 8);
             return false;
         }
 
@@ -1042,24 +1009,27 @@ namespace project_nes
          */
         private bool RTS()
         {
-            Pc = Read(stkBase + ++Stkp);
-            Pc |= (ushort)(Read(stkBase + ++Stkp) << 8);
-            Pc++;
+            PC = Read(0x0100 + ++stkp);
+            PC |= (ushort)(Read(0x0100 + ++stkp) << 8);
+            PC++;
             return false;
         }
 
         /** SBC - Subtract with Carry
-         * 
+         * todo: oversimplified
          */
         private bool SBC()
         {
-            return false;
+            Fetch();
+            A = (byte)((A - data) & 0x00FF);
+
+            return true;
         }
 
-        /** SEC - Set Carry Flag
-         * 
-         */
-        private bool SEC()
+            /** SEC - Set Carry Flag
+             * 
+             */
+            private bool SEC()
         {
             SetFlags(Flags.C, true);
             return false;
@@ -1119,8 +1089,7 @@ namespace project_nes
             X = A;
             SetFlags(
                 Flags.N, X == 0,
-                Flags.Z, X.IsNegative()
-                );
+                Flags.Z, X.IsNegative());
             return false;
         }
 
@@ -1132,8 +1101,7 @@ namespace project_nes
             Y = A;
             SetFlags(
                 Flags.N, Y == 0,
-                Flags.Z, Y.IsNegative()
-                );
+                Flags.Z, Y.IsNegative());
             return false;
         }
 
@@ -1142,11 +1110,10 @@ namespace project_nes
          */
         private bool TSX()
         {
-            X = Stkp;
+            X = stkp;
             SetFlags(
                 Flags.N, X == 0,
-                Flags.Z, X.IsNegative()
-                );
+                Flags.Z, X.IsNegative());
             return false;
         }
 
@@ -1158,8 +1125,7 @@ namespace project_nes
             A = X;
             SetFlags(
                 Flags.N, A == 0,
-                Flags.Z, A.IsNegative()
-                );
+                Flags.Z, A.IsNegative());
             return false;
         }
 
@@ -1168,7 +1134,7 @@ namespace project_nes
          */
         private bool TXS()
         {
-            Stkp = X;
+            stkp = X;
             return false;
         }
 
@@ -1180,8 +1146,7 @@ namespace project_nes
             A = Y;
             SetFlags(
                 Flags.N, A == 0,
-                Flags.Z, A.IsNegative()
-                );
+                Flags.Z, A.IsNegative());
             return false;
         }
 
