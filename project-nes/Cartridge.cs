@@ -10,34 +10,27 @@ namespace project_nes
     {
         private BinaryReader reader;
         private Header header;
-        private byte[] memory = new byte[0xBFE0];
+        private byte[] mapper = new byte[0xBFE0];
         private byte[] trainer;
         private byte[] prgRom;
         private byte[] chrRom;
-        private byte prg_banks;
-        private byte chr_banks;
-
         private byte mapperId;
-        private string format;
-        private string fileName;   
+        private string formatString;
+        private string fileName;
         private string path;
-
-        private bool invalid_format;
-
+        private bool invalidFormat;
 
         public Cartridge(string fileName, DirectoryInfo directory)
         {
             this.fileName = fileName;
             path = directory.FullName + "/" + fileName;
-            reader = new BinaryReader(File.Open(path, FileMode.Open));
+            reader = new BinaryReader(File.Open(path, FileMode.Open, FileAccess.Read));
+            header = new Header(reader);
 
-            header = new Header();
-            header.Parse(reader);
+            header.Parse('v');
 
-            if (header.Identification != "NES")
-                invalid_format = true;
-
-            format = header.Nes_20 ? header.Identification + " 2.0" : "i" + header.Identification;
+            invalidFormat = header.Identification != "NES";
+            formatString = header.Nes_20 ? header.Identification + " 2.0" : "i" + header.Identification;
             mapperId = header.Mapper_id;
 
             if (header.Trainer)
@@ -47,15 +40,51 @@ namespace project_nes
             if (header.Chr_banks > 0)
                 chrRom = reader.ReadBytes(header.Chr_banks * 8192);
 
+            reader.Close();
             this.Report();
+
+            // Fake mapper for mapper 0
+            mapper = new byte[0xBFE0];
+            int i, j;
+            for (i = 0; i < prgRom.Length; i++)
+            {
+                mapper[i] = prgRom[i];
+            }
+            for (j = 0; j < chrRom.Length; j++)
+            {
+                i++;
+                mapper[i] = chrRom[j];
+            }
+
+        }
+
+        // Indexer declaration
+        // Return mapper[i]
+        // mapper is an array holding Prg and Chr ROMs sequentially
+        // ...for now
+        public byte this[int i]
+        {
+            get { return mapper[i]; }
+            set { this.mapper[i] = value; }
         }
 
 
+        public void Report()
+        {
+            Console.WriteLine();
+            Console.WriteLine($"CARTRIDGE REPORT");
+            Console.WriteLine($"--------------------------------");
+            Console.WriteLine($"File:               {fileName}");
+            Console.WriteLine($"Path:               {path}");
+            Console.WriteLine($"Format:             {formatString}");
+            Console.WriteLine($"Mapper:             {mapperId}");
+            Console.WriteLine($"Trainer Present:    {header.Trainer}");
+            Console.WriteLine($"Prg ROM Size:       0x{prgRom.Length.Hex()} | {prgRom.Length / 1024} kb");
+            Console.WriteLine($"Chr ROM Size:       0x{chrRom.Length.Hex()} | {chrRom.Length / 1024} kb");
+            Console.WriteLine();
+        }
 
-        
-
-
-        struct Header
+        private class Header
         {
             private byte p_rom_lsb;
             private byte c_rom_lsb;
@@ -70,49 +99,60 @@ namespace project_nes
             private byte p_ram_size;
             private byte eeprom_size;
             private byte c_ram_size;
-
             private byte byte12;
             private byte byte13;
             private byte byte14;
             private byte byte15;
-
-
             private byte console_type;
             private bool nt_mirroring;
             private bool battery;
             private bool four_screen;
-
             private byte temp;
+            private BinaryReader reader;
+
+            public Header(BinaryReader reader)
+            {
+                this.reader = reader;
+            }
 
             public string Identification { get; private set; }
+
             public bool Nes_20 { get; private set; }
+
             public byte Mapper_id { get; private set; }
+
             public bool Trainer { get; private set; }
+
             public byte Prg_banks { get; private set; }
+
             public byte Chr_banks { get; private set; }
+
             public char Mirroring_type {
                 get => nt_mirroring  ? 'V' : 'H';
             }
 
-
-            public void Parse(BinaryReader reader)
+            public void Parse(char arg)
             {
-                Console.WriteLine();
-                Console.WriteLine("Parsing header......");
-                Console.WriteLine("--------------------------------");
+                bool v = arg == 'v';
+
+                if (v) Console.WriteLine(
+                    $"\nPARSING HEADER" +
+                    $"\n--------------------------------");
 
                 // Bytes 0 - 3
                 byte[] str = reader.ReadBytes(4);
                 Identification = Encoding.UTF8.GetString(str);
-                Console.WriteLine($"Identification: {Identification}");
-                Console.WriteLine("--------------------------------");
+                if (v) Console.WriteLine(
+                    $"Identification:     {Identification}" +
+                    $"\n--------------------------------");
 
                 // Bytes 4 - 5
                 p_rom_lsb = reader.ReadByte();
                 c_rom_lsb = reader.ReadByte();
-                Console.WriteLine($"p_rom_lsb : {p_rom_lsb}");
-                Console.WriteLine($"c_rom_lsb: {c_rom_lsb}");
-                Console.WriteLine("--------------------------------");
+                if (v) Console.WriteLine(
+                    $"p_rom_lsb :         {p_rom_lsb}" +
+                    $"\nc_rom_lsb:          {c_rom_lsb}" +
+                    $"\n--------------------------------");
 
                 // Byte 6
                 flags6 = reader.ReadByte();
@@ -121,53 +161,57 @@ namespace project_nes
                 Trainer         = (flags6 & (1 << 2)) > 0;
                 four_screen     = (flags6 & (1 << 3)) > 0;
                 mapper_D0_D3    = (byte)((flags6 & 0xF0) >> 4);
-                Console.WriteLine($"nt_mirroring {nt_mirroring}");
-                Console.WriteLine($"battery: {battery}");
-                Console.WriteLine($"Trainer: {c_rom_lsb}");
-                Console.WriteLine($"four_screen: {four_screen}");
-                Console.WriteLine($"mapper_D0-D3: {mapper_D0_D3}");
-                Console.WriteLine("--------------------------------");
-
+                if (v) Console.WriteLine(
+                    $"nt_mirroring        {nt_mirroring}" +
+                    $"\nbattery:            {battery}" +
+                    $"\nTrainer:            {c_rom_lsb}" +
+                    $"\nfour_screen:        {four_screen}" +
+                    $"\nmapper_D0-D3:       {mapper_D0_D3}" +
+                    "\n--------------------------------");
 
                 // Byte 7
                 flags7 = reader.ReadByte();
                 console_type    = (byte)(flags7 & 0x03);
                 Nes_20          = (byte)(flags7 & 0x0C) == 0x08;
                 mapper_D4_D7    = (byte)((flags7 & 0xF0) >> 4);
-                Console.WriteLine($"console_type: {console_type}");
-                Console.WriteLine($"NES_2.0: {Nes_20}");
-                Console.WriteLine($"mapper_D4_D7: {mapper_D4_D7}");
-                Console.WriteLine("--------------------------------");
+                if (v) Console.WriteLine(
+                    $"console_type:       {console_type}" +
+                    $"\nNES_2.0:            {Nes_20}" +
+                    $"\nmapper_D4_D7:       {mapper_D4_D7}" +
+                    $"\n--------------------------------");
 
                 // Byte 8
                 temp = reader.ReadByte();
                 mapper_D8_D11 = (byte)((temp & 0x0F));
                 submapper = (byte)((temp & 0xF0) >> 4);
-                Console.WriteLine($"mapper_D8_D11: {mapper_D8_D11}");
-                Console.WriteLine($"submapper: {submapper}");
-                Console.WriteLine("--------------------------------");
+                if (v) Console.WriteLine(
+                    $"mapper_D8_D11:      {mapper_D8_D11}" +
+                    $"\nsubmapper:          {submapper}" +
+                    $"\n--------------------------------");
 
                 // Byte 9
                 temp = reader.ReadByte();
                 p_rom_msb = (byte)((temp & 0x0F));
                 c_rom_msb = (byte)((temp & 0xF0) >> 4);
-                Console.WriteLine($"p_rom_msb: {p_rom_msb}");
-                Console.WriteLine($"c_rom_msb: {c_rom_msb}");
-                Console.WriteLine("--------------------------------");
+                if (v) Console.WriteLine(
+                    $"p_rom_msb:          {p_rom_msb}" +
+                    $"\nc_rom_msb:          {c_rom_msb}" +
+                    $"\n--------------------------------");
 
                 // Byte 10
                 temp = reader.ReadByte();
                 p_ram_size = (byte)((temp & 0x0F));
                 eeprom_size = (byte)((temp & 0xF0) >> 4);
-                Console.WriteLine($"p_ram: {p_ram_size}");
-                Console.WriteLine($"eeprom: {eeprom_size}");
-                Console.WriteLine("--------------------------------");
+                if (v) Console.WriteLine(
+                    $"p_ram:              {p_ram_size}" +
+                    $"\neeprom:             {eeprom_size}" +
+                    $"\n--------------------------------");
 
                 // Byte 11
                 c_ram_size = reader.ReadByte();
-                Console.WriteLine($"c_ram: {c_ram_size}");
-                Console.WriteLine("--------------------------------");
-                Console.WriteLine();
+                if (v) Console.WriteLine(
+                    $"c_ram:              {c_ram_size}" +
+                    $"\n--------------------------------");
 
                 // Bytes 12 - 15
                 byte12 = reader.ReadByte();
@@ -178,32 +222,10 @@ namespace project_nes
                 Mapper_id = (byte)((mapper_D4_D7 << 4) | mapper_D0_D3);
                 Prg_banks = (byte)(p_rom_lsb | p_rom_msb << 4);
                 Chr_banks = (byte)(p_rom_lsb | p_rom_msb << 4);
+
+                if (v)
+                    Console.WriteLine("\nParsing complete\n");
             }
         }
-
-
-
-        public byte this[int i]    // Indexer declaration  
-        {
-            get { return this.memory[i]; }
-            set { this.memory[i] = value; }
-        }
-
-
-        public void Report()
-        {
-            Console.WriteLine($"CARTRIDGE REPORT");
-            Console.WriteLine($"--------------------------------");
-            Console.WriteLine($"File:           {fileName}");
-            Console.WriteLine($"Path:           {path}");
-            Console.WriteLine($"Format:         {format}");
-            Console.WriteLine($"Mapper:         {mapperId}");
-            Console.WriteLine($"Prg Rom Size:   0x{prgRom.Length.Hex()}");
-            Console.WriteLine($"Chr Rom Size:   0x{chrRom.Length.Hex()}");
-        }
-
-
-
-
     }
 }
