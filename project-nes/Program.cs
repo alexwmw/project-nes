@@ -10,16 +10,22 @@ namespace project_nes
         {
 
             DirectoryInfo testRoms = new DirectoryInfo(@"/Users/alexwright/Documents/MSc Files/Project/test_roms");
+            DirectoryInfo gameRoms = new DirectoryInfo(@"/Users/alexwright/Documents/MSc Files/Project/game_roms");
 
-            string rom = @"nestest.nes";
+            //string nestest = @"nestest.nes";
+            //string donkeyKong = @"Donkey Kong (World) (Rev A).nes";
+            string kirby = @"Kirby's Adventure (USA) (Rev A).nes";
 
-            Cartridge cartridge = new Cartridge(rom, testRoms);
+            Cartridge cartridge = new Cartridge(kirby, gameRoms);
 
-            iBus bus = new Bus();
+            Bus bus = new Bus();
 
-            iCPU cpu = new CPU();
+            CPU cpu = new CPU();
 
             cpu.ConnectBus(bus);
+
+            cpu.Clock();
+
 
 
         }

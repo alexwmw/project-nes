@@ -14,10 +14,13 @@ namespace project_nes
         private byte[] trainer;
         private byte[] prgRom;
         private byte[] chrRom;
-        private byte mapperId;
         private string formatString;
         private string fileName;
         private string path;
+        private byte mapperId;
+        private byte prgBanks;
+        private byte chrBanks;
+        private char mirroring;
         private bool invalidFormat;
 
         public Cartridge(string fileName, DirectoryInfo directory)
@@ -32,43 +35,87 @@ namespace project_nes
             invalidFormat = header.Identification != "NES";
             formatString = header.Nes_20 ? header.Identification + " 2.0" : "i" + header.Identification;
             mapperId = header.Mapper_id;
+            mirroring = header.Mirroring_type;
+            prgBanks = header.Prg_banks;
+            chrBanks = header.Chr_banks;
 
             if (header.Trainer)
                 trainer = reader.ReadBytes(512);
-            if (header.Prg_banks > 0)
-                prgRom = reader.ReadBytes(header.Prg_banks * 16384);
-            if (header.Chr_banks > 0)
-                chrRom = reader.ReadBytes(header.Chr_banks * 8192);
+            if (prgBanks > 0)
+                prgRom = reader.ReadBytes(prgBanks * 16384);
+            if (chrBanks > 0)
+                chrRom = reader.ReadBytes(chrBanks * 8192);
 
             reader.Close();
             this.Report();
 
-            // Fake mapper for mapper 0
-            mapper = new byte[0xBFE0];
-            int i, j;
-            for (i = 0; i < prgRom.Length; i++)
-            {
-                mapper[i] = prgRom[i];
-            }
-            for (j = 0; j < chrRom.Length; j++)
-            {
-                i++;
-                mapper[i] = chrRom[j];
-            }
-
         }
 
-        // Indexer declaration
-        // Return mapper[i]
-        // mapper is an array holding Prg and Chr ROMs sequentially
-        // ...for now
-        public byte this[int i]
+
+        /**
+         * Received an address between 0x4020 - 0xFFFF
+         */
+        public byte CpuRead(ushort adr)
         {
-            get { return mapper[i]; }
-            set { this.mapper[i] = value; }
+
+            ushort mappedAdr;
+
+            //dummy mapper 0
+            if (adr < 0x6000)
+            {
+                // rarely used
+                throw new ArgumentOutOfRangeException(
+                    $"Cartridge read by CPU at {adr}");
+            }
+
+            else if (adr >= 0x6000 & adr <= 0x7FFF)
+            {
+                // chr rom - not used by CPU
+                throw new ArgumentOutOfRangeException(
+                    $"Cartridge read by CPU at {adr}");
+            }
+
+            else if (adr >= 0x8000 & adr <= 0xFFFF)
+            {
+                mappedAdr = (ushort)(adr & (prgBanks == 32 ? 0x7FFF : 0x3FFF));
+                return prgRom[mappedAdr];
+            }
+
+            else
+                throw new ArgumentOutOfRangeException(
+                    $"Cartridge read by CPU at {adr}");
         }
 
+        public void CpuWrite(ushort adr, byte data)
+        {
 
+            ushort mappedAdr;
+
+            //dummy mapper 0
+            if (adr < 0x6000)
+            {
+                // rarely used
+                throw new ArgumentOutOfRangeException(
+                    $"Cartridge read by CPU at {adr}");
+            }
+
+            else if (adr >= 0x6000 & adr <= 0x7FFF)
+            {
+                // chr rom - not used by CPU
+                throw new ArgumentOutOfRangeException(
+                    $"Cartridge read by CPU at {adr}");
+            }
+
+            else if (adr >= 0x8000 & adr <= 0xFFFF)
+            {
+                mappedAdr = (ushort)(adr & (prgBanks == 32 ? 0x7FFF : 0x3FFF));
+                prgRom[mappedAdr] = data;
+            }
+
+            else
+                throw new ArgumentOutOfRangeException(
+                    $"Cartridge read by CPU at {adr}");
+        }
         public void Report()
         {
             Console.WriteLine();

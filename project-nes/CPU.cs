@@ -7,7 +7,7 @@ using static HelperMethods.StaticMethods;
 
 namespace project_nes
 {
-    public class CPU : iCPU
+    public class CPU
     {
 
         // Fields
@@ -21,6 +21,7 @@ namespace project_nes
         private ushort PC;                  // Program counter
 
         //Emulation variables
+        private Instruction current;        // Curently executing instruction;
         private byte opcode;                // Current instruction byte
         private byte data;                  // Fetched data
         private ushort address;             // Fetched address
@@ -28,8 +29,8 @@ namespace project_nes
         private int cycles;                 // Cycles required by current instruction
         private int clock_count;            // Total number of clock cycles passed
 
-        private iBus bus;
         private InstructionSet instructionSet;
+        private Bus bus;
 
         // Constructors
 
@@ -86,10 +87,11 @@ namespace project_nes
 
         public void Clock()
         {
+            Log();
             if(cycles == 0)
             {
                 opcode = Read(PC);
-                Instruction current = instructionSet[opcode];
+                current = instructionSet[opcode];
 
                 cycles += current.Cycles;
                 bool addrm = current.AddrMode();
@@ -165,7 +167,7 @@ namespace project_nes
             throw new NotImplementedException();
         }
 
-        public void ConnectBus(iBus bus)
+        public void ConnectBus(Bus bus)
         {
             this.bus = bus;
         }
@@ -224,11 +226,8 @@ namespace project_nes
         }
 
 
-        private void Log(Instruction current)
+        private void Log()
         {
-
-
-
             Console.WriteLine(
                 $"{PC}  {Read(PC)} {Read(PC + 1)} {Read(PC + 2)}  {current.Name} {(!CurrentModeImplicit() ? address : '_')}                       A:{A} X:{X} Y:{Y} P:?? SP:?? PPU:  ?, ? CYC:{clock_count}"
                 );
