@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "project-nes", "project-nes\project-nes.csproj", "{69F7735C-0F17-4CF8-8B95-3A644DA32123}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "project-nes-tests", "project-nes-tests\project-nes-tests.csproj", "{EFF0F8BC-AD54-4060-A231-DB2254DC8B54}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,9 +13,5 @@ Global
 		{69F7735C-0F17-4CF8-8B95-3A644DA32123}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{69F7735C-0F17-4CF8-8B95-3A644DA32123}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{69F7735C-0F17-4CF8-8B95-3A644DA32123}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EFF0F8BC-AD54-4060-A231-DB2254DC8B54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EFF0F8BC-AD54-4060-A231-DB2254DC8B54}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EFF0F8BC-AD54-4060-A231-DB2254DC8B54}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EFF0F8BC-AD54-4060-A231-DB2254DC8B54}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

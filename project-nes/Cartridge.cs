@@ -30,7 +30,7 @@ namespace project_nes
             reader = new BinaryReader(File.Open(path, FileMode.Open, FileAccess.Read));
             header = new Header(reader);
 
-            header.Parse('v');
+            header.Parse();
 
             invalidFormat = header.Identification != "NES";
             formatString = header.Nes_20 ? header.Identification + " 2.0" : "i" + header.Identification;
@@ -48,7 +48,6 @@ namespace project_nes
 
             reader.Close();
             this.Report();
-
         }
 
 
@@ -178,7 +177,7 @@ namespace project_nes
                 get => nt_mirroring  ? 'V' : 'H';
             }
 
-            public void Parse(char arg)
+            public void Parse(char arg = '_')
             {
                 bool v = arg == 'v';
 

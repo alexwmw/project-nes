@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using CsvHelper.Configuration.Attributes;
 using HelperMethods;
 using static HelperMethods.StaticMethods;
 
@@ -18,7 +19,7 @@ namespace project_nes
         private byte Y;                     // Y register
         private byte status;                // Status byte
         private byte stkp;                  // Stack pointer
-        private ushort PC;                  // Program counter
+        public ushort PC;                  // Program counter
 
         //Emulation variables
         private Instruction current;        // Curently executing instruction;
@@ -28,6 +29,7 @@ namespace project_nes
         private ushort branch;              // Fetched branch operand
         private int cycles;                 // Cycles required by current instruction
         private int clock_count;            // Total number of clock cycles passed
+        private ushort PcPrev;
 
         private InstructionSet instructionSet;
         private Bus bus;
@@ -65,8 +67,8 @@ namespace project_nes
                 {CPX, Imm, 2}, {SBC, InX, 6}, {NOP, Imp, 2}, {UNK, Imp, 8}, {CPX, Zpg, 3}, {SBC, Zpg, 3}, {INC, Zpg, 5}, {UNK, Imp, 5}, {INX, Imp, 2}, {SBC, Imm, 2}, {NOP, Imp, 2}, {SBC, Imp, 2}, {CPX, Abs, 4}, {SBC, Abs, 4}, {INC, Abs, 6}, {UNK, Imp, 6}, // E
                 {BEQ, Rel, 2}, {SBC, InY, 5}, {UNK, Imp, 2}, {UNK, Imp, 8}, {NOP, Imp, 4}, {SBC, ZpX, 4}, {INC, ZpX, 6}, {UNK, Imp, 6}, {SED, Imp, 2}, {SBC, AbY, 4}, {NOP, Imp, 2}, {UNK, Imp, 7}, {NOP, Imp, 4}, {SBC, AbX, 4}, {INC, AbX, 7}, {UNK, Imp, 7}, // F
             };
-        }
 
+        }
 
         // Enums
 
@@ -87,31 +89,32 @@ namespace project_nes
 
         public void Clock()
         {
-            Log();
-            if(cycles == 0)
+            if (cycles == 0)
             {
-                opcode = Read(PC);
+                PcPrev = PC;
+                opcode = Read(PC++);
                 current = instructionSet[opcode];
-
                 cycles += current.Cycles;
                 bool addrm = current.AddrMode();
                 bool operation = current.Operation();
+                LogState();
 
                 if (addrm & operation)
                     cycles++;
+
+
             }
             clock_count++;
             cycles--;
         }
-
 
         public void Irq()
         {
             if (GetFlag(Flags.I) == 0)
             {
                 //Push PC to stack
-                Write(((ushort)(0x0100 + stkp--)), PC.GetPage());
-                Write(((ushort)(0x0100 + stkp--)), PC.GetOffset());
+                Write((ushort)(0x0100 + stkp--), PC.GetPage());
+                Write((ushort)(0x0100 + stkp--), PC.GetOffset());
 
                 //Clear B, set I, U; and push status to stack
                 SetFlags(
@@ -130,15 +133,15 @@ namespace project_nes
         public void Nmi()
         {
             //Push PC to stack
-            Write(((ushort)(0x0100 + stkp--)), PC.GetPage());
-            Write(((ushort)(0x0100 + stkp--)), PC.GetOffset());
+            Write((ushort)(0x0100 + stkp--), PC.GetPage());
+            Write((ushort)(0x0100 + stkp--), PC.GetOffset());
 
             //Clear B, set I, U; and push status to stack
             SetFlags(
                 Flags.B, false,
                 Flags.I, true,
                 Flags.U, true);
-            Write(((ushort)(0x0100 + stkp--)), status);
+            Write((ushort)(0x0100 + stkp--), status);
 
             //Load interrupt vector from $FFFE/F 
             PC = LittleEndian(Read(0xFFFA), Read(0xFFFB));
@@ -153,7 +156,7 @@ namespace project_nes
 
             //Reset registers
             A = X = Y = 0;
-            stkp = 0xFF;
+            stkp = 0xFD;
             status |= (byte)(Flags.U);
 
             //Reset variables
@@ -170,23 +173,31 @@ namespace project_nes
         public void ConnectBus(Bus bus)
         {
             this.bus = bus;
+
+            "CPU Bus connected".Log();
         }
-
-
 
 
         // Private Methods
 
         private byte Read(ushort address)
-            => bus.Read(address);
-
+        {
+            return bus == null ? throw new NullReferenceException("CPU tried to read. Bus not connected.")
+                       : bus.Read(address);
+        }
 
         private byte Read(int address)
-            => bus.Read((ushort)((ushort)address & 0xFFFF));
-
+        {
+            return bus == null ? throw new NullReferenceException("CPU tried to read. Bus not connected.")
+                       : bus.Read((ushort)((ushort)address & 0xFFFF));
+        }
 
         private void Write(ushort address, byte data)
-            => bus.Write(address, data);
+        {
+            if (bus == null)
+                throw new Exception("CPU tried to write. Bus not connected.");
+            bus.Write(address, data);
+        }
 
         private byte GetFlag(Flags f)
             => (byte)(status & (byte)f);
@@ -202,19 +213,19 @@ namespace project_nes
         private void SetFlags(Flags f1, bool b1, Flags f2, bool b2)
         {
             if (b1) status |= (byte)f1;
-            else    status &= (byte)~f1;
+            else status &= (byte)~f1;
             if (b2) status |= (byte)f2;
-            else    status &= (byte)~f2;
+            else status &= (byte)~f2;
         }
 
         private void SetFlags(Flags f1, bool b1, Flags f2, bool b2, Flags f3, bool b3)
         {
             if (b1) status |= (byte)f1;
-            else    status &= (byte)~f1;
+            else status &= (byte)~f1;
             if (b2) status |= (byte)f2;
-            else    status &= (byte)~f2;
+            else status &= (byte)~f2;
             if (b3) status |= (byte)f3;
-            else    status &= (byte)~f3;
+            else status &= (byte)~f3;
         }
 
         private void Fetch()
@@ -225,14 +236,14 @@ namespace project_nes
                 data = Read(address);
         }
 
-
-        private void Log()
+        public void LogState()
         {
-            Console.WriteLine(
-                $"{PC}  {Read(PC)} {Read(PC + 1)} {Read(PC + 2)}  {current.Name} {(!CurrentModeImplicit() ? address : '_')}                       A:{A} X:{X} Y:{Y} P:?? SP:?? PPU:  ?, ? CYC:{clock_count}"
-                );
+            string s = String.Format(
+                "{0} {1}    {2}     {3}        {4} {5}           A:{6} X:{7} Y:{8} P:{9} SP:{10} CYC:{11}",
+                 PC.Hex(), Read(PC).Hex(), Read(PC + 1).Hex(), Read(PC + 2).Hex(), current.Name, address.Hex(), A.Hex(), X.Hex(), Y.Hex(), "??",   stkp.Hex(),   clock_count
+                 );
+            Console.WriteLine(s);
         }
-
 
         private Func<bool> CurrentMode()
             => instructionSet[opcode].AddrMode;
@@ -248,7 +259,7 @@ namespace project_nes
         // Addresses are little-endian
         private bool Abs()
         {
-            byte lowByte  = Read(PC++);
+            byte lowByte = Read(PC++);
             byte highByte = Read(PC++);
             address = LittleEndian(lowByte, highByte);
             return false;
@@ -257,7 +268,7 @@ namespace project_nes
         //Absolute Indexed  a,x     Cycles: 4+
         private bool AbX()
         {
-            byte lowByte  = Read(PC++);
+            byte lowByte = Read(PC++);
             byte highByte = Read(PC++);
             address = LittleEndian(lowByte, highByte);
             address += X;
@@ -267,7 +278,7 @@ namespace project_nes
         //Absolute Indexed  a,y     Cycles: 4+
         private bool AbY()
         {
-            byte lowByte  = Read(PC++);
+            byte lowByte = Read(PC++);
             byte highByte = Read(PC++);
             address = LittleEndian(lowByte, highByte);
             address += Y;
@@ -288,7 +299,6 @@ namespace project_nes
             return false;
         }
 
-
         //Implicit                  Cycles:
         // No additional data required for the instruction
         private bool Imp()
@@ -296,12 +306,10 @@ namespace project_nes
             return false;
         }
 
-
-
         //Indirect          (a)     Cycles:
         private bool Ind()
         {
-            byte lowByte  = Read(PC++);
+            byte lowByte = Read(PC++);
             byte highByte = Read(PC++);
             ushort temp = LittleEndian(lowByte, highByte);
             address = temp == 0x00FF
@@ -320,7 +328,7 @@ namespace project_nes
         private bool InX()
         {
             ushort temp = Read(PC++);
-            byte lowByte  = Read(temp + X & 0x00FF);
+            byte lowByte = Read(temp + X & 0x00FF);
             byte highByte = Read(temp + X + 1 & 0x00FF);
             address = LittleEndian(lowByte, highByte);
             return false;
@@ -423,7 +431,7 @@ namespace project_nes
         private bool ASL()
         {
             Fetch();
-            ushort temp = (ushort)(data << 1); 
+            ushort temp = (ushort)(data << 1);
             SetFlags(
                 Flags.C, temp.GetPage() > 0,
                 Flags.Z, (temp & 0x00FF) == 0,
@@ -569,7 +577,7 @@ namespace project_nes
             SetFlags(Flags.I, true);
 
             //Push PC to stack
-            byte highByte  = (byte)((PC & 0xFF00) >> 8);
+            byte highByte = (byte)((PC & 0xFF00) >> 8);
             byte lowByte = (byte)(PC & 0x00FF);
             Write(((ushort)(0x0100 + stkp--)), highByte);
             Write(((ushort)(0x0100 + stkp--)), lowByte);
@@ -738,7 +746,6 @@ namespace project_nes
             return false;
         }
 
-
         private bool EOR()
         {
             Fetch();
@@ -802,7 +809,7 @@ namespace project_nes
             return false;
         }
 
-        //Add with Carry
+        // Jump ...?
         private bool JSR()
         {
             //Previous PC (or else this instruction will be stored)
@@ -1025,10 +1032,10 @@ namespace project_nes
             return true;
         }
 
-            /** SEC - Set Carry Flag
-             * 
-             */
-            private bool SEC()
+        /** SEC - Set Carry Flag
+         * 
+         */
+        private bool SEC()
         {
             SetFlags(Flags.C, true);
             return false;
@@ -1166,10 +1173,12 @@ namespace project_nes
                 Operation = op;
                 AddrMode = addrm;
                 Cycles = cycles;
-                Name = nameof(this.Operation);
             }
 
-            public string Name { get; }
+            public string Name { get {
+                    return Operation.Method.Name;
+                }
+            }
 
             public Func<bool> Operation { get; }
 
@@ -1187,11 +1196,11 @@ namespace project_nes
 
             public IEnumerator<Instruction> GetEnumerator()
                 => ins.GetEnumerator();
-            
+
 
             IEnumerator IEnumerable.GetEnumerator()
-                =>ins.GetEnumerator();
-            
+                => ins.GetEnumerator();
+
 
             public void Add(Func<bool> op, Func<bool> addrm, int cycles)
                 => ins.Add(new Instruction(op, addrm, cycles));
@@ -1202,5 +1211,7 @@ namespace project_nes
                 set { this.ins[i] = value; }
             }
         }
+
+
     }
 }

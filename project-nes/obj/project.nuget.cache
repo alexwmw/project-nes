@@ -1,8 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "OT8UquAHpL8FUsL1tRHLFhFx6I7jcBkkmnH7OZByVxflkglZqRGknGkRyONe/drjmeVVPrOKpR9fYJZuLWVxTQ==",
+  "dgSpecHash": "lA6ffsxZh4PgVmG+HIV/VOLFhP6/OKR/cBzjZSRPuComJHtWOETFIXuXd1gJX1K0HKO2BRfeI7hLGy85npgDxA==",
   "success": true,
   "projectFilePath": "/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/project-nes.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "/Users/alexwright/.nuget/packages/csvhelper/15.0.5/csvhelper.15.0.5.nupkg.sha512",
+    "/Users/alexwright/.nuget/packages/microsoft.csharp/4.5.0/microsoft.csharp.4.5.0.nupkg.sha512"
+  ],
   "logs": []
 }

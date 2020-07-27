@@ -47,22 +47,33 @@ namespace project_nes
         public byte Read(ushort adr)
         {
             if (adr < 0)
+            {
                 return cpuRam[adr & 0x7FF];
+            }
 
             if (adr >=0 & adr <= 0x1FFF)
+            { 
                 return cpuRam[adr & 0x7FF];
-
+            }
             if (adr >= 0x2000 & adr <= 0x3FFF)
+            {
                 return PPU[(adr - 0x2000) & 0x007];
+            }
 
             if (adr >= 0x4000 & adr <= 0x4017)
+            {
                 return APU_IO[adr - 0x4000];
+            }
 
             if (adr >= 0x4018 & adr <= 0x401F)
+            {
                 return APU_IO_TEST_MODE[adr - 0x4018];
+            }
 
             if (adr >= 0x4020 & adr <= 0xFFFF)
+            {
                 return cartridge.CpuRead(adr);
+            }
 
 
             throw new ArgumentOutOfRangeException($"Invalid address greater than 0xFFFF: {adr.Hex()}");

@@ -18,10 +18,17 @@ namespace HelperMethods
         public static string Hex(this ushort u) => u.ToString("x4").ToUpper();
 
         public static string Hex(this int i) => i.ToString("x").ToUpper();
+
+        public static void Log(this string s) => Console.WriteLine($"{s}");
+
+        public static void Log(this string s, object value) => Console.WriteLine($"{s}:    {value}");
+
+        public static void Log(this string s, object value, string units) => Console.WriteLine($"{s}:    {value} {units}");
+        
     }
 
     public static class StaticMethods
     {
-        public static ushort LittleEndian(byte lo, byte hi) => (ushort)((hi<< 8) | lo);
+        public static ushort LittleEndian(byte lo, byte hi) => (ushort)((hi << 8) | lo);
     }
 }

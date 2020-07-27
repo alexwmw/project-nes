@@ -1,6 +1,9 @@
 ﻿using System;
-using HelperMethods;
 using System.IO;
+using System.Threading;
+using HelperMethods;
+using CsvHelper;
+using System.Globalization;
 
 namespace project_nes
 {
@@ -9,23 +12,24 @@ namespace project_nes
         static void Main(string[] args)
         {
 
+            //ROM directories
             DirectoryInfo testRoms = new DirectoryInfo(@"/Users/alexwright/Documents/MSc Files/Project/test_roms");
             DirectoryInfo gameRoms = new DirectoryInfo(@"/Users/alexwright/Documents/MSc Files/Project/game_roms");
 
-            //string nestest = @"nestest.nes";
-            //string donkeyKong = @"Donkey Kong (World) (Rev A).nes";
-            string kirby = @"Kirby's Adventure (USA) (Rev A).nes";
-
-            Cartridge cartridge = new Cartridge(kirby, gameRoms);
+            string nestest = @"nestest.nes";
 
             Bus bus = new Bus();
-
             CPU cpu = new CPU();
-
+            Cartridge cartridge = new Cartridge(nestest, testRoms);
+            bus.InsertCartridge(cartridge);
             cpu.ConnectBus(bus);
-
-            cpu.Clock();
-
+            cpu.Reset();
+            cpu.PC = 0xC000;
+            while (true)
+            {
+                cpu.Clock();
+                Thread.Sleep(500);
+            }
 
 
         }
