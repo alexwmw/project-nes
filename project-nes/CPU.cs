@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
 using CsvHelper.Configuration.Attributes;
 using HelperMethods;
 using static HelperMethods.StaticMethods;
@@ -29,21 +32,29 @@ namespace project_nes
         private ushort branch;              // Fetched branch operand
         private int cycles;                 // Cycles required by current instruction
         private int clock_count;            // Total number of clock cycles passed
-        private ushort PcPrev;
+        private int logLineNo;
+        private State state;
 
         private InstructionSet instructionSet;
         private Bus bus;
+
+        //Logging files
+        DirectoryInfo csvLogs;
+        DateTime dateTime;
+        CultureInfo cultInfo;
+        string csvFileName;
+        string filePath;
 
         // Constructors
 
         public CPU()
         {
-            /* This will be a 16 * 16 length list 
-             * (inside an IEnumerable class object 'InstructionSet')
+            /* A 16 * 16 length list 
+             * (inside an IEnumerable class 'InstructionSet')
              * 
              * The Add method of InstructionSet allows the list to be initialised 
-             * using initializer lists - which should make this long section much
-             * easier to read instead of repeating new Instruction(...) 256 times. 
+             * using initializer lists - which make this long section more 
+             * succint instead of repeating new Instruction(...) 256 times. 
              * But I did have to use a List<Instruction> instead 
              * of an array Instruction[], and create an indexer
              */
@@ -68,6 +79,13 @@ namespace project_nes
                 {BEQ, Rel, 2}, {SBC, InY, 5}, {UNK, Imp, 2}, {UNK, Imp, 8}, {NOP, Imp, 4}, {SBC, ZpX, 4}, {INC, ZpX, 6}, {UNK, Imp, 6}, {SED, Imp, 2}, {SBC, AbY, 4}, {NOP, Imp, 2}, {UNK, Imp, 7}, {NOP, Imp, 4}, {SBC, AbX, 4}, {INC, AbX, 7}, {UNK, Imp, 7}, // F
             };
 
+            //CSV log - file creation
+            csvLogs = new DirectoryInfo(@"/Users/alexwright/Documents/MSc Files/Project/csv_logs");
+            dateTime = DateTime.UtcNow;
+            cultInfo = CultureInfo.CreateSpecificCulture("en-UK");
+            csvFileName = $"project_nes_nestest_log_{dateTime.ToString("o", cultInfo)}.csv";
+            filePath = $"{csvLogs.FullName}/{csvFileName}";
+            using (File.Create(filePath)) { }
         }
 
         // Enums
@@ -91,7 +109,7 @@ namespace project_nes
         {
             if (cycles == 0)
             {
-                PcPrev = PC;
+                state = new State(this);
                 opcode = Read(PC++);
                 current = instructionSet[opcode];
                 cycles += current.Cycles;
@@ -99,10 +117,13 @@ namespace project_nes
                 bool operation = current.Operation();
                 LogState();
 
+                using (StreamWriter file = new StreamWriter(filePath, true))
+                {
+                    file.WriteLine(CsvLine);
+                }
+
                 if (addrm & operation)
                     cycles++;
-
-
             }
             clock_count++;
             cycles--;
@@ -162,7 +183,7 @@ namespace project_nes
             //Reset variables
             address = branch = data = 0;
 
-            cycles += 8;
+            cycles += 7; // is it 7 or 8? 
         }
 
         public void PowerOn()
@@ -173,8 +194,6 @@ namespace project_nes
         public void ConnectBus(Bus bus)
         {
             this.bus = bus;
-
-            "CPU Bus connected".Log();
         }
 
 
@@ -236,13 +255,30 @@ namespace project_nes
                 data = Read(address);
         }
 
+
         public void LogState()
         {
-            string s = String.Format(
-                "{0} {1}    {2}     {3}        {4} {5}           A:{6} X:{7} Y:{8} P:{9} SP:{10} CYC:{11}",
-                 PC.Hex(), Read(PC).Hex(), Read(PC + 1).Hex(), Read(PC + 2).Hex(), current.Name, address.Hex(), A.Hex(), X.Hex(), Y.Hex(), "??",   stkp.Hex(),   clock_count
-                 );
-            Console.WriteLine(s);
+            string rowN = string.Format("{0,5}", logLineNo++);
+            byte byte1 = opcode;
+            byte byte2 = (byte)(address & 0x00FF);
+            byte byte3 = (byte)((address & 0xFF00) >> 8);
+            string line =
+                $"{rowN}.   {state.PC.x()}  {byte1.x()} {byte2.x()} {byte3.x()}  " +
+                $"{current.Name} {address.x()}            " +
+                $"A:{A.x()} X:{X.x()} Y:{Y.x()} P:{status.x()} SP:{stkp.x()} PPU:  x,xxx CYC:{clock_count}";
+            Console.WriteLine(line);
+        }
+
+        public string CsvLine
+        {
+            get
+            {
+                byte byte1 = opcode;
+                byte byte2 = (byte)(address & 0x00FF);
+                byte byte3 = (byte)((address & 0xFF00) >> 8);
+                return
+                    $"{state.PC.x()},{byte1.x()},{byte2.x()},{byte3.x()},{current.Name},{address.x()},{state.A.x()},{state.X.x()},{state.Y.x()},{state.status.x()},{state.stkp.x()},{0},{000},{clock_count}";
+            }
         }
 
         private Func<bool> CurrentMode()
@@ -295,7 +331,7 @@ namespace project_nes
         // Data expected in the next (immediate) byte.
         private bool Imm()
         {
-            address = Read(PC++);
+            address = PC++;
             return false;
         }
 
@@ -469,7 +505,7 @@ namespace project_nes
          */
         private bool BCS()
         {
-            if (GetFlag(Flags.C) == 1)
+            if (GetFlag(Flags.C) > 0)
             {
                 address = (ushort)(PC + branch);
                 cycles += address.GetPage() == PC.GetPage() ? 1 : 2;
@@ -486,7 +522,7 @@ namespace project_nes
          */
         private bool BEQ()
         {
-            if (GetFlag(Flags.Z) == 1)
+            if (GetFlag(Flags.Z) > 0)
             {
                 address = (ushort)(PC + branch);
                 cycles += address.GetPage() == PC.GetPage() ? 1 : 2;
@@ -521,7 +557,7 @@ namespace project_nes
          */
         private bool BMI()
         {
-            if (GetFlag(Flags.N) == 1)
+            if (GetFlag(Flags.N) > 0)
             {
                 address = (ushort)(PC + branch);
                 cycles += address.GetPage() == PC.GetPage() ? 1 : 2;
@@ -615,7 +651,7 @@ namespace project_nes
          */
         private bool BVS()
         {
-            if (GetFlag(Flags.V) == 1)
+            if (GetFlag(Flags.V) > 0)
             {
                 address = (ushort)(PC + branch);
                 cycles += address.GetPage() == PC.GetPage() ? 1 : 2;
@@ -809,7 +845,11 @@ namespace project_nes
             return false;
         }
 
-        // Jump ...?
+        /** JSR - Jump to Subroutine
+         * 
+         * pushes the address-1 of the next operation on to the stack before 
+         * transferring program control to the following address.
+         */
         private bool JSR()
         {
             //Previous PC (or else this instruction will be stored)
@@ -1180,6 +1220,11 @@ namespace project_nes
                 }
             }
 
+            public string NameOfAddrMode {  get {
+                    return AddrMode.Method.Name;
+                }
+            }
+
             public Func<bool> Operation { get; }
 
             public Func<bool> AddrMode { get; }
@@ -1187,6 +1232,21 @@ namespace project_nes
             public int Cycles { get; }
         }
 
+        private struct State
+        {
+            public ushort PC;
+            public byte A, X, Y, stkp, status;
+
+            public State(CPU cpu)
+            {
+                PC = cpu.PC;
+                A = cpu.A;
+                X = cpu.X;
+                Y = cpu.Y;
+                stkp = cpu.stkp;
+                status = cpu.status;
+            }
+        }
 
         // Classes
 

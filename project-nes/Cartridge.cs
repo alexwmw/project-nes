@@ -186,8 +186,7 @@ namespace project_nes
                     $"\n--------------------------------");
 
                 // Bytes 0 - 3
-                byte[] str = reader.ReadBytes(4);
-                Identification = Encoding.UTF8.GetString(str);
+                byte[] str = reader.ReadBytes(4);                 Identification = Encoding.UTF8.GetString(str);
                 if (v) Console.WriteLine(
                     $"Identification:     {Identification}" +
                     $"\n--------------------------------");

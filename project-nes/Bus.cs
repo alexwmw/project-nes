@@ -76,7 +76,7 @@ namespace project_nes
             }
 
 
-            throw new ArgumentOutOfRangeException($"Invalid address greater than 0xFFFF: {adr.Hex()}");
+            throw new ArgumentOutOfRangeException($"Invalid address greater than 0xFFFF: {adr.x()}");
         }
                
 
@@ -100,7 +100,7 @@ namespace project_nes
 
             else if (adr > 0xFFFF)
                 throw new ArgumentOutOfRangeException(
-                    $"Invalid address greater than 0xFFFF: {adr.Hex()}");
+                    $"Invalid address greater than 0xFFFF: {adr.x()}");
         }
 
         public void InsertCartridge(Cartridge cart)

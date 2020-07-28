@@ -13,9 +13,9 @@ namespace HelperMethods
 
         public static byte GetOffset(this ushort u) => (byte)(u & 0x00FF);
 
-        public static string Hex(this byte n) => n.ToString("x2").ToUpper();
+        public static string x(this byte n) => n.ToString("x2").ToUpper();
 
-        public static string Hex(this ushort u) => u.ToString("x4").ToUpper();
+        public static string x(this ushort u) => u.ToString("x4").ToUpper();
 
         public static string Hex(this int i) => i.ToString("x").ToUpper();
 
