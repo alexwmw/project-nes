@@ -260,8 +260,8 @@ namespace project_nes
         {
             string rowN = string.Format("{0,5}", logLineNo++);
             byte byte1 = opcode;
-            byte byte2 = (byte)(address & 0x00FF);
-            byte byte3 = (byte)((address & 0xFF00) >> 8);
+            byte byte2 = (byte)(CurrentMode() == Rel ? branch : address & 0x00FF);
+            byte byte3 = (byte)(CurrentMode() == Rel ? 0 : (address & 0xFF00) >> 8);
             string line =
                 $"{rowN}.   {state.PC.x()}  {byte1.x()} {byte2.x()} {byte3.x()}  " +
                 $"{current.Name} {address.x()}            " +
@@ -274,10 +274,10 @@ namespace project_nes
             get
             {
                 byte byte1 = opcode;
-                byte byte2 = (byte)(address & 0x00FF);
-                byte byte3 = (byte)((address & 0xFF00) >> 8);
+                byte byte2 = (byte)(CurrentMode() == Rel ? branch : address & 0x00FF);
+                byte byte3 = (byte)(CurrentMode() == Rel ? 0 : (address & 0xFF00) >> 8);
                 return
-                    $"{state.PC.x()},{byte1.x()},{byte2.x()},{byte3.x()},{current.Name},{address.x()},{state.A.x()},{state.X.x()},{state.Y.x()},{state.status.x()},{state.stkp.x()},{0},{000},{clock_count}";
+                    $"{state.PC.x()},{byte1.x()},{ byte2.x()},{byte3.x()},{current.Name},{address.x()},{state.A.x()},{state.X.x()},{state.Y.x()},{state.status.x()},{state.stkp.x()},{0},{000},{clock_count}";
             }
         }
 
