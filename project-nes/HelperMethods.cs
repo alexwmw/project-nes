@@ -3,9 +3,9 @@ namespace HelperMethods
 {
     public static class Extensions
     {
-        public static bool IsNegative(this ushort n) => (n & 0x80) == 1;
+        public static bool IsNegative(this ushort n) => (n & 0x80) > 0;
 
-        public static bool IsNegative(this byte n) => (n & 0x80) == 1;
+        public static bool IsNegative(this byte n) => (n & 0x80) > 0;
 
         public static bool IsZero(this byte n) => n == 0;
 

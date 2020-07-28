@@ -1,12 +1,12 @@
 ﻿<Properties StartupConfiguration="{69F7735C-0F17-4CF8-8B95-3A644DA32123}|Default">
   <MonoDevelop.Ide.ItemProperties.project-nes PreferredExecutionTarget="MonoDevelop.Default" />
-  <MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.Workbench ActiveDocument="project-nes/CPU.cs">
     <Files>
-      <File FileName="project-nes/Program.cs" Line="39" Column="29" />
-      <File FileName="project-nes/Cartridge.cs" Line="53" Column="1" />
-      <File FileName="project-nes/HelperMethods.cs" />
+      <File FileName="project-nes/Program.cs" Line="19" Column="45" />
+      <File FileName="project-nes/Cartridge.cs" Line="74" Column="56" />
+      <File FileName="project-nes/HelperMethods.cs" Line="14" Column="1" />
       <File FileName="project-nes/Bus.cs" Line="80" Column="1" />
-      <File FileName="project-nes/CPU.cs" Line="334" Column="28" />
+      <File FileName="project-nes/CPU.cs" Line="97" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -20,18 +20,14 @@
         </State>
       </Pad>
       <Pad Id="MonoDevelop.Debugger.WatchPad">
-        <State>
-          <Value>this.address</Value>
-        </State>
+        <State />
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
-    <BreakpointStore>
-      <Breakpoint file="/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/CPU.cs" relfile="project-nes/CPU.cs" line="868" column="1" />
-    </BreakpointStore>
+    <BreakpointStore />
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MultiItemStartupConfigurations />
 </Properties>

@@ -32,7 +32,7 @@ namespace project_nes
         private ushort branch;              // Fetched branch operand
         private int cycles;                 // Cycles required by current instruction
         private int clock_count;            // Total number of clock cycles passed
-        private int logLineNo;
+        private int logLineNo = 2;          // Line no. used in console logging. Offset by 2 to match Excel lines
         private State state;
 
         private InstructionSet instructionSet;
@@ -183,7 +183,9 @@ namespace project_nes
             //Reset variables
             address = branch = data = 0;
 
-            cycles += 7; // is it 7 or 8? 
+            cycles += 7; // is it 7 or 8?
+
+            SetFlags(Flags.I, true);
         }
 
         public void PowerOn()
