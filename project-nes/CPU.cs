@@ -1099,13 +1099,24 @@ namespace project_nes
         }
 
         /** SBC - Subtract with Carry
-         * todo: oversimplified
+         * 
+         * This instruction subtracts the contents of a memory location 
+         * to the accumulator together with the not of the carry bit. 
+         * If overflow occurs the carry bit is clear, 
+         * this enables multiple byte subtraction to be performed.
          */
         private bool SBC()
         {
             Fetch();
-            A = (byte)((A - data) & 0x00FF);
-
+            ushort value = (ushort)(data ^ 0x00FF);
+            ushort temp = (ushort)(A + value + GetFlag(Flags.C));
+            bool isSignedOverflow = ((temp ^ A) & (temp ^ value) & 0x0080) > 0;
+            SetFlags(
+                Flags.C, temp.GetPage() > 0,
+                Flags.Z, temp.GetOffset().IsZero(),
+                Flags.V, isSignedOverflow,
+                Flags.N, temp.IsNegative());
+            A = (byte)(temp & 0x00FF);
             return true;
         }
 
