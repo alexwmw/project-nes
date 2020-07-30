@@ -19,13 +19,18 @@ namespace project_nes
             string nestest = @"nestest.nes";
   
 
-            Bus bus = new Bus();
+            CpuBus cpuBus = new CpuBus();
+            PpuBus ppuBus = new PpuBus();
             CPU cpu = new CPU();
             PPU ppu = new PPU();
             Cartridge cartridge = new Cartridge(nestest, testRoms);
-            bus.InsertCartridge(cartridge);
-            bus.ConnectPPU(ppu);
-            cpu.ConnectBus(bus);
+
+            cpuBus.ConnectPPU(ppu);
+            cpuBus.InsertCartridge(cartridge);
+
+            ppu.ConnectBus(ppuBus);
+
+            cpu.ConnectBus(cpuBus);
             cpu.Reset();
 
             cpu.PC = 0xC000; 

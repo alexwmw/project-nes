@@ -24,7 +24,7 @@ namespace project_nes
         private byte stkp;                  // Stack pointer
         public ushort PC;                  // Program counter
 
-        private Bus bus;
+        private CpuBus bus;
         private InstructionSet instructionSet;
 
         //Emulation variables
@@ -199,7 +199,7 @@ namespace project_nes
             throw new NotImplementedException();
         }
 
-        public void ConnectBus(Bus bus)
+        public void ConnectBus(CpuBus bus)
         {
             this.bus = bus;
         }

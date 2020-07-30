@@ -3,7 +3,7 @@ using HelperMethods;
 
 namespace project_nes
 {
-    public class Bus
+    public class CpuBus
     {
 
         /** 
@@ -37,7 +37,7 @@ namespace project_nes
         private Cartridge cartridge;
 
 
-        public Bus()
+        public CpuBus()
         {
 
         }
@@ -48,29 +48,17 @@ namespace project_nes
         public byte Read(ushort adr)
         {
             if (adr < 0)
-            {
                 return cpuRam[adr & 0x7FF];
-            }
             if (adr >=0 & adr <= 0x1FFF)
-            { 
                 return cpuRam[adr & 0x7FF];
-            }
             if (adr >= 0x2000 & adr <= 0x3FFF)
-            {
-                ppu.CpuRead(adr);
-            }
+                ppu.CpuRead((ushort)(adr & 0x007));
             if (adr >= 0x4000 & adr <= 0x4017)
-            {
                 return APU_IO[adr - 0x4000];
-            }
             if (adr >= 0x4018 & adr <= 0x401F)
-            {
                 return APU_IO_TEST_MODE[adr - 0x4018];
-            }
             if (adr >= 0x4020 & adr <= 0xFFFF)
-            {
                 return cartridge.CpuRead(adr);
-            }
             throw new ArgumentOutOfRangeException($"Invalid address greater than 0xFFFF: {adr.x()}");
         }
                
@@ -79,32 +67,26 @@ namespace project_nes
         {
             if(adr >= 0x000 & adr <= 0x1FFF)
                 cpuRam[adr & 0x7FF] = data;
-
             if (adr > 0x1FFF & adr <= 0x3FFF)
-                ppu.CpuWrite(adr, data);
-
+                ppu.CpuWrite((ushort)(adr & 0x007), data);
             if (adr > 0x3FFF & adr <= 0x4017)
                 APU_IO[adr - 0x4000] = data;
-
             if (adr > 0x4017 & adr <= 0x401F)
-                APU_IO_TEST_MODE[adr - 0x4000] = data;
-
+                APU_IO_TEST_MODE[adr - 0x4018] = data;
             if (adr > 0x401F & adr <= 0xFFFF)
                 cartridge.CpuWrite(adr, data);
-
-            else if (adr > 0xFFFF)
-                throw new ArgumentOutOfRangeException(
-                    $"Invalid address greater than 0xFFFF: {adr.x()}");
+            else throw new ArgumentOutOfRangeException($"Invalid address greater than 0xFFFF: {adr.x()}");
         }
 
         public void InsertCartridge(Cartridge cart)
         {
             this.cartridge = cart;
+            ppu.ConnectCartridge(cart);
         }
 
         public void ConnectPPU(PPU p)
         {
-            this.ppu = p;
+            this.ppu = p; 
         }
     }
 }
