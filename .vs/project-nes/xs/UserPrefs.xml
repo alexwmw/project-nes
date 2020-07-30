@@ -3,9 +3,10 @@
   <MonoDevelop.Ide.Workbench>
     <Files>
       <File FileName="project-nes/Program.cs" Line="19" Column="45" />
-      <File FileName="project-nes/HelperMethods.cs" Line="14" Column="75" />
-      <File FileName="project-nes/Bus.cs" Line="80" Column="1" />
-      <File FileName="project-nes/CPU.cs" Line="1076" Column="88" />
+      <File FileName="project-nes/HelperMethods.cs" Line="1" Column="1" />
+      <File FileName="project-nes/Bus.cs" />
+      <File FileName="project-nes/CPU.cs" Line="28" Column="17" />
+      <File FileName="project-nes/Cartridge.cs" Line="73" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -17,9 +18,6 @@
             </Node>
           </Node>
         </State>
-      </Pad>
-      <Pad Id="MonoDevelop.Debugger.WatchPad">
-        <State />
       </Pad>
     </Pads>
   </MonoDevelop.Ide.Workbench>
