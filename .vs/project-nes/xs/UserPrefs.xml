@@ -3,9 +3,9 @@
   <MonoDevelop.Ide.Workbench>
     <Files>
       <File FileName="project-nes/Program.cs" Line="19" Column="45" />
-      <File FileName="project-nes/HelperMethods.cs" Line="12" Column="1" />
+      <File FileName="project-nes/HelperMethods.cs" Line="14" Column="75" />
       <File FileName="project-nes/Bus.cs" Line="80" Column="1" />
-      <File FileName="project-nes/CPU.cs" Line="998" Column="32" />
+      <File FileName="project-nes/CPU.cs" Line="457" Column="33" />
       <File FileName="project-nes/Cartridge.cs" Line="73" Column="1" />
     </Files>
     <Pads>
@@ -14,7 +14,7 @@
           <Node name="project-nes" expanded="True">
             <Node name="project-nes" expanded="True">
               <Node name="Dependencies" expanded="True" />
-              <Node name="Cartridge.cs" selected="True" />
+              <Node name="CPU.cs" selected="True" />
             </Node>
           </Node>
         </State>

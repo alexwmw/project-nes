@@ -40,7 +40,7 @@ namespace project_nes
         private int logLineNo = 2;          // Line no. used in console logging. Offset by 2 to match Excel lines
         private State before_state;
         private byte stackTopValue {
-            get => Read(0x100 + stkp + 1);
+            get => Read(0x0100 + stkp + 1);
         }
 
 
@@ -453,17 +453,29 @@ namespace project_nes
 
         // Opcodes
 
-        //Add with Carry
-        //todo: oversimplified
+
+        /** ADC - Add with Carry
+         * 
+         * This instruction adds the contents of a memory location to 
+         * the accumulator together with the carry bit. 
+         * If overflow occurs the carry bit is set, 
+         * this enables multiple byte addition to be performed.
+         */
         private bool ADC()
         {
             Fetch();
-            A = (byte)((A + data) & 0x00FF);
-
+            ushort temp = (ushort)(A + data + GetFlag(Flags.C));
+            bool isSignedOverflow = (~(A ^ data) & (A ^ temp) & 0x0080) > 0;
+            SetFlags(
+                Flags.C, (ushort)(temp & 0x0100) > 0,
+                Flags.Z, ((byte)(temp & 0x00FF)).IsNegative(),
+                Flags.V, isSignedOverflow,
+                Flags.N,temp.IsNegative());
+            A = (byte)(temp & 0x00FF);
             return true;
         }
 
-        /** ANS - Logical AND
+        /** AND - Logical AND
          * 
          * A logical AND is performed, bit by bit, on the accumulator 
          * contents using the contents of a byte of memory.
