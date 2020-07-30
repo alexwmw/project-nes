@@ -468,9 +468,9 @@ namespace project_nes
             bool isSignedOverflow = (~(A ^ data) & (A ^ temp) & 0x0080) > 0;
             SetFlags(
                 Flags.C, (ushort)(temp & 0x0100) > 0,
-                Flags.Z, ((byte)(temp & 0x00FF)).IsNegative(),
+                Flags.Z, ((byte)(temp & 0x00FF)).IsZero(),
                 Flags.V, isSignedOverflow,
-                Flags.N,temp.IsNegative());
+                Flags.N, temp.IsNegative());
             A = (byte)(temp & 0x00FF);
             return true;
         }
@@ -735,12 +735,10 @@ namespace project_nes
         private bool CMP()
         {
             Fetch();
-            ushort tempU = (ushort)(A - data);
-            byte tempB = (byte)(tempU & 0x00FF);
             SetFlags(
                 Flags.C, A >= data,
-                Flags.Z, tempB.IsZero(),
-                Flags.N, tempB.IsNegative());
+                Flags.Z, A == data,
+                Flags.N, ((byte)(A - data)).IsNegative());
             return true;
         }
 
@@ -755,7 +753,7 @@ namespace project_nes
             SetFlags(
                 Flags.C, X >= data,
                 Flags.Z, X == data,
-                Flags.N, data.IsNegative());
+                Flags.N, ((byte)(X - data)).IsNegative());
             return false;
         }
 
@@ -770,7 +768,7 @@ namespace project_nes
             SetFlags(
                 Flags.C, Y >= data,
                 Flags.Z, Y == data,
-                Flags.N, data.IsNegative());
+                Flags.N, ((byte)(Y - data)).IsNegative());
             return false;
         }
 
