@@ -5,8 +5,7 @@
       <File FileName="project-nes/Program.cs" Line="19" Column="45" />
       <File FileName="project-nes/HelperMethods.cs" Line="14" Column="75" />
       <File FileName="project-nes/Bus.cs" Line="80" Column="1" />
-      <File FileName="project-nes/CPU.cs" Line="741" Column="59" />
-      <File FileName="project-nes/Cartridge.cs" Line="73" Column="1" />
+      <File FileName="project-nes/CPU.cs" Line="1076" Column="88" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -14,7 +13,7 @@
           <Node name="project-nes" expanded="True">
             <Node name="project-nes" expanded="True">
               <Node name="Dependencies" expanded="True" />
-              <Node name="Cartridge.cs" selected="True" />
+              <Node name="CPU.cs" selected="True" />
             </Node>
           </Node>
         </State>

@@ -1074,13 +1074,13 @@ namespace project_nes
          * 
          * The RTI instruction is used at the end of an interrupt processing routine. 
          * It pulls the processor flags from the stack followed by the program counter.
-         * todo: set U and B to not U and B?
          */
         private bool RTI()
         {
             status = Read(0x0100 + ++stkp);
             PC = Read(0x0100 + ++stkp);
             PC |= (ushort)(Read(0x0100 + ++stkp) << 8);
+            SetFlags(Flags.U, true);
             return false;
         }
 
@@ -1182,8 +1182,8 @@ namespace project_nes
         {
             X = A;
             SetFlags(
-                Flags.N, X == 0,
-                Flags.Z, X.IsNegative());
+                Flags.Z, X == 0,
+                Flags.N, X.IsNegative());
             return false;
         }
 
@@ -1194,8 +1194,8 @@ namespace project_nes
         {
             Y = A;
             SetFlags(
-                Flags.N, Y == 0,
-                Flags.Z, Y.IsNegative());
+                Flags.Z, Y == 0,
+                Flags.N, Y.IsNegative());
             return false;
         }
 
@@ -1206,8 +1206,8 @@ namespace project_nes
         {
             X = stkp;
             SetFlags(
-                Flags.N, X == 0,
-                Flags.Z, X.IsNegative());
+                Flags.Z, X == 0,
+                Flags.N, X.IsNegative());
             return false;
         }
 
@@ -1218,8 +1218,8 @@ namespace project_nes
         {
             A = X;
             SetFlags(
-                Flags.N, A == 0,
-                Flags.Z, A.IsNegative());
+                Flags.Z, A == 0,
+                Flags.N, A.IsNegative());
             return false;
         }
 
@@ -1239,8 +1239,8 @@ namespace project_nes
         {
             A = Y;
             SetFlags(
-                Flags.N, A == 0,
-                Flags.Z, A.IsNegative());
+                Flags.Z, A == 0,
+                Flags.N, A.IsNegative());
             return false;
         }
 
