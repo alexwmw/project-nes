@@ -21,11 +21,14 @@ namespace project_nes
 
             Bus bus = new Bus();
             CPU cpu = new CPU();
+            PPU ppu = new PPU();
             Cartridge cartridge = new Cartridge(nestest, testRoms);
             bus.InsertCartridge(cartridge);
+            bus.ConnectPPU(ppu);
             cpu.ConnectBus(bus);
             cpu.Reset();
-            cpu.PC = 0xC000;
+
+            cpu.PC = 0xC000; 
             while (true)
             {
                 cpu.Clock();

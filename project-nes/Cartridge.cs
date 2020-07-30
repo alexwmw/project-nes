@@ -10,7 +10,6 @@ namespace project_nes
     {
         private BinaryReader reader;
         private Header header;
-        private byte[] mapper = new byte[0xBFE0];
         private byte[] trainer;
         private byte[] prgRom;
         private byte[] chrRom;
@@ -56,9 +55,7 @@ namespace project_nes
          */
         public byte CpuRead(ushort adr)
         {
-
             ushort mappedAdr;
-
             //dummy mapper 0
             if (adr < 0x6000)
             {
@@ -66,20 +63,17 @@ namespace project_nes
                 throw new ArgumentOutOfRangeException(
                     $"Cartridge read by CPU at {adr}");
             }
-
             else if (adr >= 0x6000 & adr <= 0x7FFF)
             {
                 // chr rom - not used by CPU
                 throw new ArgumentOutOfRangeException(
                     $"Cartridge read by CPU at {adr}");
             }
-
             else if (adr >= 0x8000 & adr <= 0xFFFF)
             {
                 mappedAdr = (ushort)(adr & (prgBanks == 32 ? 0x7FFF : 0x3FFF));
                 return prgRom[mappedAdr];
             }
-
             else
                 throw new ArgumentOutOfRangeException(
                     $"Cartridge read by CPU at {adr}");
@@ -97,24 +91,22 @@ namespace project_nes
                 throw new ArgumentOutOfRangeException(
                     $"Cartridge read by CPU at {adr}");
             }
-
             else if (adr >= 0x6000 & adr <= 0x7FFF)
             {
                 // chr rom - not used by CPU
                 throw new ArgumentOutOfRangeException(
                     $"Cartridge read by CPU at {adr}");
             }
-
             else if (adr >= 0x8000 & adr <= 0xFFFF)
             {
                 mappedAdr = (ushort)(adr & (prgBanks == 32 ? 0x7FFF : 0x3FFF));
                 prgRom[mappedAdr] = data;
             }
-
             else
                 throw new ArgumentOutOfRangeException(
                     $"Cartridge read by CPU at {adr}");
         }
+
         public void Report()
         {
             Console.WriteLine();
@@ -125,8 +117,8 @@ namespace project_nes
             Console.WriteLine($"Format:             {formatString}");
             Console.WriteLine($"Mapper:             {mapperId}");
             Console.WriteLine($"Trainer Present:    {header.Trainer}");
-            Console.WriteLine($"Prg ROM Size:       0x{prgRom.Length.Hex()} | {prgRom.Length / 1024} kb");
-            Console.WriteLine($"Chr ROM Size:       0x{chrRom.Length.Hex()} | {chrRom.Length / 1024} kb");
+            Console.WriteLine($"Prg ROM Size:       0x{prgRom.Length.x()} | {prgRom.Length / 1024} kb");
+            Console.WriteLine($"Chr ROM Size:       0x{chrRom.Length.x()} | {chrRom.Length / 1024} kb");
             Console.WriteLine();
         }
 

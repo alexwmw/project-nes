@@ -17,7 +17,7 @@ namespace HelperMethods
 
         public static string x(this ushort u) => u.ToString("x4").ToUpper();
 
-        public static string Hex(this int i) => i.ToString("x").ToUpper();
+        public static string x(this int i) => i.ToString("x").ToUpper();
 
         public static void Log(this string s) => Console.WriteLine($"{s}");
 
