@@ -368,7 +368,7 @@ namespace project_nes
             byte lowByte = Read(PC++);
             byte highByte = Read(PC++);
             ushort temp = LittleEndian(lowByte, highByte);
-            address = temp == 0x00FF
+            address = lowByte == 0x00FF
                 //simulate hardware bug
                 ? LittleEndian(
                     Read(temp),
@@ -1037,8 +1037,8 @@ namespace project_nes
             ushort temp = (ushort)((data << 1) | GetFlag(Flags.C));
             SetFlags(
                 Flags.C, (temp & 0xFF00) > 0,
-                Flags.N, (temp & 0x00FF) == 0,
-                Flags.Z, temp.IsNegative());
+                Flags.Z, (temp & 0x00FF) == 0,
+                Flags.N, temp.IsNegative());
 
             if (CurrentModeImplicit())
                 A = (byte)(temp & 0x00FF);
@@ -1060,8 +1060,8 @@ namespace project_nes
             ushort temp = (ushort)(GetFlag(Flags.C) << 7 | data >> 1);
             SetFlags(
                 Flags.C, (data & 0x0001) == 1,
-                Flags.N, (temp & 0x00FF) == 0,
-                Flags.Z, temp.IsNegative());
+                Flags.Z, (temp & 0x00FF) == 0,
+                Flags.N, temp.IsNegative());
 
             if (CurrentModeImplicit())
                 A = (byte)(temp & 0x00FF);
