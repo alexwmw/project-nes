@@ -723,10 +723,12 @@ namespace project_nes
         private bool CMP()
         {
             Fetch();
+            ushort tempU = (ushort)(A - data);
+            byte tempB = (byte)(tempU & 0x00FF);
             SetFlags(
                 Flags.C, A >= data,
-                Flags.Z, A == data,
-                Flags.N, data.IsNegative());
+                Flags.Z, tempB.IsZero(),
+                Flags.N, tempB.IsNegative());
             return true;
         }
 
