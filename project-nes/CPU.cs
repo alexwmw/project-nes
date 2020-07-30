@@ -24,26 +24,32 @@ namespace project_nes
         private byte stkp;                  // Stack pointer
         public ushort PC;                  // Program counter
 
+        private Bus bus;
+        private InstructionSet instructionSet;
+
         //Emulation variables
-        private Instruction current;        // Curently executing instruction;
         private byte opcode;                // Current instruction byte
         private byte data;                  // Fetched data
         private ushort address;             // Fetched address
         private ushort branch;              // Fetched branch operand
         private int cycles;                 // Cycles required by current instruction
+        private Instruction currentInstr;   // Curently executing instruction
+
+        //Debugging and monitoring
         private int clock_count;            // Total number of clock cycles passed
         private int logLineNo = 2;          // Line no. used in console logging. Offset by 2 to match Excel lines
-        private State state;
+        private State before_state;
+        private byte stackTopValue {
+            get => Read(0x100 + stkp + 1);
+        }
 
-        private InstructionSet instructionSet;
-        private Bus bus;
 
-        //Logging files
-        DirectoryInfo csvLogs;
-        DateTime dateTime;
-        CultureInfo cultInfo;
+        //Logging variables;
         string csvFileName;
         string filePath;
+        CultureInfo cultInfo;
+        DateTime dateTime;
+        DirectoryInfo csvLogs;
 
         // Constructors
 
@@ -109,12 +115,12 @@ namespace project_nes
         {
             if (cycles == 0)
             {
-                state = new State(this);
+                before_state = new State(this);
                 opcode = Read(PC++);
-                current = instructionSet[opcode];
-                cycles += current.Cycles;
-                bool addrm = current.AddrMode();
-                bool operation = current.Operation();
+                currentInstr = instructionSet[opcode];
+                cycles += currentInstr.Cycles;
+                bool addrm = currentInstr.AddrMode();
+                bool operation = currentInstr.Operation();
                 LogState();
 
                 using (StreamWriter file = new StreamWriter(filePath, true))
@@ -249,6 +255,18 @@ namespace project_nes
             else status &= (byte)~f3;
         }
 
+        private void SetFlags(Flags f1, bool b1, Flags f2, bool b2, Flags f3, bool b3, Flags f4, bool b4)
+        {
+            if (b1) status |= (byte)f1;
+            else status &= (byte)~f1;
+            if (b2) status |= (byte)f2;
+            else status &= (byte)~f2;
+            if (b3) status |= (byte)f3;
+            else status &= (byte)~f3;
+            if (b4) status |= (byte)f4;
+            else status &= (byte)~f4;
+        }
+
         private void Fetch()
         {
             if (CurrentModeImplicit())
@@ -265,8 +283,8 @@ namespace project_nes
             byte byte2 = (byte)(CurrentMode() == Rel ? branch : address & 0x00FF);
             byte byte3 = (byte)(CurrentMode() == Rel ? 0 : (address & 0xFF00) >> 8);
             string line =
-                $"{rowN}.   {state.PC.x()}  {byte1.x()} {byte2.x()} {byte3.x()}  " +
-                $"{current.Name} {address.x()}            " +
+                $"{rowN}.   {before_state.PC.x()}  {byte1.x()} {byte2.x()} {byte3.x()}  " +
+                $"{currentInstr.Name} {address.x()}            " +
                 $"A:{A.x()} X:{X.x()} Y:{Y.x()} P:{status.x()} SP:{stkp.x()} PPU:  x,xxx CYC:{clock_count}";
             Console.WriteLine(line);
         }
@@ -279,7 +297,7 @@ namespace project_nes
                 byte byte2 = (byte)(CurrentMode() == Rel ? branch : address & 0x00FF);
                 byte byte3 = (byte)(CurrentMode() == Rel ? 0 : (address & 0xFF00) >> 8);
                 return
-                    $"{state.PC.x()},{byte1.x()},{ byte2.x()},{byte3.x()},{current.Name},{address.x()},{state.A.x()},{state.X.x()},{state.Y.x()},{state.status.x()},{state.stkp.x()},{0},{000},{clock_count}";
+                    $"{before_state.PC.x()},{byte1.x()},{ byte2.x()},{byte3.x()},{currentInstr.Name},{address.x()},{before_state.A.x()},{before_state.X.x()},{before_state.Y.x()},{before_state.status.x()},{before_state.stkp.x()},{0},{000},{clock_count}";
             }
         }
 
@@ -858,7 +876,7 @@ namespace project_nes
             PC--;
 
             Write((ushort)(0x0100 + stkp--), PC.GetPage());
-            Write((ushort)(0x0100 + stkp--), (byte)(PC & 0x00FF));
+            Write((ushort)(0x0100 + stkp--), PC.GetOffset());
             PC = address;
             return false;
         }
@@ -960,8 +978,9 @@ namespace project_nes
          */
         private bool PHP()
         {
-            SetFlags(Flags.B, true);
+            SetFlags(Flags.B, true); 
             Write((ushort)(0x0100 + stkp--), status);
+            SetFlags(Flags.B, false);
             return false;
         }
 
@@ -975,7 +994,9 @@ namespace project_nes
             A = Read(0x0100 + ++stkp);
             SetFlags(
                 Flags.Z, A.IsZero(),
-                Flags.N, A.IsNegative());
+                Flags.N, A.IsNegative(),
+                Flags.B, false,
+                Flags.U, true);          //<------------ set according to nestest
             return false;
         }
 
@@ -987,6 +1008,8 @@ namespace project_nes
         private bool PLP()
         {
             status = Read(0x0100 + ++stkp);
+            SetFlags(Flags.U, true,
+                     Flags.B, false);
             return false;
         }
 
