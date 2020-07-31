@@ -44,7 +44,6 @@ namespace project_nes
                 prgRom = reader.ReadBytes(prgBanks * 16384);
             if (chrBanks > 0)
                 chrRom = reader.ReadBytes(chrBanks * 8192);
-
             reader.Close();
             this.Report();
         }
@@ -52,6 +51,9 @@ namespace project_nes
 
         /**
          * Received an address between 0x4020 - 0xFFFF
+         * 
+         * CPU should R/W only from program (PRG) memory
+         * 
          */
         public byte CpuRead(ushort adr)
         {
@@ -60,14 +62,12 @@ namespace project_nes
             if (adr < 0x6000)
             {
                 // rarely used
-                throw new ArgumentOutOfRangeException(
-                    $"Cartridge read by CPU at {adr}");
+                throw new ArgumentOutOfRangeException($"Cartridge non-CPU range read by CPU at {adr}");
             }
             else if (adr >= 0x6000 & adr <= 0x7FFF)
             {
                 // chr rom - not used by CPU
-                throw new ArgumentOutOfRangeException(
-                    $"Cartridge read by CPU at {adr}");
+                throw new ArgumentOutOfRangeException($"Cartridge non-CPU range / CHR Rom read by CPU at {adr}");
             }
             else if (adr >= 0x8000 & adr <= 0xFFFF)
             {
@@ -75,27 +75,23 @@ namespace project_nes
                 return prgRom[mappedAdr];
             }
             else
-                throw new ArgumentOutOfRangeException(
-                    $"Cartridge read by CPU at {adr}");
+                throw new ArgumentOutOfRangeException($"Cartridge non-CPU range read by CPU at {adr}");
         }
 
         public void CpuWrite(ushort adr, byte data)
         {
-
             ushort mappedAdr;
 
             //dummy mapper 0
             if (adr < 0x6000)
             {
                 // rarely used
-                throw new ArgumentOutOfRangeException(
-                    $"Cartridge read by CPU at {adr}");
+                throw new ArgumentOutOfRangeException($"Cartridge non-CPU range read by CPU at {adr}");
             }
             else if (adr >= 0x6000 & adr <= 0x7FFF)
             {
                 // chr rom - not used by CPU
-                throw new ArgumentOutOfRangeException(
-                    $"Cartridge read by CPU at {adr}");
+                throw new ArgumentOutOfRangeException($"Cartridge non-CPU range / CHR Rom read by CPU at {adr}");
             }
             else if (adr >= 0x8000 & adr <= 0xFFFF)
             {
@@ -103,9 +99,39 @@ namespace project_nes
                 prgRom[mappedAdr] = data;
             }
             else
-                throw new ArgumentOutOfRangeException(
-                    $"Cartridge read by CPU at {adr}");
+                throw new ArgumentOutOfRangeException($"Cartridge non-CPU range read by CPU at {adr}");
         }
+
+        /**
+         * PPU should R/W only from character (CHR) memory
+         */
+        public byte PpuRead(ushort adr)
+        {
+            ushort mappedAdr;
+
+            if (adr >= 0x6000 & adr <= 0x7FFF)
+            {
+                mappedAdr = adr;
+                return chrRom[mappedAdr];
+            }
+            else 
+                throw new ArgumentOutOfRangeException($"Cartridge non-PPU range read by PPU at {adr}");
+        }
+
+        public void PpuWrite(ushort adr, byte data)
+        {
+            ushort mappedAdr;
+
+            if (adr >= 0x6000 & adr <= 0x7FFF)
+            {
+                mappedAdr = adr;
+                chrRom[mappedAdr] = data;
+            }
+            else if (adr >= 0x8000 & adr <= 0xFFFF)
+                throw new ArgumentOutOfRangeException($"Cartridge non-PPU range read by PPU at {adr}");
+        }
+
+
 
         public void Report()
         {
@@ -176,13 +202,12 @@ namespace project_nes
                 if (v) Console.WriteLine(
                     $"\nPARSING HEADER" +
                     $"\n--------------------------------");
-
                 // Bytes 0 - 3
-                byte[] str = reader.ReadBytes(4);                 Identification = Encoding.UTF8.GetString(str);
+                byte[] str = reader.ReadBytes(4);
+                Identification = Encoding.UTF8.GetString(str);
                 if (v) Console.WriteLine(
                     $"Identification:     {Identification}" +
                     $"\n--------------------------------");
-
                 // Bytes 4 - 5
                 p_rom_lsb = reader.ReadByte();
                 c_rom_lsb = reader.ReadByte();
@@ -190,7 +215,6 @@ namespace project_nes
                     $"p_rom_lsb :         {p_rom_lsb}" +
                     $"\nc_rom_lsb:          {c_rom_lsb}" +
                     $"\n--------------------------------");
-
                 // Byte 6
                 flags6 = reader.ReadByte();
                 nt_mirroring    = (flags6 & (1 << 0)) > 0;
@@ -205,7 +229,6 @@ namespace project_nes
                     $"\nfour_screen:        {four_screen}" +
                     $"\nmapper_D0-D3:       {mapper_D0_D3}" +
                     "\n--------------------------------");
-
                 // Byte 7
                 flags7 = reader.ReadByte();
                 console_type    = (byte)(flags7 & 0x03);
@@ -216,40 +239,35 @@ namespace project_nes
                     $"\nNES_2.0:            {Nes_20}" +
                     $"\nmapper_D4_D7:       {mapper_D4_D7}" +
                     $"\n--------------------------------");
-
                 // Byte 8
-                temp = reader.ReadByte();
-                mapper_D8_D11 = (byte)((temp & 0x0F));
-                submapper = (byte)((temp & 0xF0) >> 4);
+                temp            = reader.ReadByte();
+                mapper_D8_D11   = (byte)((temp & 0x0F));
+                submapper       = (byte)((temp & 0xF0) >> 4);
                 if (v) Console.WriteLine(
                     $"mapper_D8_D11:      {mapper_D8_D11}" +
                     $"\nsubmapper:          {submapper}" +
                     $"\n--------------------------------");
-
                 // Byte 9
                 temp = reader.ReadByte();
-                p_rom_msb = (byte)((temp & 0x0F));
-                c_rom_msb = (byte)((temp & 0xF0) >> 4);
+                p_rom_msb        = (byte)((temp & 0x0F));
+                c_rom_msb        = (byte)((temp & 0xF0) >> 4);
                 if (v) Console.WriteLine(
                     $"p_rom_msb:          {p_rom_msb}" +
                     $"\nc_rom_msb:          {c_rom_msb}" +
                     $"\n--------------------------------");
-
                 // Byte 10
                 temp = reader.ReadByte();
-                p_ram_size = (byte)((temp & 0x0F));
-                eeprom_size = (byte)((temp & 0xF0) >> 4);
+                p_ram_size         = (byte)((temp & 0x0F));
+                eeprom_size        = (byte)((temp & 0xF0) >> 4);
                 if (v) Console.WriteLine(
                     $"p_ram:              {p_ram_size}" +
                     $"\neeprom:             {eeprom_size}" +
                     $"\n--------------------------------");
-
                 // Byte 11
-                c_ram_size = reader.ReadByte();
+                c_ram_size         = reader.ReadByte();
                 if (v) Console.WriteLine(
                     $"c_ram:              {c_ram_size}" +
                     $"\n--------------------------------");
-
                 // Bytes 12 - 15
                 byte12 = reader.ReadByte();
                 byte13 = reader.ReadByte();
