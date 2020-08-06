@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using CsvHelper.Configuration.Attributes;
 using HelperMethods;
 using static HelperMethods.StaticMethods;
 
@@ -26,6 +25,7 @@ namespace project_nes
 
         private CpuBus bus;
         private InstructionSet instructionSet;
+        private int clockRate;
 
         //Emulation variables
         private byte opcode;                // Current instruction byte
@@ -38,13 +38,10 @@ namespace project_nes
         //Debugging and monitoring
         private int clock_count;            // Total number of clock cycles passed
         private int logLineNo = 2;          // Line no. used in console logging. Offset by 2 to match Excel lines
-        private State before_state;
-        private byte stackTopValue {
-            get => Read(0x0100 + stkp + 1);
-        }
+        private State state;
 
 
-        //Logging variables;
+        //CSV file variables;
         string csvFileName;
         string filePath;
         CultureInfo cultInfo;
@@ -115,19 +112,17 @@ namespace project_nes
         {
             if (cycles == 0)
             {
-                before_state = new State(this);
+                state = new State(this);
                 opcode = Read(PC++);
                 currentInstr = instructionSet[opcode];
                 cycles += currentInstr.Cycles;
                 bool addrm = currentInstr.AddrMode();
                 bool operation = currentInstr.Operation();
                 LogState();
-
                 using (StreamWriter file = new StreamWriter(filePath, true))
                 {
-                    file.WriteLine(CsvLine);
+                    file.WriteLine(state);
                 }
-
                 if (addrm & operation)
                     cycles++;
             }
@@ -275,31 +270,20 @@ namespace project_nes
                 data = Read(address);
         }
 
-
-        public void LogState()
+        private void LogState()
         {
             string rowN = string.Format("{0,5}", logLineNo++);
             byte byte1 = opcode;
             byte byte2 = (byte)(CurrentMode() == Rel ? branch : address & 0x00FF);
             byte byte3 = (byte)(CurrentMode() == Rel ? 0 : (address & 0xFF00) >> 8);
             string line =
-                $"{rowN}.   {before_state.PC.x()}  {byte1.x()} {byte2.x()} {byte3.x()}  " +
+                $"{rowN}.   {state.PC.x()}  {byte1.x()} {byte2.x()} {byte3.x()}  " +
                 $"{currentInstr.Name} {address.x()}            " +
                 $"A:{A.x()} X:{X.x()} Y:{Y.x()} P:{status.x()} SP:{stkp.x()} PPU:  x,xxx CYC:{clock_count}";
             Console.WriteLine(line);
         }
 
-        public string CsvLine
-        {
-            get
-            {
-                byte byte1 = opcode;
-                byte byte2 = (byte)(CurrentMode() == Rel ? branch : address & 0x00FF);
-                byte byte3 = (byte)(CurrentMode() == Rel ? 0 : (address & 0xFF00) >> 8);
-                return
-                    $"{before_state.PC.x()},{byte1.x()},{ byte2.x()},{byte3.x()},{currentInstr.Name},{address.x()},{before_state.A.x()},{before_state.X.x()},{before_state.Y.x()},{before_state.status.x()},{before_state.stkp.x()},{0},{000},{clock_count}";
-            }
-        }
+
 
         private Func<bool> CurrentMode()
             => instructionSet[opcode].AddrMode;
@@ -419,7 +403,6 @@ namespace project_nes
             branch = Read(PC++);
             if (branch.IsNegative())
                 branch |= 0xFF00;
-
             return false;
         }
 
@@ -428,7 +411,6 @@ namespace project_nes
         {
             address = Read(PC++);
             address &= 0x00FF;
-
             return false;
         }
 
@@ -446,7 +428,6 @@ namespace project_nes
         {
             address = (ushort)(Read(PC++) + Y);
             address &= 0x00FF;
-
             return false;
         }
 
@@ -1290,14 +1271,12 @@ namespace project_nes
                 Cycles = cycles;
             }
 
-            public string Name { get {
-                    return Operation.Method.Name;
-                }
+            public string Name {
+                get => Operation.Method.Name;
             }
 
-            public string NameOfAddrMode {  get {
-                    return AddrMode.Method.Name;
-                }
+            public string NameOfAddrMode {
+                get => AddrMode.Method.Name;
             }
 
             public Func<bool> Operation { get; }
@@ -1307,13 +1286,17 @@ namespace project_nes
             public int Cycles { get; }
         }
 
+        // Classes
+
         private struct State
         {
             public ushort PC;
             public byte A, X, Y, stkp, status;
+            CPU post_fetch;
 
             public State(CPU cpu)
             {
+                post_fetch = cpu;
                 PC = cpu.PC;
                 A = cpu.A;
                 X = cpu.X;
@@ -1321,9 +1304,24 @@ namespace project_nes
                 stkp = cpu.stkp;
                 status = cpu.status;
             }
-        }
 
-        // Classes
+            public override string ToString()
+               =>
+               $"{PC.x()}," +
+               $"{post_fetch.opcode.x()}," +
+               $"{(post_fetch.address & 0x00FF).x()}," +
+               $"{(post_fetch.address & 0xFF00).x()}," +
+               $"{post_fetch.currentInstr.Name}," +
+               $"{post_fetch.address.x()}," +
+               $"{A.x()}," +
+               $"{X.x()}," +
+               $"{Y.x()}," +
+               $"{status.x()}," +
+               $"{stkp.x()}," +
+               $"{0},{000}," +
+               $"{post_fetch.clock_count}";
+        }
+            
 
         private class InstructionSet : IEnumerable<Instruction>
         {
