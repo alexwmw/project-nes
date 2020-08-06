@@ -22,6 +22,18 @@
         "runtime": {
           "lib/netcoreapp2.0/_._": {}
         }
+      },
+      "SDL2-CS/2.0.0": {
+        "type": "package"
+      },
+      "SDL2-CS.dll/2.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net20/SDL2-CS.dll": {}
+        },
+        "runtime": {
+          "lib/net20/SDL2-CS.dll": {}
+        }
       }
     }
   },
@@ -113,11 +125,45 @@
         "useSharedDesignerContext.txt",
         "version.txt"
       ]
+    },
+    "SDL2-CS/2.0.0": {
+      "sha512": "W7T4y+lMs7Wm/94dGggRxJYqxX5N6uuxuxw5ob/H34fnaoUwgoG0s+P7xzqsGXUc1cbCAjnShs21FdeFUnPlHA==",
+      "type": "package",
+      "path": "sdl2-cs/2.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE",
+        "content/net20/SDL2-CS/LPUtf8StrMarshaler.cs",
+        "content/net20/SDL2-CS/SDL2.cs",
+        "content/net20/SDL2-CS/SDL2_image.cs",
+        "content/net20/SDL2-CS/SDL2_mixer.cs",
+        "content/net20/SDL2-CS/SDL2_ttf.cs",
+        "sdl2-cs.2.0.0.nupkg.sha512",
+        "sdl2-cs.nuspec"
+      ]
+    },
+    "SDL2-CS.dll/2.0.0": {
+      "sha512": "yDYt8yMALzqNirxKqq7mtrNPrOiv1/D5FsQxUnRULJw8v95rWDkIBNR8BBJ4SmulJpkPiIk3a0UB7Q1LJsK8HQ==",
+      "type": "package",
+      "path": "sdl2-cs.dll/2.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE",
+        "lib/net20/SDL2-CS.XML",
+        "lib/net20/SDL2-CS.dll",
+        "lib/net20/SDL2-CS.dll.config",
+        "sdl2-cs.dll.2.0.0.nupkg.sha512",
+        "sdl2-cs.dll.nuspec"
+      ]
     }
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v3.1": [
-      "CsvHelper >= 15.0.5"
+      "CsvHelper >= 15.0.5",
+      "SDL2-CS >= 2.0.0",
+      "SDL2-CS.dll >= 2.0.0"
     ]
   },
   "packageFolders": {
@@ -158,6 +204,14 @@
           "CsvHelper": {
             "target": "Package",
             "version": "[15.0.5, )"
+          },
+          "SDL2-CS": {
+            "target": "Package",
+            "version": "[2.0.0, )"
+          },
+          "SDL2-CS.dll": {
+            "target": "Package",
+            "version": "[2.0.0, )"
           }
         },
         "imports": [
@@ -178,5 +232,17 @@
         "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/3.1.302/RuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'SDL2-CS.dll 2.0.0' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8' instead of the project target framework '.NETCoreApp,Version=v3.1'. This package may not be fully compatible with your project.",
+      "libraryId": "SDL2-CS.dll",
+      "targetGraphs": [
+        ".NETCoreApp,Version=v3.1"
+      ]
+    }
+  ]
 }

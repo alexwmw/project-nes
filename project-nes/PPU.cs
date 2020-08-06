@@ -1,5 +1,6 @@
 ﻿using System;
 
+
 namespace project_nes
 {
     public class PPU
@@ -15,14 +16,13 @@ namespace project_nes
          *   
          ** https://www.reddit.com/r/EmuDev/comments/4j4ryc/resources_for_writing_graphics_renderer/
          * 
-         * Basically, for an NES emulator what you'll be doing is blitting the 
-         * framebuffer pixel-by-pixel to a 256 by 240 buffer, and then once the 
-         * PPU finishes a frame you'll upload that to a texture and show it 
-         * fullscreen. 
+         *  Basically, for an NES emulator what you'll be doing is blitting the 
+         *  framebuffer pixel-by-pixel to a 256 by 240 buffer, and then once the 
+         *  PPU finishes a frame you'll upload that to a texture and show it 
+         *  fullscreen. 
          * 
          * 
          ** https://www.reddit.com/r/EmuDev/comments/9spw6q/doubts_about_graphics_in_emulation/
-         *    This is a somewhat complex subject, but you should be able to handle it. 
          *    Using SDL will probably be the easiest way to do this.
          *    
          *    1. Create an SDL_Surface that's 256x240 pixels in size 
@@ -43,9 +43,10 @@ namespace project_nes
          *       to the screen. Go back to step 2. 
          */
 
-        private const int maxCycles = 341; 
+        private const int maxCycles = 341;
         private const int maxSLs = 261;
 
+        // PPU registers
         private byte control;       // VBHB SINN | NMI enable (V), PPU master/slave (P), sprite height (H), background tile select (B), sprite tile select (S), increment mode (I), nametable select (NN)
         private byte mask;          // BGRs bMmG | color emphasis (BGR), sprite enable (s), background enable (b), sprite left column enable (M), background left column enable (m), greyscale (G)
         private byte status;        // VSO- ---- | vblank (V), sprite 0 hit (S), sprite overflow (O); read resets write pair for $2005/$2006
@@ -55,7 +56,7 @@ namespace project_nes
         private byte ppuAddress;    // PPU read/write address (two writes: most significant byte, least significant byte)
         private byte ppuData;       // PPU data read/write
         private byte oamDma;        // OAM DMA high address
-        private byte[] ppuRegisters; // Hold the register 'properties' so they can be accessed via addresses
+        private byte[] ppuRegisters; // Hold the register 'properties' so they can be accessed via an index
 
         private int cycle;
         private int scanLine;
@@ -75,7 +76,14 @@ namespace project_nes
                 PpuAddress,
                 PpuData
             };
+
+
+
+            PatternMemory[0] = new Pixel[(16 * 8), (16 * 8)];
+            PatternMemory[1] = new Pixel[(16 * 8), (16 * 8)];
         }
+
+        public Pixel[][,] PatternMemory { get; }
 
         private byte Control { get; set; }
 
@@ -93,12 +101,11 @@ namespace project_nes
 
         private byte PpuData { get; set; }
 
-        public byte[][] Display { get; }
 
         public void Clock()
         {
             cycle++;
-            if(cycle >= maxCycles)
+            if (cycle >= maxCycles)
             {
                 cycle = 0;
                 scanLine++;
@@ -138,5 +145,68 @@ namespace project_nes
         {
             return ppuBus.Read(addr);
         }
-    }
+
+
+        //Adapted from olcnes https://github.com/OneLoneCoder/olcNES/tree/master/Part%20%234%20-%20PPU%20Backgrounds
+        public void GetPatternTable(int i, byte palette)
+        {
+            // Nested 16 by 16 for-loops -- for each tile in the 16x16 tile grid in memory
+            for (int tileY = 0; tileY < 16; tileY++)
+            {
+                for (int tileX = 0; tileX < 16; tileX++)
+                {
+                    //Translate XY coordinates into 1D coordinate with (Y * Width + X) byte-offset
+                    // Y is multiplied by 256 (16*16)   i.e. 16 tiles width, each tile being 16 bytes of information
+                    // X is multiplied by 16            i.e. 16 bytes (one tile) 
+                    int offset = tileY * 256 + tileX * 16;
+
+                    //For each row in the 8px * 8px tile...
+                    for (int row = 0; row < 8; row++)
+                    {
+                        byte lsb = PpuRead((ushort)(i * 0x1000 + offset + row + 0));
+                        byte msb = PpuRead((ushort)(i * 0x1000 + offset + row + 8));
+
+                        //For each pixel in the 8px row...
+                        for (int col = 0; col < 8; col++)
+                        {
+                            byte pixelVal = (byte)((lsb * 0x01) + (msb * 0x01));
+                            lsb >>= 1;
+                            msb >>= 1;
+
+                            // At the pattern memory (bank) specifed by paramater i:
+                            //   At index row,col of tile x,y - set the pixel colour
+                            PatternMemory[i][row + (tileY * 8), col + (tileX * 8)] = GetColour(palette, pixelVal);
+                        }
+                    }
+                }
+            }
+        }
+
+        private Pixel GetColour(byte palet, byte pixel)
+        {
+            return new Pixel(0,0,0);
+        }
+
+
+        public struct Pixel
+        {
+            private byte[] colours;
+
+            public Pixel(byte red, byte green, byte blue)
+            {
+                Red = red;
+                Green = green;
+                Blue = blue;
+                colours = new byte[3] { Red, Green, Blue };
+            }
+            public byte Red { get; }
+            public byte Green { get; }
+            public byte Blue { get; }
+
+            public byte this[int i]
+            {
+                get => colours[i];
+            }
+        }
+    } 
 }
