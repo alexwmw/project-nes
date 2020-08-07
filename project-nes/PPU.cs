@@ -1,5 +1,7 @@
 ﻿using System;
-
+using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
 
 namespace project_nes
 {
@@ -61,6 +63,8 @@ namespace project_nes
         private int cycle;
         private int scanLine;
 
+        private Palette palette;
+
         PpuBus ppuBus;
 
         public PPU()
@@ -77,13 +81,81 @@ namespace project_nes
                 PpuData
             };
 
+            PatternMemory = new RgbPixel[2, (16 * 8) , (16 * 8)];
 
+            palette = new Palette
+            {
+                { 84,  84,  84 },
+                {  0,  30, 116 },
+                {  8,  16, 144 },
+                { 48,   0, 136 },
+                { 68,   0, 100 },
+                { 92,   0,  48 },
+                { 84,   4,   0 },
+                { 60,  24,   0 },
+                { 32,  42,   0 },
+                {  8,  58,   0 },
+                {  0,  64,   0 },
+                {  0,  60,   0 },
+                {  0,  50,  60 },
+                {  0,   0,   0 },
+                {  0,   0,   0 },
+                {  0,   0,   0 },
 
-            PatternMemory[0] = new Pixel[(16 * 8), (16 * 8)];
-            PatternMemory[1] = new Pixel[(16 * 8), (16 * 8)];
+                { 152, 150, 152 },
+                {   8,  76, 196 },
+                {  48,  50, 236 },
+                {  92,  30, 228 },
+                { 136,  20, 176 },
+                { 160,  20, 100 },
+                { 152,  34,  32 },
+                { 120,  60,   0 },
+                {  84,  90,   0 },
+                {  40, 114,   0 },
+                {   8, 124,   0 },
+                {   0, 118,  40 },
+                {   0, 102, 120 },
+                {   0,   0,   0 },
+                {   0,   0,   0 },
+                {   0,   0,   0 },
+
+                { 236, 238, 236 },
+                {  76, 154, 236 },
+                { 120, 124, 236 },
+                { 176,  98, 236 },
+                { 228,  84, 236 },
+                { 236,  88, 180 },
+                { 236, 106, 100 },
+                { 212, 136,  32 },
+                { 160, 170,   0 },
+                { 116, 196,   0 },
+                {  76, 208,  32 },
+                {  56, 204, 108 },
+                {  56, 180, 204 },
+                {  60,  60,  60 },
+                {   0,   0,   0 },
+                {   0,   0,   0 },
+  
+                { 236, 238, 236 },
+                { 168, 204, 236 },
+                { 188, 188, 236 },
+                { 212, 178, 236 },
+                { 236, 174, 236 },
+                { 236, 174, 212 },
+                { 236, 180, 176 },
+                { 228, 196, 144 },
+                { 204, 210, 120 },
+                { 180, 222, 120 },
+                { 168, 226, 144 },
+                { 152, 226, 180 },
+                { 160, 214, 228 },
+                { 160, 162, 160 },
+                {   0,   0,   0 },
+                {   0,   0,   0 }
+            };
         }
 
-        public Pixel[][,] PatternMemory { get; }
+        public Color[, ,] PatternMemory { get; }
 
         private byte Control { get; set; }
 
@@ -155,7 +227,7 @@ namespace project_nes
             {
                 for (int tileX = 0; tileX < 16; tileX++)
                 {
-                    //Translate XY coordinates into 1D coordinate with (Y * Width + X) byte-offset
+                    //Translate XY coordinates into 1D coordinate with (Y * Width + X)  byte-offset
                     // Y is multiplied by 256 (16*16)   i.e. 16 tiles width, each tile being 16 bytes of information
                     // X is multiplied by 16            i.e. 16 bytes (one tile) 
                     int offset = tileY * 256 + tileX * 16;
@@ -175,29 +247,30 @@ namespace project_nes
 
                             // At the pattern memory (bank) specifed by paramater i:
                             //   At index row,col of tile x,y - set the pixel colour
-                            PatternMemory[i][row + (tileY * 8), col + (tileX * 8)] = GetColour(palette, pixelVal);
+                            PatternMemory[i, row + (tileY * 8), col + (tileX * 8)] = GetColour(palette, pixelVal);
                         }
                     }
                 }
             }
         }
 
-        private Pixel GetColour(byte palet, byte pixel)
+        private Color GetColour(byte palet, byte pixel)
         {
-            return new Pixel(0,0,0);
+            byte index = PpuRead((ushort)(0x3f00 + (palet * 4) + pixel));
+
+            return palette[index];
         }
 
-
-        public struct Pixel
+        public struct RgbPixel
         {
-            private byte[] colours;
+            private byte[] rgb;
 
-            public Pixel(byte red, byte green, byte blue)
+            public RgbPixel(byte red, byte green, byte blue)
             {
                 Red = red;
                 Green = green;
                 Blue = blue;
-                colours = new byte[3] { Red, Green, Blue };
+                rgb = new byte[3] { Red, Green, Blue };
             }
             public byte Red { get; }
             public byte Green { get; }
@@ -205,7 +278,33 @@ namespace project_nes
 
             public byte this[int i]
             {
-                get => colours[i];
+                get => rgb[i];
+            }
+
+            public int HexValue()
+            {
+                return (Red << 16) & (Green << 8) & (Blue);
+            }
+        }
+
+        private class Palette : IEnumerable<Color>
+        {
+            private List<Color> colors = new List<Color>();
+
+            public IEnumerator<Color> GetEnumerator()
+                => colors.GetEnumerator();
+
+            IEnumerator IEnumerable.GetEnumerator()
+                => colors.GetEnumerator();
+
+            public void Add(byte r, byte g, byte b)
+                => colors.Add(Color.FromArgb(r, g, b));
+            
+
+            public Color this[int i]    // Indexer declaration  
+            {
+                get { return this.colors[i]; }
+                set { this.colors[i] = value; }
             }
         }
     } 
