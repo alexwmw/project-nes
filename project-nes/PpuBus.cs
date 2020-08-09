@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using HelperMethods;
 
 namespace project_nes
 {
@@ -124,7 +125,7 @@ namespace project_nes
                 return paletteRam[(addr & 0x001F)];
                 // Hard code in mirroring? https://youtu.be/-THeUXqR3zY?t=860
             }
-            throw new ArgumentOutOfRangeException("Address exceeds 0x3FFF");
+            throw new ArgumentOutOfRangeException($"Address {addr.x()} exceeds 0x3FFF");
         }
     }
 }

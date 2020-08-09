@@ -109,10 +109,19 @@ namespace project_nes
         {
             ushort mappedAdr;
 
-            if (adr >= 0x6000 & adr <= 0x7FFF)
+            if (adr >= 0x0000 & adr <= 0x1FFF)
             {
                 mappedAdr = adr;
-                return chrRom[mappedAdr];
+                try
+                {
+                    return chrRom[mappedAdr];
+                }
+                catch(System.IndexOutOfRangeException e)
+                {
+                    Console.WriteLine($"PpuRead Received the address {mappedAdr.x()}, originally {(adr - 0x6000).x()}");
+                    Console.WriteLine($"But chrRom has a length of {chrRom.Length.x()}");
+                    throw e;
+                }
             }
             else 
                 throw new ArgumentOutOfRangeException($"Cartridge non-PPU range read by PPU at {adr}");

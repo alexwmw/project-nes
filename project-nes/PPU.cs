@@ -240,13 +240,15 @@ namespace project_nes
                     {
                         byte lsb = PpuRead((ushort)(i * 0x1000 + offset + row + 0));
                         byte msb = PpuRead((ushort)(i * 0x1000 + offset + row + 8));
+                        
 
                         //For each pixel in the 8px row...
                         for (int col = 0; col < 8; col++)
                         {
-                            byte pixelVal = (byte)((lsb * 0x01) + (msb * 0x01));
+                            byte pixelVal = (byte)((lsb & 0x01) + (msb & 0x01));
                             lsb >>= 1;
                             msb >>= 1;
+                            Console.WriteLine("pixelval: " + pixelVal +"\n");
 
                             // At the pattern memory (bank) specifed by paramater i:
                             //   At index row,col of tile x,y - set the pixel colour
@@ -303,7 +305,6 @@ namespace project_nes
             public void Add(byte r, byte g, byte b)
                 => colors.Add(Color.FromArgb(r, g, b));
             
-
             public Color this[int i]    // Indexer declaration  
             {
                 get { return this.colors[i]; }
