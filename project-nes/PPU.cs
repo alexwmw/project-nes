@@ -48,7 +48,11 @@ namespace project_nes
         private const int maxCycles = 341;
         private const int maxSLs = 261;
 
-        // PPU registers
+        /** PPU registers
+         * These are the backing fields of register properties.
+         * When each register is r/w to, various actions are triggered.
+         * Property getters and setters are a convenient medium for this
+         */
         private byte control;       // VBHB SINN | NMI enable (V), PPU master/slave (P), sprite height (H), background tile select (B), sprite tile select (S), increment mode (I), nametable select (NN)
         private byte mask;          // BGRs bMmG | color emphasis (BGR), sprite enable (s), background enable (b), sprite left column enable (M), background left column enable (m), greyscale (G)
         private byte status;        // VSO- ---- | vblank (V), sprite 0 hit (S), sprite overflow (O); read resets write pair for $2005/$2006
@@ -58,18 +62,17 @@ namespace project_nes
         private byte ppuAddress;    // PPU read/write address (two writes: most significant byte, least significant byte)
         private byte ppuData;       // PPU data read/write
         private byte oamDma;        // OAM DMA high address
-        private byte[] ppuRegisters; // Hold the register 'properties' so they can be accessed via an index
+        private byte[] ppuRegisters;// Hold the register properties so they can be accessed via an index
 
         private int cycle;
         private int scanLine;
-
         private Palette palette;
 
         PpuBus ppuBus;
 
         public PPU()
         {
-            ppuRegisters = new byte[]
+            ppuRegisters = new byte[8]
             {
                 Control,
                 Mask,
@@ -81,7 +84,8 @@ namespace project_nes
                 PpuData
             };
 
-            PatternMemory = new RgbPixel[2, (16 * 8) , (16 * 8)];
+            // Two adjacent 16 * 16 2D arrays of 8 * 8 tiles
+            PatternMemory = new Color[2, (16 * 8) , (16 * 8)];
 
             palette = new Palette
             {
@@ -172,7 +176,6 @@ namespace project_nes
         private byte PpuAddress { get; set; }
 
         private byte PpuData { get; set; }
-
 
         public void Clock()
         {

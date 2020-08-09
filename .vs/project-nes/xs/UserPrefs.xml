@@ -2,11 +2,11 @@
   <MonoDevelop.Ide.ItemProperties.project-nes PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.Workbench>
     <Files>
-      <File FileName="project-nes/Program.cs" Line="21" Column="45" />
-      <File FileName="project-nes/CPU.cs" Line="1326" Column="1" />
-      <File FileName="project-nes/PPU.cs" Line="290" Column="51" />
-      <File FileName="project-nes/PpuBus.cs" Line="24" Column="40" />
-      <File FileName="project-nes/CpuBus.cs" />
+      <File FileName="project-nes/PPU.cs" Line="163" Column="1" />
+      <File FileName="project-nes/PpuBus.cs" Line="127" Column="75" />
+      <File FileName="project-nes/Cartridge.cs" Line="205" Column="31" />
+      <File FileName="project-nes/CpuBus.cs" Line="110" Column="10" />
+      <File FileName="project-nes/Program.cs" Line="32" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
@@ -18,7 +18,7 @@
                   <Node name="CsvHelper" expanded="True" />
                 </Node>
               </Node>
-              <Node name="PPU.cs" selected="True" />
+              <Node name="PpuBus.cs" selected="True" />
             </Node>
           </Node>
         </State>

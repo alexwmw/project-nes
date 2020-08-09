@@ -19,7 +19,6 @@ namespace project_nes
         private byte mapperId;
         private byte prgBanks;
         private byte chrBanks;
-        private char mirroring;
         private bool invalidFormat;
 
         public Cartridge(string fileName, DirectoryInfo directory)
@@ -34,23 +33,24 @@ namespace project_nes
             invalidFormat = header.Identification != "NES";
             formatString = header.Nes_20 ? header.Identification + " 2.0" : "i" + header.Identification;
             mapperId = header.Mapper_id;
-            mirroring = header.Mirroring_type;
+            Mirroring = header.Mirroring_type;
             prgBanks = header.Prg_banks;
             chrBanks = header.Chr_banks;
 
             if (header.Trainer)
-                trainer = reader.ReadBytes(512);
+                trainer = reader.ReadBytes(0x200); // trainer is 512 (0x200) bytes
             if (prgBanks > 0)
-                prgRom = reader.ReadBytes(prgBanks * 16384);
+                prgRom = reader.ReadBytes(prgBanks * 0x4000); // prgBanks = no. of 16kb banks to read
             if (chrBanks > 0)
-                chrRom = reader.ReadBytes(chrBanks * 8192);
+                chrRom = reader.ReadBytes(chrBanks * 0x2000);   // chrBanks = no. of 8kb banks to read  
             reader.Close();
             this.Report();
         }
 
+        public char Mirroring { get; }
 
         /**
-         * Received an address between 0x4020 - 0xFFFF
+         * Receives an address between 0x4020 - 0xFFFF
          * 
          * CPU should R/W only from program (PRG) memory
          * 
