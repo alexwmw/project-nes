@@ -7,8 +7,26 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CsvHelper" Version="15.0.5" />
-    <PackageReference Include="SDL2-CS" Version="2.0.0" />
-    <PackageReference Include="SDL2-CS.dll" Version="2.0.0" />
+    <PackageReference Include="SFML.Net" Version="2.5.0" />
+    <PackageReference Include="SFML.Window" Version="2.5.0" />
+    <PackageReference Include="SFML.Graphics" Version="2.5.0" />
+    <PackageReference Include="SFML.System" Version="2.5.0" />
+    <PackageReference Include="CSFML" Version="2.5.0" />
+    <PackageReference Include="System.Drawing.Common" Version="4.7.0" />
+    <PackageReference Include="runtime.osx.10.10-x64.CoreCompat.System.Drawing" Version="5.8.64" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="SFML.Audio">
+      <HintPath>bin\Debug\netcoreapp3.1\SFML.Audio.dll</HintPath>
+    </Reference>
+    <Reference Include="SFML.Graphics">
+      <HintPath>bin\Debug\netcoreapp3.1\SFML.Graphics.dll</HintPath>
+    </Reference>
+    <Reference Include="SFML.Window">
+      <HintPath>bin\Debug\netcoreapp3.1\SFML.Window.dll</HintPath>
+    </Reference>
+    <Reference Include="SFML.System">
+      <HintPath>bin\Debug\netcoreapp3.1\SFML.System.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>

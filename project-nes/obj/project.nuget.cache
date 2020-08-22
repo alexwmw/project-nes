@@ -1,24 +1,19 @@
 {
   "version": 2,
-  "dgSpecHash": "oXAI1o08/D1PTov2l/P56Dulp88gne/axgBs1HOWf3y/aRdQavvaX04DjHGWcOnuQM7JY+DLxN2NY4iEt0FABA==",
+  "dgSpecHash": "XyM0XqCPDJapKFR01VcGn5XRPBH521vQ/OabiXvOPSMfYWP+vJZZFbeGOowl0U/3NhABBOAZNpkEV4S8L3QAwA==",
   "success": true,
   "projectFilePath": "/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/project-nes.csproj",
   "expectedPackageFiles": [
-    "/Users/alexwright/.nuget/packages/csvhelper/15.0.5/csvhelper.15.0.5.nupkg.sha512",
-    "/Users/alexwright/.nuget/packages/microsoft.csharp/4.5.0/microsoft.csharp.4.5.0.nupkg.sha512",
-    "/Users/alexwright/.nuget/packages/sdl2-cs/2.0.0/sdl2-cs.2.0.0.nupkg.sha512",
-    "/Users/alexwright/.nuget/packages/sdl2-cs.dll/2.0.0/sdl2-cs.dll.2.0.0.nupkg.sha512"
+    "/Users/alexwright/.nuget/packages/csfml/2.5.0/csfml.2.5.0.nupkg.sha512",
+    "/Users/alexwright/.nuget/packages/microsoft.netcore.platforms/3.1.0/microsoft.netcore.platforms.3.1.0.nupkg.sha512",
+    "/Users/alexwright/.nuget/packages/microsoft.win32.systemevents/4.7.0/microsoft.win32.systemevents.4.7.0.nupkg.sha512",
+    "/Users/alexwright/.nuget/packages/runtime.osx.10.10-x64.corecompat.system.drawing/5.8.64/runtime.osx.10.10-x64.corecompat.system.drawing.5.8.64.nupkg.sha512",
+    "/Users/alexwright/.nuget/packages/sfml.audio/2.5.0/sfml.audio.2.5.0.nupkg.sha512",
+    "/Users/alexwright/.nuget/packages/sfml.graphics/2.5.0/sfml.graphics.2.5.0.nupkg.sha512",
+    "/Users/alexwright/.nuget/packages/sfml.net/2.5.0/sfml.net.2.5.0.nupkg.sha512",
+    "/Users/alexwright/.nuget/packages/sfml.system/2.5.0/sfml.system.2.5.0.nupkg.sha512",
+    "/Users/alexwright/.nuget/packages/sfml.window/2.5.0/sfml.window.2.5.0.nupkg.sha512",
+    "/Users/alexwright/.nuget/packages/system.drawing.common/4.7.0/system.drawing.common.4.7.0.nupkg.sha512"
   ],
-  "logs": [
-    {
-      "code": "NU1701",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "Package 'SDL2-CS.dll 2.0.0' was restored using '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8' instead of the project target framework '.NETCoreApp,Version=v3.1'. This package may not be fully compatible with your project.",
-      "libraryId": "SDL2-CS.dll",
-      "targetGraphs": [
-        ".NETCoreApp,Version=v3.1"
-      ]
-    }
-  ]
+  "logs": []
 }

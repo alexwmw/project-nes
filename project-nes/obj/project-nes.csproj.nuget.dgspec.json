@@ -36,17 +36,33 @@
       "frameworks": {
         "netcoreapp3.1": {
           "dependencies": {
-            "CsvHelper": {
+            "CSFML": {
               "target": "Package",
-              "version": "[15.0.5, )"
+              "version": "[2.5.0, )"
             },
-            "SDL2-CS": {
+            "SFML.Graphics": {
               "target": "Package",
-              "version": "[2.0.0, )"
+              "version": "[2.5.0, )"
             },
-            "SDL2-CS.dll": {
+            "SFML.Net": {
               "target": "Package",
-              "version": "[2.0.0, )"
+              "version": "[2.5.0, )"
+            },
+            "SFML.System": {
+              "target": "Package",
+              "version": "[2.5.0, )"
+            },
+            "SFML.Window": {
+              "target": "Package",
+              "version": "[2.5.0, )"
+            },
+            "System.Drawing.Common": {
+              "target": "Package",
+              "version": "[4.7.0, )"
+            },
+            "runtime.osx.10.10-x64.CoreCompat.System.Drawing": {
+              "target": "Package",
+              "version": "[5.8.64, )"
             }
           },
           "imports": [
@@ -64,7 +80,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/3.1.302/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/3.1.401/RuntimeIdentifierGraph.json"
         }
       }
     }

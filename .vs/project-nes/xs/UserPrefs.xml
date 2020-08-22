@@ -2,23 +2,19 @@
   <MonoDevelop.Ide.ItemProperties.project-nes PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.Workbench>
     <Files>
-      <File FileName="project-nes/PPU.cs" Line="163" Column="1" />
-      <File FileName="project-nes/PpuBus.cs" Line="127" Column="75" />
-      <File FileName="project-nes/Cartridge.cs" Line="205" Column="31" />
-      <File FileName="project-nes/CpuBus.cs" Line="110" Column="10" />
-      <File FileName="project-nes/Program.cs" Line="32" Column="1" />
+      <File FileName="project-nes/PPU.cs" Line="309" Column="51" />
+      <File FileName="project-nes/CPU.cs" Line="23" Column="44" />
+      <File FileName="project-nes/Program.cs" Line="59" Column="18" />
+      <File FileName="project-nes/SFML.cs" Line="19" Column="59" />
+      <File FileName="project-nes/VirtualScreen.cs" Line="52" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="project-nes" expanded="True">
             <Node name="project-nes" expanded="True">
-              <Node name="Dependencies" expanded="True">
-                <Node name="PackageDependencies" expanded="True">
-                  <Node name="CsvHelper" expanded="True" />
-                </Node>
-              </Node>
-              <Node name="PpuBus.cs" selected="True" />
+              <Node name="Dependencies" expanded="True" />
+              <Node name="Program.cs" selected="True" />
             </Node>
           </Node>
         </State>

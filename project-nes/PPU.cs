@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
+//using System.Drawing;
+using SFML.Graphics;
 
 namespace project_nes
 {
@@ -248,7 +249,9 @@ namespace project_nes
                             byte pixelVal = (byte)((lsb & 0x01) + (msb & 0x01));
                             lsb >>= 1;
                             msb >>= 1;
-                            Console.WriteLine("pixelval: " + pixelVal +"\n");
+                            Console.WriteLine($"" +
+                                $"pixelval: {pixelVal} \n" +
+                                $"pixelval: {pixelVal} \n");
 
                             // At the pattern memory (bank) specifed by paramater i:
                             //   At index row,col of tile x,y - set the pixel colour
@@ -262,7 +265,7 @@ namespace project_nes
         private Color GetColour(byte palet, byte pixel)
         {
             byte index = PpuRead((ushort)(0x3f00 + (palet * 4) + pixel));
-
+            Console.WriteLine("Index: " + index + "\n");
             return palette[index];
         }
 
@@ -303,8 +306,8 @@ namespace project_nes
                 => colors.GetEnumerator();
 
             public void Add(byte r, byte g, byte b)
-                => colors.Add(Color.FromArgb(r, g, b));
-            
+                => colors.Add(new Color(r, g, b));
+
             public Color this[int i]    // Indexer declaration  
             {
                 get { return this.colors[i]; }
