@@ -87,7 +87,7 @@ namespace project_nes
             cultInfo = CultureInfo.CreateSpecificCulture("en-UK");
             csvFileName = $"project_nes_nestest_log_{dateTime.ToString("o", cultInfo)}.csv";
             filePath = $"{csvLogs.FullName}/{csvFileName}";
-            using (File.Create(filePath)) { }
+            //using (File.Create(filePath)) { }
         }
 
         // Enums

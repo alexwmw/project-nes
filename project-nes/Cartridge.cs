@@ -24,7 +24,7 @@ namespace project_nes
         public Cartridge(string fileName, DirectoryInfo directory)
         {
             this.fileName = fileName;
-            path = directory.FullName + "/" + fileName;
+            path = directory.FullName + @"\" + fileName;
             reader = new BinaryReader(File.Open(path, FileMode.Open, FileAccess.Read));
             header = new Header(reader);
 

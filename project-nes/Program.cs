@@ -13,14 +13,17 @@ namespace project_nes
         static void Main(string[] args)
         {
             uint systemClock = 0;
-            uint winW = 256;
-            uint winH = 240;
+            uint scale = 2;
+            uint winW = 16 * 8;
+            uint winH = 16 * 8;
+            uint winWSc = winW * scale;
+            uint winHSc = winH * scale;
 
-            SFML_Loop Loop;
 
             //ROM directories
             DirectoryInfo testRoms = new DirectoryInfo(@"/Users/alexwright/Documents/MSc Files/Project/test_roms");
             DirectoryInfo gameRoms = new DirectoryInfo(@"/Users/alexwright/Documents/MSc Files/Project/game_roms");
+            DirectoryInfo winRoms = new DirectoryInfo(@"C:\Users\Alex\Documents\MSc Files\Project\win_roms");
 
             string nestest = @"nestest.nes";
             string dk = @"Donkey Kong (World) (Rev A).nes";
@@ -30,9 +33,9 @@ namespace project_nes
             PpuBus ppuBus = new PpuBus();
             CPU cpu = new CPU();
             PPU ppu = new PPU();
-            Cartridge cartridge = new Cartridge(dk, gameRoms);
-            VirtualScreen screen = new VirtualScreen(16*8,16*8,1,Color.Black);
-
+            Cartridge cartridge = new Cartridge(dk, winRoms);
+            VirtualScreen screen = new VirtualScreen(winWSc, winHSc, scale, Color.Yellow);
+            RenderWindow window = new RenderWindow(new VideoMode(winWSc, winHSc), "Title");
 
             // Connections
             cpuBus.ConnectPPU(ppu);
@@ -44,22 +47,22 @@ namespace project_nes
             // Init procedure
             cpu.Reset();
             // cpu.PC = 0xC000;  // Force nestest all tests
-            // Loop = new SFML_Loop(winW, winH, "ProjectNES", Color.White);
-            // Loop.Run();
+
 
             
             ppu.GetPatternTable(1, 1);
 
-            for (int i = 0; i < (16*8); i++)
+            for (int i = 0; i < (winW); i++)
             {
-                for (int j = 0; j < (16 * 8); j++)
+                for (int j = 0; j < (winH); j++)
                 {
                     screen.SetPixel(i, j, ppu.PatternMemory[1, i, j]);
                     //Console.Write(ppu.PatternMemory[1, i, j]);
+                    //screen.SetPixel(j,i, Color.Cyan);   
                 }
             }
+
             
-            RenderWindow window = new RenderWindow(new VideoMode(1920, 1080), "Title");
             while (window.IsOpen)
             {
                 // clear the window with black color

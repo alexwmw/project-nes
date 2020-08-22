@@ -12,12 +12,10 @@ namespace project_nes
 
 
         // From https://github.com/amhndu/SimpleNES/blob/master/src/VirtualScreen.cpp
-        public VirtualScreen(int width, int height, float pixel_size, Color color)
+        public VirtualScreen(uint width, uint height, float pixel_size, Color color)
         {
-            vertices = new VertexArray(PrimitiveType.Triangles, (uint)(width * height * 6));
-
-            screenSize.X = (uint)width;
-            screenSize.Y = (uint)height;
+            vertices = new VertexArray(PrimitiveType.Triangles, width * height * 6);
+            screenSize = new Vector2u(width, height);
 
             pixelSize = pixel_size;
 
@@ -28,20 +26,20 @@ namespace project_nes
                     uint i = (x * screenSize.Y + y) * 6;
                     Vector2f coord2d = new Vector2f(x * pixelSize, y * pixelSize);
 
-                    for(uint j = 0; j < 6; ++j)
-                    {
-                        var v = vertices[i + j];
-                        v.Position = coord2d;
-                        v.Color = color;
-                        vertices[i + j] = v;
-                    }
+                    vertices[i + 0] = new Vertex(coord2d, color);
+                    vertices[i + 1] = new Vertex(coord2d + new Vector2f(pixelSize, 0), color);
+                    vertices[i + 2] = new Vertex(coord2d + new Vector2f(pixelSize, pixelSize), color);
+                    vertices[i + 3] = new Vertex(coord2d + new Vector2f(pixelSize, pixelSize), color);
+                    vertices[i + 4] = new Vertex(coord2d + new Vector2f(0, pixelSize), color);
+                    vertices[i + 5] = new Vertex(coord2d, color);
                 }
             }
         }
 
         public void Draw(RenderTarget target, RenderStates states)
         {
-            target.Draw(vertices, states);
+            //target.Draw(vertices, states);
+            vertices.Draw(target, states);
         }
 
         public void SetPixel(int x, int y, Color color)
@@ -52,9 +50,7 @@ namespace project_nes
 
             for (uint j = 0; j < 6; ++j)
             {
-                var v = vertices[i + j];
-                v.Color = color;
-                vertices[i + j] = v;
+                vertices[i + j] = new Vertex(vertices[i + j].Position, color);
             }
         }
     }

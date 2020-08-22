@@ -673,24 +673,26 @@
     ]
   },
   "packageFolders": {
-    "/Users/alexwright/.nuget/packages/": {}
+    "C:\\Users\\Alex\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/project-nes.csproj",
+      "projectUniqueName": "C:\\Users\\Alex\\project-nes\\project-nes\\project-nes.csproj",
       "projectName": "project-nes",
-      "projectPath": "/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/project-nes.csproj",
-      "packagesPath": "/Users/alexwright/.nuget/packages/",
-      "outputPath": "/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/obj/",
+      "projectPath": "C:\\Users\\Alex\\project-nes\\project-nes\\project-nes.csproj",
+      "packagesPath": "C:\\Users\\Alex\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Alex\\project-nes\\project-nes\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/Users/alexwright/.config/NuGet/NuGet.Config"
+        "C:\\Users\\Alex\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "netcoreapp3.1"
       ],
       "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -751,7 +753,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/3.1.401/RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.401\\RuntimeIdentifierGraph.json"
       }
     }
   }
