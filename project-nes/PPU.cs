@@ -249,13 +249,15 @@ namespace project_nes
                             byte pixelVal = (byte)((lsb & 0x01) + (msb & 0x01));
                             lsb >>= 1;
                             msb >>= 1;
-                            Console.WriteLine($"" +
-                                $"pixelval: {pixelVal} \n" +
-                                $"pixelval: {pixelVal} \n");
 
                             // At the pattern memory (bank) specifed by paramater i:
                             //   At index row,col of tile x,y - set the pixel colour
-                            PatternMemory[i, row + (tileY * 8), col + (tileX * 8)] = GetColour(palette, pixelVal);
+                            PatternMemory[
+                                i, 
+                                tileX * 8 + (7 - col),  // was row + (tileY * 8)
+                                row + (tileY * 8)]      // was col + (tileX * 8)
+
+                                = GetColour(palette, pixelVal);
                         }
                     }
                 }
@@ -265,7 +267,10 @@ namespace project_nes
         private Color GetColour(byte palet, byte pixel)
         {
             byte index = PpuRead((ushort)(0x3f00 + (palet * 4) + pixel));
-            Console.WriteLine("Index: " + index + "\n");
+
+            // For tesing only - delete this line:
+            index = (byte)((pixel + 6 )* 5);
+
             return palette[index];
         }
 

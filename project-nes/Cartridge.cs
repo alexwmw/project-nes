@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using HelperMethods;
 
@@ -21,10 +22,40 @@ namespace project_nes
         private byte chrBanks;
         private bool invalidFormat;
 
+
+        public Cartridge(string filePath)
+        {
+            int index = filePath.LastIndexOf(Path.DirectorySeparatorChar);
+
+            this.fileName = filePath.Substring(index);
+            path = filePath;
+            reader = new BinaryReader(File.Open(path, FileMode.Open, FileAccess.Read));
+            header = new Header(reader);
+
+            header.Parse();
+
+            invalidFormat = header.Identification != "NES";
+            formatString = header.Nes_20 ? header.Identification + " 2.0" : "i" + header.Identification;
+            mapperId = header.Mapper_id;
+            Mirroring = header.Mirroring_type;
+            prgBanks = header.Prg_banks;
+            chrBanks = header.Chr_banks;
+
+            if (header.Trainer)
+                trainer = reader.ReadBytes(0x200); // trainer is 512 (0x200) bytes
+            if (prgBanks > 0)
+                prgRom = reader.ReadBytes(prgBanks * 0x4000); // prgBanks = no. of 16kb banks to read
+            if (chrBanks > 0)
+                chrRom = reader.ReadBytes(chrBanks * 0x2000);   // chrBanks = no. of 8kb banks to read  
+            reader.Close();
+            this.Report();
+        }
+
         public Cartridge(string fileName, DirectoryInfo directory)
         {
             this.fileName = fileName;
-            path = directory.FullName + @"\" + fileName;
+            path = directory.FullName + fileName;
+
             reader = new BinaryReader(File.Open(path, FileMode.Open, FileAccess.Read));
             header = new Header(reader);
 

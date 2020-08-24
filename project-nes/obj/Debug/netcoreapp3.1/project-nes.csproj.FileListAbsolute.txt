@@ -1,95 +1,255 @@
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\project-nes.exe
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\project-nes.deps.json
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\project-nes.runtimeconfig.json
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\project-nes.runtimeconfig.dev.json
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\project-nes.dll
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\project-nes.pdb
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\Microsoft.Win32.SystemEvents.dll
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtime.osx.10.10-x64.CoreCompat.System.Drawing.dll
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\SFML.Audio.dll
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\SFML.Graphics.dll
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\SFML.System.dll
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\SFML.Window.dll
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\System.Drawing.Common.dll
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\alpine-x64\native\libcsfml-audio.so
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\alpine-x64\native\libcsfml-graphics.so
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\alpine-x64\native\libcsfml-system.so
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\alpine-x64\native\libcsfml-window.so
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\alpine-x64\native\libsfml-audio.so
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\alpine-x64\native\libsfml-audio.so.2.5
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\alpine-x64\native\libsfml-audio.so.2.5.1
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\alpine-x64\native\libsfml-graphics.so
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\alpine-x64\native\libsfml-graphics.so.2.5
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\alpine-x64\native\libsfml-graphics.so.2.5.1
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\alpine-x64\native\libsfml-system.so
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\alpine-x64\native\libsfml-system.so.2.5
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\alpine-x64\native\libsfml-system.so.2.5.1
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\alpine-x64\native\libsfml-window.so
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\alpine-x64\native\libsfml-window.so.2.5
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\alpine-x64\native\libsfml-window.so.2.5.1
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\debian-x64\native\libcsfml-audio.so
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\debian-x64\native\libcsfml-graphics.so
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\debian-x64\native\libcsfml-system.so
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\debian-x64\native\libcsfml-window.so
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\debian-x64\native\libsfml-audio.so
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\debian-x64\native\libsfml-audio.so.2.5
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\debian-x64\native\libsfml-audio.so.2.5.1
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\debian-x64\native\libsfml-graphics.so
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\debian-x64\native\libsfml-graphics.so.2.5
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\debian-x64\native\libsfml-graphics.so.2.5.1
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\debian-x64\native\libsfml-system.so
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\debian-x64\native\libsfml-system.so.2.5
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\debian-x64\native\libsfml-system.so.2.5.1
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\debian-x64\native\libsfml-window.so
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\debian-x64\native\libsfml-window.so.2.5
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\debian-x64\native\libsfml-window.so.2.5.1
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\fedora-x64\native\libcsfml-audio.so
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\fedora-x64\native\libcsfml-graphics.so
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\fedora-x64\native\libcsfml-system.so
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\fedora-x64\native\libcsfml-window.so
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\fedora-x64\native\libsfml-audio.so
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\fedora-x64\native\libsfml-audio.so.2.5
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\fedora-x64\native\libsfml-audio.so.2.5.1
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\fedora-x64\native\libsfml-graphics.so
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\fedora-x64\native\libsfml-graphics.so.2.5
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\fedora-x64\native\libsfml-graphics.so.2.5.1
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\fedora-x64\native\libsfml-system.so
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\fedora-x64\native\libsfml-system.so.2.5
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\fedora-x64\native\libsfml-system.so.2.5.1
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\fedora-x64\native\libsfml-window.so
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\fedora-x64\native\libsfml-window.so.2.5
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\fedora-x64\native\libsfml-window.so.2.5.1
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\win-x64\native\csfml-Audio.dll
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\win-x64\native\csfml-Graphics.dll
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\win-x64\native\csfml-System.dll
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\win-x64\native\csfml-Window.dll
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\win-x64\native\openal32.dll
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\win-x86\native\csfml-Audio.dll
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\win-x86\native\csfml-Graphics.dll
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\win-x86\native\csfml-System.dll
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\win-x86\native\csfml-Window.dll
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\win-x86\native\openal32.dll
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\win\lib\netcoreapp3.0\Microsoft.Win32.SystemEvents.dll
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\osx-x64\native\libcairo.2.dylib
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\osx-x64\native\libfontconfig.1.dylib
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\osx-x64\native\libfreetype.6.dylib
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\osx-x64\native\libgdiplus-lighthouse.dylib
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\osx-x64\native\libgdiplus.dylib
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\osx-x64\native\libgif.7.dylib
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\osx-x64\native\libglib-2.0.0.dylib
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\osx-x64\native\libintl.8.dylib
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\osx-x64\native\libjpeg.9.dylib
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\osx-x64\native\libpcre.1.dylib
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\osx-x64\native\libpixman-1.0.dylib
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\osx-x64\native\libpng16.16.dylib
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\osx-x64\native\libtiff.5.dylib
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\unix\lib\netcoreapp3.0\System.Drawing.Common.dll
-C:\Users\Alex\project-nes\project-nes\bin\Debug\netcoreapp3.1\runtimes\win\lib\netcoreapp3.0\System.Drawing.Common.dll
-C:\Users\Alex\project-nes\project-nes\obj\Debug\netcoreapp3.1\project-nes.csprojAssemblyReference.cache
-C:\Users\Alex\project-nes\project-nes\obj\Debug\netcoreapp3.1\project-nes.AssemblyInfoInputs.cache
-C:\Users\Alex\project-nes\project-nes\obj\Debug\netcoreapp3.1\project-nes.AssemblyInfo.cs
-C:\Users\Alex\project-nes\project-nes\obj\Debug\netcoreapp3.1\project-nes.csproj.CoreCompileInputs.cache
-C:\Users\Alex\project-nes\project-nes\obj\Debug\netcoreapp3.1\project-nes.csproj.CopyComplete
-C:\Users\Alex\project-nes\project-nes\obj\Debug\netcoreapp3.1\project-nes.dll
-C:\Users\Alex\project-nes\project-nes\obj\Debug\netcoreapp3.1\project-nes.pdb
-C:\Users\Alex\project-nes\project-nes\obj\Debug\netcoreapp3.1\project-nes.genruntimeconfig.cache
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/project-nes.exe
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/project-nes.deps.json
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/project-nes.runtimeconfig.json
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/project-nes.runtimeconfig.dev.json
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/project-nes.dll
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/project-nes.pdb
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/Microsoft.Win32.SystemEvents.dll
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtime.osx.10.10-x64.CoreCompat.System.Drawing.dll
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/SFML.Audio.dll
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/SFML.Graphics.dll
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/SFML.System.dll
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/SFML.Window.dll
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/System.Drawing.Common.dll
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/alpine-x64/native/libcsfml-audio.so
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/alpine-x64/native/libcsfml-graphics.so
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/alpine-x64/native/libcsfml-system.so
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/alpine-x64/native/libcsfml-window.so
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/alpine-x64/native/libsfml-audio.so
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/alpine-x64/native/libsfml-audio.so.2.5
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/alpine-x64/native/libsfml-audio.so.2.5.1
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/alpine-x64/native/libsfml-graphics.so
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/alpine-x64/native/libsfml-graphics.so.2.5
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/alpine-x64/native/libsfml-graphics.so.2.5.1
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/alpine-x64/native/libsfml-system.so
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/alpine-x64/native/libsfml-system.so.2.5
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/alpine-x64/native/libsfml-system.so.2.5.1
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/alpine-x64/native/libsfml-window.so
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/alpine-x64/native/libsfml-window.so.2.5
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/alpine-x64/native/libsfml-window.so.2.5.1
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/debian-x64/native/libcsfml-audio.so
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/debian-x64/native/libcsfml-graphics.so
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/debian-x64/native/libcsfml-system.so
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/debian-x64/native/libcsfml-window.so
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/debian-x64/native/libsfml-audio.so
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/debian-x64/native/libsfml-audio.so.2.5
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/debian-x64/native/libsfml-audio.so.2.5.1
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/debian-x64/native/libsfml-graphics.so
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/debian-x64/native/libsfml-graphics.so.2.5
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/debian-x64/native/libsfml-graphics.so.2.5.1
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/debian-x64/native/libsfml-system.so
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/debian-x64/native/libsfml-system.so.2.5
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/debian-x64/native/libsfml-system.so.2.5.1
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/debian-x64/native/libsfml-window.so
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/debian-x64/native/libsfml-window.so.2.5
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/debian-x64/native/libsfml-window.so.2.5.1
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/fedora-x64/native/libcsfml-audio.so
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/fedora-x64/native/libcsfml-graphics.so
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/fedora-x64/native/libcsfml-system.so
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/fedora-x64/native/libcsfml-window.so
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/fedora-x64/native/libsfml-audio.so
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/fedora-x64/native/libsfml-audio.so.2.5
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/fedora-x64/native/libsfml-audio.so.2.5.1
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/fedora-x64/native/libsfml-graphics.so
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/fedora-x64/native/libsfml-graphics.so.2.5
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/fedora-x64/native/libsfml-graphics.so.2.5.1
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/fedora-x64/native/libsfml-system.so
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/fedora-x64/native/libsfml-system.so.2.5
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/fedora-x64/native/libsfml-system.so.2.5.1
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/fedora-x64/native/libsfml-window.so
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/fedora-x64/native/libsfml-window.so.2.5
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/fedora-x64/native/libsfml-window.so.2.5.1
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/win-x64/native/csfml-Audio.dll
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/win-x64/native/csfml-Graphics.dll
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/win-x64/native/csfml-System.dll
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/win-x64/native/csfml-Window.dll
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/win-x64/native/openal32.dll
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/win-x86/native/csfml-Audio.dll
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/win-x86/native/csfml-Graphics.dll
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/win-x86/native/csfml-System.dll
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/win-x86/native/csfml-Window.dll
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/win-x86/native/openal32.dll
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/win/lib/netcoreapp3.0/Microsoft.Win32.SystemEvents.dll
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/osx-x64/native/libcairo.2.dylib
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/osx-x64/native/libfontconfig.1.dylib
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/osx-x64/native/libfreetype.6.dylib
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/osx-x64/native/libgdiplus-lighthouse.dylib
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/osx-x64/native/libgdiplus.dylib
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/osx-x64/native/libgif.7.dylib
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/osx-x64/native/libglib-2.0.0.dylib
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/osx-x64/native/libintl.8.dylib
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/osx-x64/native/libjpeg.9.dylib
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/osx-x64/native/libpcre.1.dylib
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/osx-x64/native/libpixman-1.0.dylib
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/osx-x64/native/libpng16.16.dylib
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/osx-x64/native/libtiff.5.dylib
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/unix/lib/netcoreapp3.0/System.Drawing.Common.dll
+C:/Users/Alex/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/win/lib/netcoreapp3.0/System.Drawing.Common.dll
+C:/Users/Alex/project-nes/project-nes/obj/Debug/netcoreapp3.1/project-nes.csprojAssemblyReference.cache
+C:/Users/Alex/project-nes/project-nes/obj/Debug/netcoreapp3.1/project-nes.AssemblyInfoInputs.cache
+C:/Users/Alex/project-nes/project-nes/obj/Debug/netcoreapp3.1/project-nes.AssemblyInfo.cs
+C:/Users/Alex/project-nes/project-nes/obj/Debug/netcoreapp3.1/project-nes.csproj.CoreCompileInputs.cache
+C:/Users/Alex/project-nes/project-nes/obj/Debug/netcoreapp3.1/project-nes.csproj.CopyComplete
+C:/Users/Alex/project-nes/project-nes/obj/Debug/netcoreapp3.1/project-nes.dll
+C:/Users/Alex/project-nes/project-nes/obj/Debug/netcoreapp3.1/project-nes.pdb
+C:/Users/Alex/project-nes/project-nes/obj/Debug/netcoreapp3.1/project-nes.genruntimeconfig.cache
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/obj/Debug/netcoreapp3.1/project-nes.dll
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/obj/Debug/netcoreapp3.1/project-nes.pdb
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/project-nes.deps.json
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/project-nes.runtimeconfig.json
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/project-nes.runtimeconfig.dev.json
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/project-nes.dll
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/project-nes.pdb
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/Microsoft.Win32.SystemEvents.dll
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/SFML.Audio.dll
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/SFML.Graphics.dll
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/SFML.System.dll
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/SFML.Window.dll
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/System.Drawing.Common.dll
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/alpine-x64/native/libcsfml-audio.so
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/alpine-x64/native/libcsfml-graphics.so
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/alpine-x64/native/libcsfml-system.so
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/alpine-x64/native/libcsfml-window.so
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/alpine-x64/native/libsfml-audio.so
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/alpine-x64/native/libsfml-audio.so.2.5
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/alpine-x64/native/libsfml-audio.so.2.5.1
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/alpine-x64/native/libsfml-graphics.so
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/alpine-x64/native/libsfml-graphics.so.2.5
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/alpine-x64/native/libsfml-graphics.so.2.5.1
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/alpine-x64/native/libsfml-system.so
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/alpine-x64/native/libsfml-system.so.2.5
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/alpine-x64/native/libsfml-system.so.2.5.1
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/alpine-x64/native/libsfml-window.so
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/alpine-x64/native/libsfml-window.so.2.5
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/alpine-x64/native/libsfml-window.so.2.5.1
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/debian-x64/native/libcsfml-audio.so
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/debian-x64/native/libcsfml-graphics.so
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/debian-x64/native/libcsfml-system.so
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/debian-x64/native/libcsfml-window.so
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/debian-x64/native/libsfml-audio.so
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/debian-x64/native/libsfml-audio.so.2.5
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/debian-x64/native/libsfml-audio.so.2.5.1
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/debian-x64/native/libsfml-graphics.so
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/debian-x64/native/libsfml-graphics.so.2.5
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/debian-x64/native/libsfml-graphics.so.2.5.1
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/debian-x64/native/libsfml-system.so
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/debian-x64/native/libsfml-system.so.2.5
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/debian-x64/native/libsfml-system.so.2.5.1
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/debian-x64/native/libsfml-window.so
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/debian-x64/native/libsfml-window.so.2.5
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/debian-x64/native/libsfml-window.so.2.5.1
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/fedora-x64/native/libcsfml-audio.so
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/fedora-x64/native/libcsfml-graphics.so
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/fedora-x64/native/libcsfml-system.so
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/fedora-x64/native/libcsfml-window.so
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/fedora-x64/native/libsfml-audio.so
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/fedora-x64/native/libsfml-audio.so.2.5
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/fedora-x64/native/libsfml-audio.so.2.5.1
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/fedora-x64/native/libsfml-graphics.so
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/fedora-x64/native/libsfml-graphics.so.2.5
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/fedora-x64/native/libsfml-graphics.so.2.5.1
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/fedora-x64/native/libsfml-system.so
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/fedora-x64/native/libsfml-system.so.2.5
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/fedora-x64/native/libsfml-system.so.2.5.1
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/fedora-x64/native/libsfml-window.so
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/fedora-x64/native/libsfml-window.so.2.5
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/fedora-x64/native/libsfml-window.so.2.5.1
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/win-x64/native/csfml-Audio.dll
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/win-x64/native/csfml-Graphics.dll
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/win-x64/native/csfml-System.dll
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/win-x64/native/csfml-Window.dll
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/win-x64/native/openal32.dll
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/win-x86/native/csfml-Audio.dll
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/win-x86/native/csfml-Graphics.dll
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/win-x86/native/csfml-System.dll
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/win-x86/native/csfml-Window.dll
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/win-x86/native/openal32.dll
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/win/lib/netcoreapp3.0/Microsoft.Win32.SystemEvents.dll
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/unix/lib/netcoreapp3.0/System.Drawing.Common.dll
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/bin/Debug/netcoreapp3.1/runtimes/win/lib/netcoreapp3.0/System.Drawing.Common.dll
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/obj/Debug/netcoreapp3.1/project-nes.csprojAssemblyReference.cache
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/obj/Debug/netcoreapp3.1/project-nes.AssemblyInfoInputs.cache
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/obj/Debug/netcoreapp3.1/project-nes.AssemblyInfo.cs
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/obj/Debug/netcoreapp3.1/project-nes.csproj.CoreCompileInputs.cache
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/obj/Debug/netcoreapp3.1/project-nes.csproj.CopyComplete
+/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/obj/Debug/netcoreapp3.1/project-nes.genruntimeconfig.cache
+Z:\project-nes\obj\Debug\netcoreapp3.1\project-nes.AssemblyInfoInputs.cache
+Z:\project-nes\obj\Debug\netcoreapp3.1\project-nes.AssemblyInfo.cs
+Z:\project-nes\obj\Debug\netcoreapp3.1\project-nes.csproj.CoreCompileInputs.cache
+Z:\project-nes\obj\Debug\netcoreapp3.1\project-nes.dll
+Z:\project-nes\obj\Debug\netcoreapp3.1\project-nes.pdb
+Z:\project-nes\bin\Debug\netcoreapp3.1\project-nes.exe
+Z:\project-nes\bin\Debug\netcoreapp3.1\project-nes.deps.json
+Z:\project-nes\bin\Debug\netcoreapp3.1\project-nes.runtimeconfig.json
+Z:\project-nes\bin\Debug\netcoreapp3.1\project-nes.runtimeconfig.dev.json
+Z:\project-nes\bin\Debug\netcoreapp3.1\project-nes.dll
+Z:\project-nes\bin\Debug\netcoreapp3.1\project-nes.pdb
+Z:\project-nes\bin\Debug\netcoreapp3.1\Microsoft.Win32.SystemEvents.dll
+Z:\project-nes\bin\Debug\netcoreapp3.1\SFML.Audio.dll
+Z:\project-nes\bin\Debug\netcoreapp3.1\SFML.Graphics.dll
+Z:\project-nes\bin\Debug\netcoreapp3.1\SFML.System.dll
+Z:\project-nes\bin\Debug\netcoreapp3.1\SFML.Window.dll
+Z:\project-nes\bin\Debug\netcoreapp3.1\System.Drawing.Common.dll
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\alpine-x64\native\libcsfml-audio.so
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\alpine-x64\native\libcsfml-graphics.so
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\alpine-x64\native\libcsfml-system.so
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\alpine-x64\native\libcsfml-window.so
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\alpine-x64\native\libsfml-audio.so
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\alpine-x64\native\libsfml-audio.so.2.5
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\alpine-x64\native\libsfml-audio.so.2.5.1
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\alpine-x64\native\libsfml-graphics.so
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\alpine-x64\native\libsfml-graphics.so.2.5
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\alpine-x64\native\libsfml-graphics.so.2.5.1
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\alpine-x64\native\libsfml-system.so
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\alpine-x64\native\libsfml-system.so.2.5
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\alpine-x64\native\libsfml-system.so.2.5.1
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\alpine-x64\native\libsfml-window.so
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\alpine-x64\native\libsfml-window.so.2.5
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\alpine-x64\native\libsfml-window.so.2.5.1
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\debian-x64\native\libcsfml-audio.so
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\debian-x64\native\libcsfml-graphics.so
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\debian-x64\native\libcsfml-system.so
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\debian-x64\native\libcsfml-window.so
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\debian-x64\native\libsfml-audio.so
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\debian-x64\native\libsfml-audio.so.2.5
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\debian-x64\native\libsfml-audio.so.2.5.1
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\debian-x64\native\libsfml-graphics.so
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\debian-x64\native\libsfml-graphics.so.2.5
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\debian-x64\native\libsfml-graphics.so.2.5.1
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\debian-x64\native\libsfml-system.so
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\debian-x64\native\libsfml-system.so.2.5
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\debian-x64\native\libsfml-system.so.2.5.1
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\debian-x64\native\libsfml-window.so
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\debian-x64\native\libsfml-window.so.2.5
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\debian-x64\native\libsfml-window.so.2.5.1
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\fedora-x64\native\libcsfml-audio.so
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\fedora-x64\native\libcsfml-graphics.so
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\fedora-x64\native\libcsfml-system.so
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\fedora-x64\native\libcsfml-window.so
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\fedora-x64\native\libsfml-audio.so
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\fedora-x64\native\libsfml-audio.so.2.5
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\fedora-x64\native\libsfml-audio.so.2.5.1
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\fedora-x64\native\libsfml-graphics.so
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\fedora-x64\native\libsfml-graphics.so.2.5
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\fedora-x64\native\libsfml-graphics.so.2.5.1
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\fedora-x64\native\libsfml-system.so
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\fedora-x64\native\libsfml-system.so.2.5
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\fedora-x64\native\libsfml-system.so.2.5.1
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\fedora-x64\native\libsfml-window.so
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\fedora-x64\native\libsfml-window.so.2.5
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\fedora-x64\native\libsfml-window.so.2.5.1
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\win-x64\native\csfml-Audio.dll
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\win-x64\native\csfml-Graphics.dll
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\win-x64\native\csfml-System.dll
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\win-x64\native\csfml-Window.dll
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\win-x64\native\openal32.dll
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\win-x86\native\csfml-Audio.dll
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\win-x86\native\csfml-Graphics.dll
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\win-x86\native\csfml-System.dll
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\win-x86\native\csfml-Window.dll
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\win-x86\native\openal32.dll
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\win\lib\netcoreapp3.0\Microsoft.Win32.SystemEvents.dll
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\unix\lib\netcoreapp3.0\System.Drawing.Common.dll
+Z:\project-nes\bin\Debug\netcoreapp3.1\runtimes\win\lib\netcoreapp3.0\System.Drawing.Common.dll
+Z:\project-nes\obj\Debug\netcoreapp3.1\project-nes.csproj.CopyComplete
+Z:\project-nes\obj\Debug\netcoreapp3.1\project-nes.genruntimeconfig.cache

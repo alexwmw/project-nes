@@ -30,5 +30,19 @@ namespace HelperMethods
     public static class StaticMethods
     {
         public static ushort LittleEndian(byte lo, byte hi) => (ushort)((hi << 8) | lo);
+
+
+        public static void Window_KeyPressed(object sender, SFML.Window.KeyEventArgs e)
+        {
+            var window = (SFML.Window.Window) sender;
+            if(e.Code == SFML.Window.Keyboard.Key.Escape)
+            {
+                window.Close();
+            }
+        }
+
+
+
+
     }
 }

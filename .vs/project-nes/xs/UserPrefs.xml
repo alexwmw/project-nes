@@ -2,18 +2,16 @@
   <MonoDevelop.Ide.ItemProperties.project-nes PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.Workbench>
     <Files>
-      <File FileName="project-nes/PPU.cs" Line="309" Column="51" />
-      <File FileName="project-nes/CPU.cs" Line="23" Column="44" />
-      <File FileName="project-nes/Program.cs" Line="59" Column="18" />
-      <File FileName="project-nes/SFML.cs" Line="19" Column="59" />
-      <File FileName="project-nes/VirtualScreen.cs" Line="52" Column="1" />
+      <File FileName="project-nes/Program.cs" Line="65" Column="71" />
+      <File FileName="project-nes/VirtualScreen.cs" Line="65" Column="37" />
+      <File FileName="project-nes/Cartridge.cs" />
+      <File FileName="project-nes/HelperMethods.cs" Line="35" Column="1" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="project-nes" expanded="True">
             <Node name="project-nes" expanded="True">
-              <Node name="Dependencies" expanded="True" />
               <Node name="Program.cs" selected="True" />
             </Node>
           </Node>

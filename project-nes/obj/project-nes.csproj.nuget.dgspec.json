@@ -1,27 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Alex\\project-nes\\project-nes\\project-nes.csproj": {}
+    "/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/project-nes.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Alex\\project-nes\\project-nes\\project-nes.csproj": {
+    "/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/project-nes.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Alex\\project-nes\\project-nes\\project-nes.csproj",
+        "projectUniqueName": "/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/project-nes.csproj",
         "projectName": "project-nes",
-        "projectPath": "C:\\Users\\Alex\\project-nes\\project-nes\\project-nes.csproj",
-        "packagesPath": "C:\\Users\\Alex\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Alex\\project-nes\\project-nes\\obj\\",
+        "projectPath": "/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/project-nes.csproj",
+        "packagesPath": "/Users/alexwright/.nuget/packages/",
+        "outputPath": "/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\Alex\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "/Users/alexwright/.config/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "netcoreapp3.1"
         ],
         "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -61,10 +59,6 @@
             "System.Drawing.Common": {
               "target": "Package",
               "version": "[4.7.0, )"
-            },
-            "runtime.osx.10.10-x64.CoreCompat.System.Drawing": {
-              "target": "Package",
-              "version": "[5.8.64, )"
             }
           },
           "imports": [
@@ -82,7 +76,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.401\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/3.1.401/RuntimeIdentifierGraph.json"
         }
       }
     }
