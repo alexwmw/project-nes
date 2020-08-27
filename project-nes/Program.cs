@@ -1,5 +1,9 @@
-﻿using System.IO;
-using SFML.Graphics;
+﻿//# define DisplayPatternMemory
+//# define force_nestest_all_tests
+# define GameLoop
+
+using System;
+using System.IO;
 using System.Runtime.InteropServices;
 namespace project_nes
 {
@@ -9,38 +13,34 @@ namespace project_nes
         {
             uint systemClock = 0;
 
-            uint displayScale = 4;
-            uint winW = 16 * 8;
-            uint winH = 16 * 8;
-
-
             //ROM directories
             DirectoryInfo macRoms = new DirectoryInfo(@"/Users/alexwright/Documents/MSc Files/Project/mac_roms/");
             DirectoryInfo winRoms = new DirectoryInfo(@"C:\Users\Alex\Documents\MSc Files\Project\win_roms\");
-            DirectoryInfo dirForCurrentOS =
-                RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                ? winRoms : macRoms;
+            DirectoryInfo dirForCurrentOS = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? winRoms : macRoms;
 
             //File names
             string nestest = @"nestest.nes";
             string dk = @"Donkey Kong (World) (Rev A).nes";
-            string kir = @"Kirby's Adventure (USA) (Rev A).nes";
 
             //File to open
-            string fileName = dk;
+            string selectedFile = nestest;
+            string fileName = args.Length == 0 ? dirForCurrentOS.FullName + selectedFile : args[0];
 
 
             // Emulator component objects
-            Cartridge cartridge = args.Length > 0 ? new Cartridge(args[0]) : new Cartridge(fileName, dirForCurrentOS);
+            Cartridge cartridge = new Cartridge(fileName);
             CpuBus cpuBus = new CpuBus();
             PpuBus ppuBus = new PpuBus();
             CPU cpu = new CPU();
             PPU ppu = new PPU();
 
-
-            // IO device setup
-            VirtualScreen screen = new VirtualScreen(winW, winH, displayScale);
-            screen.AddKeyPressEvent(KeyEvents.KeyEvent);
+            // IO device setup         
+            uint displayScale = 2;
+            uint winW = 256;
+            uint winH = 240;
+            IODevice IODevice = new IODevice(winW, winH, displayScale);
+            IODevice.AddKeyPressEvent(Events.KeyEvent);
+            IODevice.AddClosedEvent(Events.OnClose);
 
             // Emulator connections
             cpuBus.ConnectPPU(ppu);
@@ -48,13 +48,24 @@ namespace project_nes
             ppuBus.ConnectCartridge(cartridge);
             ppu.ConnectBus(ppuBus);
             cpu.ConnectBus(cpuBus);
+            ppu.ConnectIO(IODevice);
+            ppu.SetPalette(Palette.DefaultPalette);
 
             // Emulator init procedure
             cpu.Reset();
-            // cpu.PC = 0xC000;  // Force nestest all tests
+#if force_nestest_all_tests
+            cpu.PC = 0xC000;
+#endif
 
+#if DisplayPatternMemory
 
-            /* * * * * * * * * * * * * * * * * * * * * */
+            displayScale = 4;
+            winW = 16 * 8;
+            winH = 16 * 8;
+            IODevice screen = new IODevice(winW, winH, displayScale);
+            screen.AddKeyPressEvent(Events.KeyEvent);
+            screen.AddClosedEvent(Events.OnClose);
+
             ppu.GetPatternTable(1, 1);
             ppu.GetPatternTable(0, 1);
 
@@ -62,38 +73,51 @@ namespace project_nes
             {
                 for (int j = 0; j < (winH); j++)
                 {
-                    screen.SetPixel(i, j, ppu.PatternMemory[1, i, j]); 
+                    screen.SetPixel(i, j, ppu.PatternMemory[0, i, j]); 
                 }
             }
-            /* * * * * * * * * * * * * * * * * * * * * */
 
-
-            // Loop(s)
-
-            while (screen.IsOpen)
+            while(screen.WindowIsOpen)
             {
-                // clear the window with black color
-                screen.Clear(Color.Black);
-
-                // draw everything here...
+            
+                screen.Clear();
                 screen.DispatchEvents();
-                screen.DrawToWindow();
-                // end the current frame
+                screen.DrawToWindow(); 
                 screen.Display();
             }
+#endif
 
+#if GameLoop
 
-            while (false)
+            // Emulation loop
+            void LoopEmulator()
             {
                 ppu.Clock();
-                if(systemClock % 3 == 0)
+                if (systemClock % 3 == 0)
                 {
                     cpu.Clock();
+                }
+                if (ppu.Nmi)
+                {
+                    ppu.Nmi = false;
+                    cpu.Nmi();
                 }
                 systemClock++;
             }
 
-
+            // Screen Loop
+            while (IODevice.WindowIsOpen)
+            {
+                IODevice.DispatchEvents();
+                LoopEmulator();
+                if (ppu.FrameComplete)
+                {
+                    ppu.FrameComplete = false;
+                    IODevice.DrawToWindow();
+                    IODevice.Display();
+                }
+            }
+#endif
         }
     }
 }

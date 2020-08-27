@@ -4,24 +4,23 @@ using SFML.System;
 using SFML.Window;
 namespace project_nes
 {
-    public class VirtualScreen : Drawable
+    public class IODevice : Drawable
     {
 
         private Color color = Color.Black; // init color
         private VertexArray vertices;
+        private VertexBuffer buffer;
         private Vector2u screenSize;
         private RenderWindow window;
 
         // From https://github.com/amhndu/SimpleNES/blob/master/src/VirtualScreen.cpp
-        public VirtualScreen(uint width, uint height, uint pixel_size)
+        public IODevice(uint width, uint height, uint pixel_size)
         {
             width *=  pixel_size;
             height *= pixel_size;
             vertices = new VertexArray(PrimitiveType.Triangles, width * height * 6);
             screenSize = new Vector2u(width, height);
             window = new RenderWindow(new VideoMode(width, height), "ProjectNES");
-
-
 
             for (uint x = 0; x < width; ++x)
             {
@@ -46,15 +45,18 @@ namespace project_nes
             if (i >= vertices.VertexCount)
                 return;
 
+            Vertex v;
             for (uint j = 0; j < 6; ++j)
             {
-                vertices[i + j] = new Vertex(vertices[i + j].Position, color);
+                v = vertices[i + j];
+                v.Color = color;
+                vertices[i + j] = v;
             }
         }
 
         public void Draw(RenderTarget target, RenderStates states) => vertices.Draw(target, states);
 
-        public bool IsOpen => window.IsOpen;
+        public bool WindowIsOpen => window.IsOpen;
 
         public void Close() => window.Close();
 
@@ -62,15 +64,15 @@ namespace project_nes
 
         public void Display() => window.Display();
 
-        public void AddKeyPressEvent(EventHandler<KeyEventArgs> action)
-        {
-            window.KeyPressed += action;
-        }
+        public void AddKeyPressEvent(EventHandler<KeyEventArgs> action) => window.KeyPressed += action;
+
+        public void AddClosedEvent(EventHandler action) => window.Closed += action;
 
         public void Clear() => window.Clear();
 
         public void Clear(Color color) => window.Clear(color);
 
         public void DispatchEvents() => window.DispatchEvents();
+
     }
 }

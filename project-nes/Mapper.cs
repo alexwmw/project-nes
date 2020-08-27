@@ -52,7 +52,7 @@ namespace project_nes
         {
             ushort mappedAdr =
                 (adr >= 0x0000 & adr <= 0x1FFF) ? adr :
-                throw new ArgumentOutOfRangeException($"Cartridge non-PPU range read by PPU at {adr}");
+                throw new ArgumentOutOfRangeException($"Cartridge: non-PPU range read by PPU at {adr}");
             return chrRom[mappedAdr];
         }
 
@@ -60,7 +60,7 @@ namespace project_nes
         {
             ushort mappedAdr =
                 (adr >= 0x6000 & adr <= 0x7FFF) ? adr :
-                throw new ArgumentOutOfRangeException($"Cartridge non-PPU range read by PPU at {adr}");
+                throw new ArgumentOutOfRangeException($"Cartridge: non-PPU range attempted write by PPU at {adr}");
             chrRom[mappedAdr] = data;
         }
     }

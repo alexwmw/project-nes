@@ -5,35 +5,23 @@ namespace project_nes
 {
     public class CpuBus
     {
-
         /** 
          * See https://wiki.nesdev.com/w/index.php/CPU_memory_map
          */
 
-        /**
-         * $0000-$07FF
-         */
+        // $0000-$07FF
         private byte[] cpuRam = new byte[0x0800];
 
-        /**
-         * $2000-$2007
-         */
+        //$2000-$2007
         private PPU ppu;
 
-        /**
-         * $4000-$4017
-         */
-        private byte[] APU_IO = new byte[0x0018];
+        //$4000-$4017
+        private byte[] APU_IO = new byte[0x0018]; //todo: not yet used
 
-        /**
-         * $4018-$401F
-         */
-        private byte[] APU_IO_TEST_MODE = new byte[0x0008];
+        //$4018-$401F
+        private byte[] APU_IO_TEST_MODE = new byte[0x0008]; //todo: not yet used
 
-        /**
-         * $4020-$FFFF
-         */
-
+        //$4020-$FFFF
         private Cartridge cartridge;
 
 
@@ -42,22 +30,15 @@ namespace project_nes
 
         }
 
-
-        // A Read-Write signal is not needed as it is implied by the method being called
-
         public byte Read(ushort adr)
         {
-            if (adr < 0)
-            {
-                return cpuRam[adr & 0x7FF];
-            }
             if (adr >=0 & adr <= 0x1FFF)
             {
                 return cpuRam[adr & 0x7FF];
             }
             if (adr >= 0x2000 & adr <= 0x3FFF)
             {
-                ppu.CpuRead((ushort)(adr & 0x007));
+                return ppu.CpuRead((ushort)(adr & 0x007));
             }
             if (adr >= 0x4000 & adr <= 0x4017)
             {
@@ -71,8 +52,11 @@ namespace project_nes
             {
                 return cartridge.CpuRead(adr);
             }
-
-            throw new ArgumentOutOfRangeException($"Invalid address greater than 0xFFFF: {adr.x()}");
+            if (adr < 0xFFFF)
+            {
+                throw new ArgumentOutOfRangeException($"Something weird happened: 0x{adr.x()} or 0d{adr}");
+            }
+            throw new ArgumentOutOfRangeException($"Invalid address greater than 0xFFFF: 0x{adr.x()} or 0d{adr}");
         }
                
 
@@ -82,11 +66,11 @@ namespace project_nes
             {
                 cpuRam[adr & 0x7FF] = data;
             }
-            else if (adr > 0x1FFF & adr <= 0x3FFF)
+            else if (adr >= 0x2000 & adr <= 0x3FFF)
             {
                 ppu.CpuWrite((ushort)(adr & 0x007), data);
             }
-            else if (adr > 0x3FFF & adr <= 0x4017)
+            else if (adr >= 0x4000 & adr <= 0x4017)
             {
                 APU_IO[adr - 0x4000] = data;
             }

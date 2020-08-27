@@ -8,170 +8,69 @@ using HelperMethods;
 namespace project_nes
 {
     public class Cartridge
-    {
-        private BinaryReader reader;
-        private Header header;
-        private byte[] trainer;
-        private byte[] prgRom;
-        private byte[] chrRom;
-        private string formatString;
+    { 
+        private string fileFormat;
         private string fileName;
-        private string path;
+        private string filePath;
         private byte mapperId;
         private byte prgBanks;
         private byte chrBanks;
-        private bool invalidFormat;
+        private byte[] prgRom; // program memory
+        private byte[] chrRom; // character memory aka pattern memory
 
+        private IMapper mapper;
+        private BinaryReader reader;
+        private Header header;
 
-        public Cartridge(string filePath)
+        public Cartridge(string path)
         {
-            int index = filePath.LastIndexOf(Path.DirectorySeparatorChar);
+            filePath = path;
+            reader = new BinaryReader(File.Open(this.filePath, FileMode.Open, FileAccess.Read));
+            fileName = this.filePath.Substring(path.LastIndexOf(Path.DirectorySeparatorChar) + 1);
 
-            this.fileName = filePath.Substring(index);
-            path = filePath;
-            reader = new BinaryReader(File.Open(path, FileMode.Open, FileAccess.Read));
+            // Header is parsed and various flags are set inside the header
             header = new Header(reader);
-
             header.Parse();
 
-            invalidFormat = header.Identification != "NES";
-            formatString = header.Nes_20 ? header.Identification + " 2.0" : "i" + header.Identification;
+            // Header flags determine...
+            fileFormat = header.Nes_20 ? header.Identification + " 2.0" : "i" + header.Identification; //iNES or NES 2.0
             mapperId = header.Mapper_id;
             Mirroring = header.Mirroring_type;
             prgBanks = header.Prg_banks;
             chrBanks = header.Chr_banks;
 
+            // Read data from file into memory
             if (header.Trainer)
-                trainer = reader.ReadBytes(0x200); // trainer is 512 (0x200) bytes
+                reader.ReadBytes(0x200); // trainer is 512 bytes. Junk. Not stored
             if (prgBanks > 0)
                 prgRom = reader.ReadBytes(prgBanks * 0x4000); // prgBanks = no. of 16kb banks to read
             if (chrBanks > 0)
-                chrRom = reader.ReadBytes(chrBanks * 0x2000);   // chrBanks = no. of 8kb banks to read  
+                chrRom = reader.ReadBytes(chrBanks * 0x2000);   // chrBanks = no. of 8kb banks to read
+
+            // Mapper is instantiated based on string "Mapper" + mapperId
+            mapper = (IMapper)Activator.CreateInstance(Type.GetType($"project_nes.Mapper{mapperId}")); 
+            mapper.PrgBanks = prgBanks;
+            mapper.PrgRom = prgRom;
+            mapper.ChrRom = chrRom;
+           
             reader.Close();
-            this.Report();
+            Report();
         }
 
-        public Cartridge(string fileName, DirectoryInfo directory)
-        {
-            this.fileName = fileName;
-            path = directory.FullName + fileName;
+        // 'V' or 'H' for mirroring mode
+        public char Mirroring { get; } 
 
-            reader = new BinaryReader(File.Open(path, FileMode.Open, FileAccess.Read));
-            header = new Header(reader);
+        // Receives an address between 0x4020 - 0xFFFF
+        public byte CpuRead(ushort adr) => mapper.CpuRead(adr);
 
-            header.Parse();
+        // Receives an address between 0x4020 - 0xFFFF
+        public void CpuWrite(ushort adr, byte data) => mapper.CpuWrite(adr, data);
 
-            invalidFormat = header.Identification != "NES";
-            formatString = header.Nes_20 ? header.Identification + " 2.0" : "i" + header.Identification;
-            mapperId = header.Mapper_id;
-            Mirroring = header.Mirroring_type;
-            prgBanks = header.Prg_banks;
-            chrBanks = header.Chr_banks;
+        //PPU should R/W only character (CHR) memory
+        public byte PpuRead(ushort adr) => mapper.PpuRead(adr);
 
-            if (header.Trainer)
-                trainer = reader.ReadBytes(0x200); // trainer is 512 (0x200) bytes
-            if (prgBanks > 0)
-                prgRom = reader.ReadBytes(prgBanks * 0x4000); // prgBanks = no. of 16kb banks to read
-            if (chrBanks > 0)
-                chrRom = reader.ReadBytes(chrBanks * 0x2000);   // chrBanks = no. of 8kb banks to read  
-            reader.Close();
-            this.Report();
-        }
-
-        public char Mirroring { get; }
-
-        /**
-         * Receives an address between 0x4020 - 0xFFFF
-         * 
-         * CPU should R/W only from program (PRG) memory
-         * 
-         */
-        public byte CpuRead(ushort adr)
-        {
-            ushort mappedAdr;
-            //dummy mapper 0
-            if (adr < 0x6000)
-            {
-                // rarely used
-                throw new ArgumentOutOfRangeException($"Cartridge non-CPU range read by CPU at {adr}");
-            }
-            else if (adr >= 0x6000 & adr <= 0x7FFF)
-            {
-                // chr rom - not used by CPU
-                throw new ArgumentOutOfRangeException($"Cartridge non-CPU range / CHR Rom read by CPU at {adr}");
-            }
-            else if (adr >= 0x8000 & adr <= 0xFFFF)
-            {
-                mappedAdr = (ushort)(adr & (prgBanks == 32 ? 0x7FFF : 0x3FFF));
-                return prgRom[mappedAdr];
-            }
-            else
-                throw new ArgumentOutOfRangeException($"Cartridge non-CPU range read by CPU at {adr}");
-        }
-
-        public void CpuWrite(ushort adr, byte data)
-        {
-            ushort mappedAdr;
-
-            //dummy mapper 0
-            if (adr < 0x6000)
-            {
-                // rarely used
-                throw new ArgumentOutOfRangeException($"Cartridge non-CPU range read by CPU at {adr}");
-            }
-            else if (adr >= 0x6000 & adr <= 0x7FFF)
-            {
-                // chr rom - not used by CPU
-                throw new ArgumentOutOfRangeException($"Cartridge non-CPU range / CHR Rom read by CPU at {adr}");
-            }
-            else if (adr >= 0x8000 & adr <= 0xFFFF)
-            {
-                mappedAdr = (ushort)(adr & (prgBanks == 32 ? 0x7FFF : 0x3FFF));
-                prgRom[mappedAdr] = data;
-            }
-            else
-                throw new ArgumentOutOfRangeException($"Cartridge non-CPU range read by CPU at {adr}");
-        }
-
-        /**
-         * PPU should R/W only from character (CHR) memory
-         */
-        public byte PpuRead(ushort adr)
-        {
-            ushort mappedAdr;
-
-            if (adr >= 0x0000 & adr <= 0x1FFF)
-            {
-                mappedAdr = adr;
-                try
-                {
-                    return chrRom[mappedAdr];
-                }
-                catch(System.IndexOutOfRangeException e)
-                {
-                    Console.WriteLine($"PpuRead Received the address {mappedAdr.x()}, originally {(adr - 0x6000).x()}");
-                    Console.WriteLine($"But chrRom has a length of {chrRom.Length.x()}");
-                    throw e;
-                }
-            }
-            else 
-                throw new ArgumentOutOfRangeException($"Cartridge non-PPU range read by PPU at {adr}");
-        }
-
-        public void PpuWrite(ushort adr, byte data)
-        {
-            ushort mappedAdr;
-
-            if (adr >= 0x6000 & adr <= 0x7FFF)
-            {
-                mappedAdr = adr;
-                chrRom[mappedAdr] = data;
-            }
-            else if (adr >= 0x8000 & adr <= 0xFFFF)
-                throw new ArgumentOutOfRangeException($"Cartridge non-PPU range read by PPU at {adr}");
-        }
-
-
+        //PPU should R/W only character (CHR) memory
+        public void PpuWrite(ushort adr, byte data) => mapper.PpuWrite(adr, data);
 
         public void Report()
         {
@@ -179,8 +78,8 @@ namespace project_nes
             Console.WriteLine($"CARTRIDGE REPORT");
             Console.WriteLine($"--------------------------------");
             Console.WriteLine($"File:               {fileName}");
-            Console.WriteLine($"Path:               {path}");
-            Console.WriteLine($"Format:             {formatString}");
+            Console.WriteLine($"Path:               {filePath}");
+            Console.WriteLine($"Format:             {fileFormat}");
             Console.WriteLine($"Mapper:             {mapperId}");
             Console.WriteLine($"Trainer Present:    {header.Trainer}");
             Console.WriteLine($"Prg ROM Size:       0x{prgRom.Length.x()} | {prgRom.Length / 1024} kb");

@@ -24,8 +24,11 @@ namespace HelperMethods
         public static void Log(this string s, object value) => Console.WriteLine($"{s}:    {value}");
 
         public static void Log(this string s, object value, string units) => Console.WriteLine($"{s}:    {value} {units}");
+
         
     }
+
+
 
     public static class StaticMethods
     {

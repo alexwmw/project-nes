@@ -14,7 +14,7 @@
         "outputPath": "/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/Users/alexwright/.config/NuGet/NuGet.Config"
+          "/Users/alexwright/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "netcoreapp3.1"
@@ -37,6 +37,10 @@
         "netcoreapp3.1": {
           "dependencies": {
             "CSFML": {
+              "target": "Package",
+              "version": "[2.5.0, )"
+            },
+            "SFML.Audio": {
               "target": "Package",
               "version": "[2.5.0, )"
             },

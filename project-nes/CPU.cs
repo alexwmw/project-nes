@@ -1,4 +1,6 @@
-﻿using System;
+﻿//#define LOGGING
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
@@ -37,7 +39,7 @@ namespace project_nes
         //Debugging and monitoring
         private int clock_count;            // Total number of clock cycles passed
         private int logLineNo = 2;          // Line no. used in console logging. Offset by 2 to match Excel lines
-        private State state;
+        public State state;
 
 
         //CSV file variables;
@@ -80,14 +82,15 @@ namespace project_nes
                 {CPX, Imm, 2}, {SBC, InX, 6}, {NOP, Imp, 2}, {UNK, Imp, 8}, {CPX, Zpg, 3}, {SBC, Zpg, 3}, {INC, Zpg, 5}, {UNK, Imp, 5}, {INX, Imp, 2}, {SBC, Imm, 2}, {NOP, Imp, 2}, {SBC, Imp, 2}, {CPX, Abs, 4}, {SBC, Abs, 4}, {INC, Abs, 6}, {UNK, Imp, 6}, // E
                 {BEQ, Rel, 2}, {SBC, InY, 5}, {UNK, Imp, 2}, {UNK, Imp, 8}, {NOP, Imp, 4}, {SBC, ZpX, 4}, {INC, ZpX, 6}, {UNK, Imp, 6}, {SED, Imp, 2}, {SBC, AbY, 4}, {NOP, Imp, 2}, {UNK, Imp, 7}, {NOP, Imp, 4}, {SBC, AbX, 4}, {INC, AbX, 7}, {UNK, Imp, 7}, // F
             };
-
+#if LOGGING
             //CSV log - file creation
             csvLogs = new DirectoryInfo(@"/Users/alexwright/Documents/MSc Files/Project/csv_logs");
             dateTime = DateTime.UtcNow;
             cultInfo = CultureInfo.CreateSpecificCulture("en-UK");
             csvFileName = $"project_nes_nestest_log_{dateTime.ToString("o", cultInfo)}.csv";
             filePath = $"{csvLogs.FullName}/{csvFileName}";
-            //using (File.Create(filePath)) { }
+            using (File.Create(filePath)) { }
+#endif
         }
 
         // Enums
@@ -117,11 +120,11 @@ namespace project_nes
                 cycles += currentInstr.Cycles;
                 bool addrm = currentInstr.AddrMode();
                 bool operation = currentInstr.Operation();
-                LogState();
+#if LOGGING
+                //LogState();
                 using (StreamWriter file = new StreamWriter(filePath, true))
-                {
                     file.WriteLine(state);
-                }
+#endif
                 if (addrm & operation)
                     cycles++;
             }
@@ -142,7 +145,7 @@ namespace project_nes
                     Flags.B, false,
                     Flags.I, true,
                     Flags.U, true);
-                Write(((ushort)(0x0100 + stkp--)), status);
+                Write((ushort)(0x0100 + stkp--), status);
 
                 //Load interrupt vector from $FFFE/F 
                 PC = LittleEndian(Read(0xFFFE), Read(0xFFFF));
@@ -269,7 +272,7 @@ namespace project_nes
                 data = Read(address);
         }
 
-        private void LogState()
+        public void LogState()
         {
             string rowN = string.Format("{0,5}", logLineNo++);
             byte byte1 = opcode;
@@ -1286,7 +1289,7 @@ namespace project_nes
 
         // Classes
 
-        private struct State
+        public struct State
         {
             public ushort PC;
             public byte A, X, Y, stkp, status;

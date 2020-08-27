@@ -35,7 +35,7 @@ namespace project_nes
          *   Hold the layout of background information in two adjacent banks.
          *   The two banks facilitate scrolling
          */
-        private byte[,] nameTables;
+        public byte[,] nameTables; 
 
         /** Pattern Memory or Character (CHR) Memory
          *   This is thr CHR rom on the cartridge
@@ -65,21 +65,18 @@ namespace project_nes
                 if (cartridge.Mirroring == 'V')
                 {
                     addr -= 0x2000;
-                    // i = MS bit
-                    // j = address % 1 kb
-                    i = (byte)((addr & 0xF000) >> 12);
-                    j = (byte)(addr % 0x800);
+                    i = (byte)((addr & 0xF000) >> 12);  // MS bit
+                    j = (byte)(addr % 0x800);           // address % 1 kb
                 }
                 else if (cartridge.Mirroring == 'H')
                 {
                     addr &= 0x0FFF;
-                    // i = addr < 1 kb ?
-                    // j = addr - (0 kb or 1 kb)
-                    i = (byte)(addr < 0x0800 ? 0 : 1);
-                    j = (byte)(addr - (i * 0x800));
+                    i = (byte)(addr < 0x0800 ? 0 : 1);  // addr < 1 kb ?
+                    j = (byte)(addr - (i * 0x800));     // addr - (0 kb or 1 kb)
                 }
                 else
                     throw new SystemException("Cartridge.Mirroring was not V or H");
+
                 nameTables[i, j] = data;
             }
             else if (addr >= 0x3F00 & addr <= 0x3FFF) // Palette RAM indexes & mirrors
@@ -87,8 +84,7 @@ namespace project_nes
                 paletteRam[addr & 0x001F] = data;
                 // Hard code in mirroring? https://youtu.be/-THeUXqR3zY?t=860
             }
-            else
-                throw new ArgumentOutOfRangeException("Address exceeds 0x3FFF");
+            else throw new ArgumentOutOfRangeException("Address exceeds 0x3FFF");
         }
 
         public byte Read(ushort addr)
@@ -103,21 +99,18 @@ namespace project_nes
                 if (cartridge.Mirroring == 'V')
                 {
                     addr -= 0x2000;
-                    // i = MS bit
-                    // j = address % 1 kb
                     i = (byte)((addr & 0xF000) >> 12);
                     j = (byte)(addr % 0x800);
                 }
                 else if (cartridge.Mirroring == 'H')
                 {
                     addr &= 0x0FFF;
-                    // i = addr < 1 kb ?
-                    // j = addr - (0 kb or 1 kb)
                     i = (byte)(addr < 0x0800 ? 0 : 1);
                     j = (byte)(addr - (i * 0x800));
                 }
                 else
                     throw new SystemException("Cartridge.Mirroring was not V or H");
+
                 return nameTables[i, j];
             }
             if (addr >= 0x3F00 & addr <= 0x3FFF) // Palette RAM indexes & mirrors

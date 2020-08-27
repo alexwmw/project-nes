@@ -9,6 +9,7 @@
       "project-nes/1.0.0": {
         "dependencies": {
           "CSFML": "2.5.0",
+          "SFML.Audio": "2.5.0",
           "SFML.Graphics": "2.5.0",
           "SFML.Net": "2.5.0",
           "SFML.System": "2.5.0",

@@ -1,7 +1,8 @@
-﻿using System;
+﻿//#define generate_a_nice_pattern
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
-//using System.Drawing;
 using SFML.Graphics;
 
 namespace project_nes
@@ -16,201 +17,343 @@ namespace project_nes
          *   258-319  Idle
          *   321-336  First two tiles on next scanline
          *   337-340  Unused fetches
-         *   
-         ** https://www.reddit.com/r/EmuDev/comments/4j4ryc/resources_for_writing_graphics_renderer/
-         * 
-         *  Basically, for an NES emulator what you'll be doing is blitting the 
-         *  framebuffer pixel-by-pixel to a 256 by 240 buffer, and then once the 
-         *  PPU finishes a frame you'll upload that to a texture and show it 
-         *  fullscreen. 
-         * 
-         * 
-         ** https://www.reddit.com/r/EmuDev/comments/9spw6q/doubts_about_graphics_in_emulation/
-         *    Using SDL will probably be the easiest way to do this.
-         *    
-         *    1. Create an SDL_Surface that's 256x240 pixels in size 
-         *       (the size of the NES screen) which is an in-memory 
-         *       image that you can draw to, but is not able to render. 
-         *       Along with it, create an SDL_Texture with the 
-         *       SDL_TEXTUREACCESS_STREAMING flag. 
-         *       This is what lets you render your SDL_Surface to the screen in 
-         *       SDL2.
-         *       
-         *    2. Now you're ready to start drawing. Every frame or scanline or 
-         *       however your emulator works, set pixels in your SDL_Surface 
-         *       using one of the set pixel routines you can find by googling.
-         *       
-         *    3. Once you're finished with a frame and want to display it, 
-         *       use SDL_UpdateTexture to push the new SDL_Surface data to 
-         *       the GPU and then use SDL_RenderCopy to actually render that 
-         *       to the screen. Go back to step 2. 
          */
 
         private const int maxCycles = 341;
         private const int maxSLs = 261;
+        private const int firstBlankSL = 241;
+        private const int firstBlankCycle = 257;
 
         /** PPU registers
          * These are the backing fields of register properties.
          * When each register is r/w to, various actions are triggered.
          * Property getters and setters are a convenient medium for this
          */
-        private byte control;       // VBHB SINN | NMI enable (V), PPU master/slave (P), sprite height (H), background tile select (B), sprite tile select (S), increment mode (I), nametable select (NN)
+        private byte control;       // VPHB SINN | NMI enable (V), PPU master/slave (P), sprite height (H), background tile select (B), sprite tile select (S), increment mode (I), nametable select (NN)
         private byte mask;          // BGRs bMmG | color emphasis (BGR), sprite enable (s), background enable (b), sprite left column enable (M), background left column enable (m), greyscale (G)
         private byte status;        // VSO- ---- | vblank (V), sprite 0 hit (S), sprite overflow (O); read resets write pair for $2005/$2006
         private byte oamAddress;    // OAM r/w address
         private byte oamData;       // OAM r/w data
         private byte scroll;        // fine scroll position (two writes: X scroll, Y scroll)
-        private byte ppuAddress;    // PPU read/write address (two writes: most significant byte, least significant byte)
         private byte ppuData;       // PPU data read/write
         private byte oamDma;        // OAM DMA high address
-        private byte[] ppuRegisters;// Hold the register properties so they can be accessed via an index
 
+        // Emulation variables
+        private byte latch;   
+        private ushort ppuAddress;
         private int cycle;
         private int scanLine;
-        private Palette palette;
 
-        PpuBus ppuBus;
+        // Internal references
+        private Palette palette;
+        private IODevice IODevice;
+        private PpuBus ppuBus;
+        private int frameCount;
 
         public PPU()
         {
-            ppuRegisters = new byte[8]
-            {
-                Control,
-                Mask,
-                Status,
-                OamAddress,
-                OamData,
-                Scroll,
-                PpuAddress,
-                PpuData
-            };
+            latch = 0;
+            frameCount = 0;
 
-            // Two adjacent 16 * 16 2D arrays of 8 * 8 tiles
+            // Two adjacent 16 * 16 2D arrays of 8 * 8 tiles. Used only for testing
             PatternMemory = new Color[2, (16 * 8) , (16 * 8)];
-
-            palette = new Palette
-            {
-                { 84,  84,  84 },
-                {  0,  30, 116 },
-                {  8,  16, 144 },
-                { 48,   0, 136 },
-                { 68,   0, 100 },
-                { 92,   0,  48 },
-                { 84,   4,   0 },
-                { 60,  24,   0 },
-                { 32,  42,   0 },
-                {  8,  58,   0 },
-                {  0,  64,   0 },
-                {  0,  60,   0 },
-                {  0,  50,  60 },
-                {  0,   0,   0 },
-                {  0,   0,   0 },
-                {  0,   0,   0 },
-
-                { 152, 150, 152 },
-                {   8,  76, 196 },
-                {  48,  50, 236 },
-                {  92,  30, 228 },
-                { 136,  20, 176 },
-                { 160,  20, 100 },
-                { 152,  34,  32 },
-                { 120,  60,   0 },
-                {  84,  90,   0 },
-                {  40, 114,   0 },
-                {   8, 124,   0 },
-                {   0, 118,  40 },
-                {   0, 102, 120 },
-                {   0,   0,   0 },
-                {   0,   0,   0 },
-                {   0,   0,   0 },
-
-                { 236, 238, 236 },
-                {  76, 154, 236 },
-                { 120, 124, 236 },
-                { 176,  98, 236 },
-                { 228,  84, 236 },
-                { 236,  88, 180 },
-                { 236, 106, 100 },
-                { 212, 136,  32 },
-                { 160, 170,   0 },
-                { 116, 196,   0 },
-                {  76, 208,  32 },
-                {  56, 204, 108 },
-                {  56, 180, 204 },
-                {  60,  60,  60 },
-                {   0,   0,   0 },
-                {   0,   0,   0 },
-  
-                { 236, 238, 236 },
-                { 168, 204, 236 },
-                { 188, 188, 236 },
-                { 212, 178, 236 },
-                { 236, 174, 236 },
-                { 236, 174, 212 },
-                { 236, 180, 176 },
-                { 228, 196, 144 },
-                { 204, 210, 120 },
-                { 180, 222, 120 },
-                { 168, 226, 144 },
-                { 152, 226, 180 },
-                { 160, 214, 228 },
-                { 160, 162, 160 },
-                {   0,   0,   0 },
-                {   0,   0,   0 }
-            };
         }
+
+        private enum CtrlFlags
+        {
+            ntable_0 = 1 << 0,
+            ntable_1 = 1 << 1,
+            increment_mode = 1 << 2,
+            sprite_select = 1 << 3,
+            backgr_select = 1 << 4,
+            sprite_height = 1 << 5,
+            slave_mode = 1 << 6,
+            nmi_enable = 1 << 7
+        }
+
+        private enum StatFlags
+        {
+            sprite_overflow = 1 << 5,
+            sprite_zero_hit = 1 << 6,
+            vertical_blank = 1 << 7,
+        }
+
+        private enum MaskFlags
+        {
+            greyscale = 1 << 0,
+            backgr_left = 1 << 1,
+            sprite_left = 1 << 2,
+            backgr_enable = 1 << 3,
+            sprite_enable = 1 << 4,
+            red_emph = 1 << 5,
+            green_emph = 1 << 6,
+            blue_emph = 1 << 7,
+        }
+
+
+
+
+        // Properties * * * * * * * * *
+
+        public bool Nmi { get; set; }
+
+        public bool FrameComplete { get; set; }
 
         public Color[, ,] PatternMemory { get; }
 
-        private byte Control { get; set; }
 
-        private byte Mask { get; set; }
 
-        private byte Status { get; set; }
+        // Registers Getters & Setters * * * * * * * * * *
 
+        private byte GetControl()
+            => throw new AccessViolationException("Read of unreadable register"); // Not actually readable
+
+        //todo
+        private void SetControl(byte value)
+        {
+            control = value;
+        //tram_addr.nametable_x = control.nametable_x;
+        //tram_addr.nametable_y = control.nametable_y;
+        }
+
+        private byte Mask()
+             => throw new AccessViolationException("Read of unreadable register"); // Not actually readable
+        
+        private void SetMask(byte value) => mask = value; // No further actions
+
+        private byte GetStatus()
+        {
+            try
+            {
+                return status;
+            }
+            finally
+            {
+                SetFlag(StatFlags.vertical_blank, false);
+                latch = 0;
+            }
+        }
+
+        //todo
         private byte OamAddress { get; set; }
 
+        //todo
         private byte OamData { get; set; }
 
-        private byte Scroll { get; set; }
+        // Used to offset into a tile when scrolling
+        private byte GetScroll() 
+             => throw new AccessViolationException("Read of unreadable register"); // Not actually readable
 
-        private byte PpuAddress { get; set; }
+        //todo
+        private void SetScroll(byte value)
+        {
+            if (latch == 0)
+            {
+                //fine_x = value & 0x07;
+                //tram_addr.coarse_x = value >> 3;
+                //address_latch = 1;
+            }
+            else
+            { 
+                //tram_addr.fine_y = value & 0x07;
+                //tram_addr.coarse_y = value >> 3;
+                //address_latch = 0;
+            }
+        }
+        
 
-        private byte PpuData { get; set; }
+        private byte GetPpuAddressByte() 
+            => throw new AccessViolationException("Read of unreadable register"); // Not actually readable
+
+        private void SetPpuAddressByte(byte value)
+        {
+            // When latch is 0 write the high byte
+            // When latch is 1 write the low byte
+            if (latch == 0)
+            {
+                ppuAddress = (ushort)((value << 8) | (ppuAddress & 0x00FF));
+                latch = 1;
+            }
+            else
+            {
+
+                ppuAddress = (ushort)((ppuAddress & 0xFF00) | value);
+                latch = 0;
+            }
+        }
+            
+
+        private byte GetPpuData()
+        {
+            try
+            {
+                /* Reads should be delayed by one cycle - 
+                * UNLESS reading from palette ROM
+                */
+
+                // store ppuData that was set during the last cycle
+                byte ppuDataDelayedBy1 = ppuData;
+
+                // update ppuData during this cycle
+                ppuData = PpuRead(ppuAddress);
+
+                // If palette location, return current, else return previous
+                return ppuAddress >= 0x3F00 ? ppuData : ppuDataDelayedBy1;
+            }
+            finally
+            {
+                // If set to vertical mode (1), the increment is 32, so it skips
+                // one whole nametable row; in horizontal mode (0) it just increments
+                // by 1, moving to the next column
+                ppuAddress += (ushort)(GetFlag(CtrlFlags.increment_mode) ? 32 : 1);
+            }
+        }
+
+        private void SetPpuData(byte value)
+        {
+            PpuWrite(ppuAddress, value);
+
+            // If set to vertical mode (1), the increment is 32, so it skips
+            // one whole nametable row; in horizontal mode (0) it just increments
+            // by 1, moving to the next column
+            ppuAddress += (ushort)(GetFlag(CtrlFlags.increment_mode) ? 32 : 1);
+        }
+
+
+        // Methods * * * * * * * *
+       
+
 
         public void Clock()
         {
+            #if generate_a_nice_pattern
+            // If within visible portion of screen, set pixel of screen
+            if (cycle > 0 & scanLine > 0 & cycle < firstBlankCycle & scanLine < firstBlankSL)
+            {
+                int i = Math.Abs((scanLine * cycle + frameCount) % ((frameCount + 1) % 64));
+                IODevice.SetPixel(cycle - 1, scanLine - 1, palette[i]);
+            }
+            #endif
+            bool at_init_point = scanLine == -1 & cycle == 1;
+            bool first_blank_SL = scanLine == 241 & cycle == 1;
+            bool SL_complete = cycle >= 341;
+            bool visible_SL = scanLine >= -1 & scanLine < 240;
+            bool in_read_section = cycle >= 2 & cycle < 258 | cycle >= 321 & cycle < 338;
+            bool frame_complete = scanLine >= 261;
+            bool at_end_of_SL = cycle == 256;
+
+
+            if (at_init_point)
+                SetFlag(StatFlags.vertical_blank, false);
+
+            if (in_read_section & visible_SL)
+            {
+
+            }
+            if (first_blank_SL)
+            {
+                SetFlag(StatFlags.vertical_blank, true);
+                Nmi = GetFlag(CtrlFlags.nmi_enable);
+            }
+
             cycle++;
-            if (cycle >= maxCycles)
+
+            if (SL_complete)
             {
                 cycle = 0;
                 scanLine++;
-                cycle++;
-
-                if (scanLine >= maxSLs)
+                
+                // If scanline gets to 261 (maxSL), the frame is complete
+                if (frame_complete)
                 {
                     scanLine = -1;
-                    //frame complete
+                    frameCount++;
+                    FrameComplete = true;
                 }
             }
         }
 
+        // Ctrl get set
+        private void SetFlag(CtrlFlags f, bool b)
+            => control = (byte)(b ? control | (byte)f : control & (byte)~f);
+
+        private bool GetFlag(CtrlFlags f)
+            => (control & (byte)f) > 0;
+        
+        // Mask get set
+        private void SetFlag(MaskFlags f, bool b)
+            => mask = (byte)(b ? mask | (byte)f : mask & (byte)~f);
+
+        private bool GetFlag(MaskFlags f)
+            => (mask & (byte)f) > 0;
+
+        // Status get set
+        private void SetFlag(StatFlags f, bool b)
+            => status = (byte)(b ? status | (byte)f : status & (byte)~f);
+
+        private bool GetFlag(StatFlags f)
+            => (status & (byte)f) > 0;
+
+
+
         public void CpuWrite(ushort addr, byte data)
         {
-            //incoming addresses start at 0x2000
-            ppuRegisters[addr - 0x2000] = data;
+            switch (addr)
+            {
+                case 0:
+                    SetControl(data);
+                    break;
+                case 1:
+                    SetMask(data);
+                    break;
+                case 2:
+                    throw new AccessViolationException("Write to unwritable register");
+                case 3:
+                    OamAddress = data;
+                    break;
+                case 4:
+                    OamData = data;
+                    break;
+                case 5:
+                    SetScroll(data);
+                    break;
+                case 6:
+                    SetPpuAddressByte(data);
+                    break;
+                case 7:
+                    SetPpuData(data);
+                    break;
+                default:
+                    throw new IndexOutOfRangeException($"Cpu Write to unknown Register {addr}");
+            } 
         }
 
         public byte CpuRead(ushort addr)
-        {
-            //incoming addresses start at 0x2000
-            return ppuRegisters[addr - 0x2000];
-        }
+            => addr switch
+            {
+                0 => GetControl(),
+                1 => Mask(),
+                2 => GetStatus(),
+                3 => OamAddress,
+                4 => OamData,
+                5 => GetScroll(),
+                6 => GetPpuAddressByte(),
+                7 => GetPpuData(),
+                _ => throw new IndexOutOfRangeException($"Cpu Read of unknown Register {addr}"),
+            };
 
-        public void ConnectBus(PpuBus bus)
+            public void ConnectBus(PpuBus bus)
         {
             ppuBus = bus;
         }
+
+        public void ConnectIO(IODevice IO)
+        {
+            this.IODevice = IO;
+            IODevice.Clear();
+        }
+
+        public void SetPalette(Palette p) => palette = p;
 
         public void PpuWrite(ushort addr, byte data)
         {
@@ -221,6 +364,7 @@ namespace project_nes
         {
             return ppuBus.Read(addr);
         }
+
 
 
         //Adapted from olcnes https://github.com/OneLoneCoder/olcNES/tree/master/Part%20%234%20-%20PPU%20Backgrounds
@@ -264,7 +408,7 @@ namespace project_nes
             }
         }
 
-        private Color GetColour(byte palet, byte pixel)
+        public Color GetColour(byte palet, byte pixel)
         {
             byte index = PpuRead((ushort)(0x3f00 + (palet * 4) + pixel));
 
@@ -274,49 +418,32 @@ namespace project_nes
             return palette[index];
         }
 
-        public struct RgbPixel
+        private class LoopyRegister
         {
-            private byte[] rgb;
+            private ushort address;
 
-            public RgbPixel(byte red, byte green, byte blue)
-            {
-                Red = red;
-                Green = green;
-                Blue = blue;
-                rgb = new byte[3] { Red, Green, Blue };
-            }
-            public byte Red { get; }
-            public byte Green { get; }
-            public byte Blue { get; }
+            public byte Coarse_x { get; set; } //5
+            public byte Coarse_y { get; set; }  //5
+            public byte NTable_x { get; set; }  //1
+            public byte NTable_y { get; set; }  //1
+            public byte Fine_y { get; set; }    //3
 
-            public byte this[int i]
+            public ushort Address
             {
-                get => rgb[i];
+                get => address;
+
+                set => Set(value);
             }
 
-            public int HexValue()
+            public void Set(ushort word)
             {
-                return (Red << 16) & (Green << 8) & (Blue);
-            }
-        }
+                Coarse_x = (byte)(word & 0x001F >> 0);
+                Coarse_y = (byte)(word & 0x03E0 >> 5);
+                NTable_x = (byte)(word & 0x0400 >> 10);
+                NTable_y = (byte)(word & 0x0800 >> 11);
+                Fine_y = (byte)(word & 0x7000 >> 12);
 
-        private class Palette : IEnumerable<Color>
-        {
-            private List<Color> colors = new List<Color>();
-
-            public IEnumerator<Color> GetEnumerator()
-                => colors.GetEnumerator();
-
-            IEnumerator IEnumerable.GetEnumerator()
-                => colors.GetEnumerator();
-
-            public void Add(byte r, byte g, byte b)
-                => colors.Add(new Color(r, g, b));
-
-            public Color this[int i]    // Indexer declaration  
-            {
-                get { return this.colors[i]; }
-                set { this.colors[i] = value; }
+                address = word;
             }
         }
     } 
