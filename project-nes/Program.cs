@@ -5,6 +5,8 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading;
+
 namespace project_nes
 {
     class Program
@@ -23,7 +25,7 @@ namespace project_nes
             string dk = @"Donkey Kong (World) (Rev A).nes";
 
             //File to open
-            string selectedFile = nestest;
+            string selectedFile = dk;
             string fileName = args.Length == 0 ? dirForCurrentOS.FullName + selectedFile : args[0];
 
 
@@ -118,6 +120,9 @@ namespace project_nes
                 }
             }
 #endif
+
+
+
         }
     }
 }

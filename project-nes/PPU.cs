@@ -1,8 +1,13 @@
 ﻿//#define generate_a_nice_pattern
+//#define LOGGING
 
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Threading;
+using HelperMethods;
 using SFML.Graphics;
 
 namespace project_nes
@@ -28,6 +33,7 @@ namespace project_nes
          * These are the backing fields of register properties.
          * When each register is r/w to, various actions are triggered.
          * Property getters and setters are a convenient medium for this
+         * edit: got rid of properties; too difficult to debug
          */
         private byte control;       // VPHB SINN | NMI enable (V), PPU master/slave (P), sprite height (H), background tile select (B), sprite tile select (S), increment mode (I), nametable select (NN)
         private byte mask;          // BGRs bMmG | color emphasis (BGR), sprite enable (s), background enable (b), sprite left column enable (M), background left column enable (m), greyscale (G)
@@ -43,12 +49,34 @@ namespace project_nes
         private ushort ppuAddress;
         private int cycle;
         private int scanLine;
+        private LoopyRegister vReg;
+        private LoopyRegister tReg;
+        private byte fine_x;
+
 
         // Internal references
         private Palette palette;
         private IODevice IODevice;
         private PpuBus ppuBus;
+
+        // Background rendering
+        private byte tileID;
+        private byte tileAttrib;
+        private byte tileLSB;
+        private byte tileMSB;
+        private ushort patternShifterLo;
+        private ushort patternShifterHi;
+        private ushort attribShifterLo;
+        private ushort attribShifterHi;
+
+        //CSV file & debugging;
         private int frameCount;
+        private string csvFileName;
+        private string filePath;
+        private CultureInfo cultInfo;
+        private DateTime dateTime;
+        private DirectoryInfo csvLogs;
+        public PpuState state;
 
         public PPU()
         {
@@ -57,6 +85,34 @@ namespace project_nes
 
             // Two adjacent 16 * 16 2D arrays of 8 * 8 tiles. Used only for testing
             PatternMemory = new Color[2, (16 * 8) , (16 * 8)];
+
+#if LOGGING
+            //CSV log - file creation
+            csvLogs = new DirectoryInfo(@"/Users/alexwright/Documents/MSc Files/Project/csv_logs");
+            dateTime = DateTime.UtcNow;
+            cultInfo = CultureInfo.CreateSpecificCulture("en-UK");
+            csvFileName = $"project_nes_ppu_log_{dateTime.ToString("o", cultInfo)}.csv";
+            filePath = $"{csvLogs.FullName}/{csvFileName}";
+            using (File.Create(filePath)) { }
+
+            using (StreamWriter file = new StreamWriter(filePath, true))
+                file.WriteLine(
+                   $"frameCount," +
+                   $"scanLine," +
+                   $"cycle," +
+                   $"ppuAddress," +
+                   $"read(address)," +
+                   $"ppuData," +
+                   $"patternShifterHi," +
+                   $"patternShifterLo," +
+                   $"attribShifterHi," +
+                   $"attribShifterLo," +
+                   $"tileID," +
+                   $"tileAttrib," +
+                   $"tileMSB," +
+                   $"tileLSB"
+                   );
+#endif
         }
 
         private enum CtrlFlags
@@ -90,6 +146,15 @@ namespace project_nes
             blue_emph = 1 << 7,
         }
 
+        private enum LoopyFields
+        {
+            coarse_x = 0b11111 << 0,
+            coarse_y = 0b11111 << 5,
+            nTable_x = 0b1 << 10, 
+            nTable_y = 0b1 << 11,
+            fine_y   = 0b111 << 12
+        }
+
 
 
 
@@ -103,7 +168,7 @@ namespace project_nes
 
 
 
-        // Registers Getters & Setters * * * * * * * * * *
+        // Register Getters & Setters * * * * * * * * * *
 
         private byte GetControl()
             => throw new AccessViolationException("Read of unreadable register"); // Not actually readable
@@ -119,7 +184,8 @@ namespace project_nes
         private byte Mask()
              => throw new AccessViolationException("Read of unreadable register"); // Not actually readable
         
-        private void SetMask(byte value) => mask = value; // No further actions
+        private void SetMask(byte value)
+            => mask = value; // No further actions
 
         private byte GetStatus()
         {
@@ -203,8 +269,9 @@ namespace project_nes
             finally
             {
                 // If set to vertical mode (1), the increment is 32, so it skips
-                // one whole nametable row; in horizontal mode (0) it just increments
-                // by 1, moving to the next column
+                // one whole nametable row;
+                // In horizontal mode (0) it just increments by 1, moving to
+                // the next column
                 ppuAddress += (ushort)(GetFlag(CtrlFlags.increment_mode) ? 32 : 1);
             }
         }
@@ -220,43 +287,104 @@ namespace project_nes
         }
 
 
-        // Methods * * * * * * * *
-       
-
+        // Clock function * * * * * * * *
+     
 
         public void Clock()
         {
-            #if generate_a_nice_pattern
+#if generate_a_nice_pattern
             // If within visible portion of screen, set pixel of screen
             if (cycle > 0 & scanLine > 0 & cycle < firstBlankCycle & scanLine < firstBlankSL)
             {
                 int i = Math.Abs((scanLine * cycle + frameCount) % ((frameCount + 1) % 64));
                 IODevice.SetPixel(cycle - 1, scanLine - 1, palette[i]);
             }
-            #endif
-            bool at_init_point = scanLine == -1 & cycle == 1;
-            bool first_blank_SL = scanLine == 241 & cycle == 1;
-            bool SL_complete = cycle >= 341;
-            bool visible_SL = scanLine >= -1 & scanLine < 240;
-            bool in_read_section = cycle >= 2 & cycle < 258 | cycle >= 321 & cycle < 338;
-            bool frame_complete = scanLine >= 261;
-            bool at_end_of_SL = cycle == 256;
-
+#endif
+#if LOGGING
+            state = new PpuState(this);
+            using (StreamWriter file = new StreamWriter(filePath, true))
+                file.WriteLine(state);
+#endif
+            bool at_init_point  =     scanLine  == -1   & cycle == 1;
+            bool visible_SL     =     scanLine  >= -1   & scanLine < 240;
+            bool last_visible_SL =    scanLine  == 240;
+            bool first_blank_SL =     scanLine  == 241  & cycle == 1;
+            bool frame_complete =     scanLine  >= 261;
+            bool at_end_of_SL   =     cycle     == 256;
+            bool visible_cycle  =     cycle     > 0     & cycle < 256;
+            bool SL_complete    =     cycle     >= 341; 
+            bool in_read_section =    (cycle >= 2 & cycle < 258 ) | (cycle >= 321  & cycle < 338);
 
             if (at_init_point)
                 SetFlag(StatFlags.vertical_blank, false);
 
-            if (in_read_section & visible_SL)
+            if (visible_SL & in_read_section)
             {
+                UpdateShifters();
+                int stage_no = (cycle - 1) % 8;
 
+                if (stage_no == 0)
+                {
+                    LoadShifters();
+                    tileID = PpuRead((ushort)(0x2000 | ppuAddress & 0x0FFF));
+                }
+                else if(stage_no == 2)
+                {
+                    /** Tile attributes are stored in the last 64 (0x0040) byte of 
+                     *  the name table, and thus start 960 (0x03C0) bytes into the 
+                     *  name table.
+                     *  
+                     *  There is one byte of attribute memory per 16 tiles. 
+                     */  
+                    tileAttrib = PpuRead((ushort)(0x23C0 | ppuAddress & 0x0FFF));
+                }
+                else if (stage_no == 4)
+                {
+                    int bg = GetFlag(CtrlFlags.backgr_select) ? 1 : 0;
+                    tileLSB = PpuRead((ushort)((bg << 12) + (tileID << 4)));
+                }
+                else if(stage_no == 6)
+                {
+                    int bg = GetFlag(CtrlFlags.backgr_select) ? 1 : 0;
+                    tileMSB = PpuRead((ushort)((bg << 12) + (tileID << 4) + 8));
+                }
             }
-            if (first_blank_SL)
+
+            if (visible_SL & visible_cycle)
+            {
+                byte pixel = 0;
+                byte palet = 0;
+                if (true)
+                {
+                    ushort bit_mux = 0x8000; //mux = multiplexer or data selector
+
+                    byte pix0 = (byte)((patternShifterLo & bit_mux) > 0 ? 1 : 0);
+                    byte pix1 = (byte)((patternShifterHi & bit_mux) > 0 ? 1 : 0);
+                    pixel = (byte)((pix1 << 1) | pix0);
+
+                    byte pal0 = (byte)((attribShifterLo & bit_mux) > 0 ? 1 : 0);
+                    byte pal1 = (byte)((attribShifterHi & bit_mux) > 0 ? 1 : 0);
+                    palet = (byte)((pal1 << 1) | pal0);
+                }
+
+                IODevice.SetPixel(cycle - 1, scanLine, GetColourFromPalette(palet, pixel));
+            }
+            if (last_visible_SL)
+            {
+                // Do nothing
+            }
+            else if (first_blank_SL)
             {
                 SetFlag(StatFlags.vertical_blank, true);
                 Nmi = GetFlag(CtrlFlags.nmi_enable);
             }
 
+            // Actually set the pixel - once per cycle
+            
+
+
             cycle++;
+            //Console.WriteLine(state);
 
             if (SL_complete)
             {
@@ -269,9 +397,52 @@ namespace project_nes
                     scanLine = -1;
                     frameCount++;
                     FrameComplete = true;
+                    
                 }
             }
         }
+
+
+        // Rendering methods * * * * * * * *
+
+        public Color GetColourFromPalette(byte palet, byte pixel)
+        {
+            byte index = PpuRead((ushort)(0x3f00 + (palet * 4) + pixel));
+
+        #if generate_a_nice_pattern
+            index = (byte)((pixel + 6) * 5);
+        #endif
+            return palette[index];
+        }
+
+        private void IncrementScrollX() { }
+
+        private void IncrementScrollY() { }
+
+        private void TransferAddressX() { }
+
+        private void TransferAddressY() { }
+
+        private void LoadShifters()
+        {
+            patternShifterLo = (ushort)((patternShifterLo & 0xFF00) | tileLSB);
+            patternShifterHi = (ushort)((patternShifterHi & 0xFF00) | tileMSB);
+            attribShifterLo = (ushort)((attribShifterLo & 0xFF00) | ((tileAttrib & 0b01) > 0 ? 0xFF : 0x00));
+            attribShifterHi = (ushort)((attribShifterHi & 0xFF00) | ((tileAttrib & 0b10) > 0 ? 0xFF : 0x00));
+        }
+
+        private void UpdateShifters()
+        {
+            if(GetFlag(MaskFlags.backgr_enable))
+            {
+                patternShifterLo <<= 1;
+                patternShifterHi <<= 1;
+                attribShifterLo  <<= 1;
+                attribShifterHi  <<= 1;
+            }
+        }
+
+        // Flag handlers * * * * * * * * * *
 
         // Ctrl get set
         private void SetFlag(CtrlFlags f, bool b)
@@ -295,6 +466,20 @@ namespace project_nes
             => (status & (byte)f) > 0;
 
 
+        // Loopy get set
+        private void SetLoopyField()
+        {
+            throw new NotImplementedException();
+        }
+
+        private byte GetLoopyField()
+        {
+            throw new NotImplementedException();
+        }
+
+
+
+        // R/W methods & object reference setters * * * * * * * * * * * * * *
 
         public void CpuWrite(ushort addr, byte data)
         {
@@ -342,7 +527,7 @@ namespace project_nes
                 _ => throw new IndexOutOfRangeException($"Cpu Read of unknown Register {addr}"),
             };
 
-            public void ConnectBus(PpuBus bus)
+        public void ConnectBus(PpuBus bus)
         {
             ppuBus = bus;
         }
@@ -353,8 +538,6 @@ namespace project_nes
             IODevice.Clear();
         }
 
-        public void SetPalette(Palette p) => palette = p;
-
         public void PpuWrite(ushort addr, byte data)
         {
             ppuBus.Write(addr, data);
@@ -364,6 +547,9 @@ namespace project_nes
         {
             return ppuBus.Read(addr);
         }
+
+        public void SetPalette(Palette p) => palette = p;
+
 
 
 
@@ -401,32 +587,27 @@ namespace project_nes
                                 tileX * 8 + (7 - col),  // was row + (tileY * 8)
                                 row + (tileY * 8)]      // was col + (tileX * 8)
 
-                                = GetColour(palette, pixelVal);
+                                = GetColourFromPalette(palette, pixelVal);
                         }
                     }
                 }
             }
         }
 
-        public Color GetColour(byte palet, byte pixel)
-        {
-            byte index = PpuRead((ushort)(0x3f00 + (palet * 4) + pixel));
 
-            // For tesing only - delete this line:
-            index = (byte)((pixel + 6 )* 5);
-
-            return palette[index];
-        }
 
         private class LoopyRegister
         {
             private ushort address;
+            private byte coarse_x, course_y, ntable_x, ntable_y, fine_y;
 
             public byte Coarse_x { get; set; } //5
             public byte Coarse_y { get; set; }  //5
             public byte NTable_x { get; set; }  //1
             public byte NTable_y { get; set; }  //1
             public byte Fine_y { get; set; }    //3
+
+
 
             public ushort Address
             {
@@ -445,6 +626,34 @@ namespace project_nes
 
                 address = word;
             }
+        }
+
+
+        public struct PpuState
+        {
+            private PPU ppu;
+
+            public PpuState(PPU ppu)
+            {
+                this.ppu = ppu;
+            }
+
+            public override string ToString()
+               =>
+               $"{ppu.frameCount}," +
+               $"{ppu.scanLine}," +
+               $"{ppu.cycle}," +
+               $"{ppu.ppuAddress.x()}," +
+               $"{ppu.PpuRead(ppu.ppuAddress).x()}," +
+               $"{ppu.ppuData.x()}," +
+               $"{ppu.patternShifterHi.x()}," +
+               $"{ppu.patternShifterLo.x()}," +
+               $"{ppu.attribShifterHi.x()}," +
+               $"{ppu.attribShifterLo.x()}," +
+               $"{ppu.tileID.x()}," +
+               $"{ppu.tileAttrib.x()}," +
+               $"{ppu.tileMSB.x()}," +
+               $"{ppu.tileLSB.x()}";
         }
     } 
 }

@@ -16,7 +16,7 @@ namespace project_nes
         private byte prgBanks;
         private byte chrBanks;
         private byte[] prgRom; // program memory
-        private byte[] chrRom; // character memory aka pattern memory
+        private byte[] chrRom; // character memory aka pattern memory or pattern tables
 
         private IMapper mapper;
         private BinaryReader reader;

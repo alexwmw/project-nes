@@ -7,7 +7,7 @@ namespace project_nes
     public class IODevice : Drawable
     {
 
-        private Color color = Color.Black; // init color
+        private Color color = Color.Yellow; // init color
         private VertexArray vertices;
         private VertexBuffer buffer;
         private Vector2u screenSize;
