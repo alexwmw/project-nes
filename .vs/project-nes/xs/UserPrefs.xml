@@ -2,28 +2,27 @@
   <MonoDevelop.Ide.ItemProperties.project-nes PreferredExecutionTarget="MonoDevelop.Default" />
   <MonoDevelop.Ide.Workbench>
     <Files>
-      <File FileName="project-nes/Program.cs" Line="28" Column="37" />
-      <File FileName="project-nes/PPU.cs" Line="49" Column="24" />
-      <File FileName="project-nes/CPU.cs" Line="1323" Column="44" />
-      <File FileName="project-nes/IODevice.cs" Line="7" Column="37" />
-      <File FileName="project-nes/PpuBus.cs" Line="87" Column="41" />
+      <File FileName="project-nes/Program.cs" Line="123" Column="38" />
+      <File FileName="project-nes/PPU.cs" Line="442" Column="25" />
+      <File FileName="project-nes/CpuBus.cs" Line="2" Column="21" />
+      <File FileName="project-nes/PpuBus.cs" Line="209" Column="1" />
+      <File FileName="project-nes/IODevice.cs" Line="7" Column="31" />
+      <File FileName="project-nes/Cartridge.cs" Line="46" Column="58" />
+      <File FileName="project-nes/Mapper.cs" Line="37" Column="38" />
+      <File FileName="project-nes/Events.cs" Line="24" Column="1" />
+      <File FileName="project-nes/CPU.cs" Line="209" Column="25" />
     </Files>
     <Pads>
       <Pad Id="ProjectPad">
         <State name="__root__">
           <Node name="project-nes" expanded="True">
             <Node name="project-nes" expanded="True">
-              <Node name="PPU.cs" selected="True" />
+              <Node name="Dependencies" expanded="True">
+                <Node name="PackageDependencies" expanded="True" />
+              </Node>
+              <Node name="IODevice.cs" selected="True" />
             </Node>
           </Node>
-        </State>
-      </Pad>
-      <Pad Id="MonoDevelop.Debugger.WatchPad">
-        <State>
-          <Value>this.attribShifterHi</Value>
-          <Value>this.attribShifterHi</Value>
-          <Value>this.attribShifterHi</Value>
-          <Value>this.attribShifterHi</Value>
         </State>
       </Pad>
     </Pads>

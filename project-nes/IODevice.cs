@@ -7,13 +7,11 @@ namespace project_nes
     public class IODevice : Drawable
     {
 
-        private Color color = Color.Yellow; // init color
+        private Color initColor = Color.Yellow; // init color
         private VertexArray vertices;
-        private VertexBuffer buffer;
         private Vector2u screenSize;
         private RenderWindow window;
 
-        // From https://github.com/amhndu/SimpleNES/blob/master/src/VirtualScreen.cpp
         public IODevice(uint width, uint height, uint pixel_size)
         {
             width *=  pixel_size;
@@ -29,12 +27,12 @@ namespace project_nes
                     uint i = (x * screenSize.Y + y) * 6;
                     Vector2f coord2d = new Vector2f(x * pixel_size, y * pixel_size);
 
-                    vertices[i + 0] = new Vertex(coord2d, color);
-                    vertices[i + 1] = new Vertex(coord2d + new Vector2f(pixel_size, 0), color);
-                    vertices[i + 2] = new Vertex(coord2d + new Vector2f(pixel_size, pixel_size), color);
-                    vertices[i + 3] = new Vertex(coord2d + new Vector2f(pixel_size, pixel_size), color);
-                    vertices[i + 4] = new Vertex(coord2d + new Vector2f(0, pixel_size), color);
-                    vertices[i + 5] = new Vertex(coord2d, color);
+                    vertices[i + 0] = new Vertex(coord2d, initColor);
+                    vertices[i + 1] = new Vertex(coord2d + new Vector2f(pixel_size, 0), initColor);
+                    vertices[i + 2] = new Vertex(coord2d + new Vector2f(pixel_size, pixel_size), initColor);
+                    vertices[i + 3] = new Vertex(coord2d + new Vector2f(pixel_size, pixel_size), initColor);
+                    vertices[i + 4] = new Vertex(coord2d + new Vector2f(0, pixel_size), initColor);
+                    vertices[i + 5] = new Vertex(coord2d, initColor);
                 }
             }
         }

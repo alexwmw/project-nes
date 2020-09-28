@@ -14,7 +14,7 @@
         "outputPath": "/Users/alexwright/Documents/MSc Files/Project/project-nes/project-nes/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/Users/alexwright/.nuget/NuGet/NuGet.Config"
+          "/Users/alexwright/.config/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "netcoreapp3.1"

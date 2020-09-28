@@ -1,7 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
 using HelperMethods;
 
@@ -33,7 +31,7 @@ namespace project_nes
             header.Parse();
 
             // Header flags determine...
-            fileFormat = header.Nes_20 ? header.Identification + " 2.0" : "i" + header.Identification; //iNES or NES 2.0
+            fileFormat = header.Nes_20 ? header.HeaderFormat + " 2.0" : "i" + header.HeaderFormat; //iNES or NES 2.0
             mapperId = header.Mapper_id;
             Mirroring = header.Mirroring_type;
             prgBanks = header.Prg_banks;
@@ -42,19 +40,26 @@ namespace project_nes
             // Read data from file into memory
             if (header.Trainer)
                 reader.ReadBytes(0x200); // trainer is 512 bytes. Junk. Not stored
-            if (prgBanks > 0)
-                prgRom = reader.ReadBytes(prgBanks * 0x4000); // prgBanks = no. of 16kb banks to read
-            if (chrBanks > 0)
-                chrRom = reader.ReadBytes(chrBanks * 0x2000);   // chrBanks = no. of 8kb banks to read
+            if (header.Prg_banks > 0)
+            {
+                int prgSize = header.Prg_banks * 0x4000;
+                prgRom = reader.ReadBytes(prgSize); // prgBanks = no. of 16kb banks to read
+            }
+            if (header.Chr_banks > 0)
+            {
+                int chrSize = header.Chr_banks * 0x2000;
+                chrRom = reader.ReadBytes(chrSize);   // chrBanks = no. of 8kb banks to read
+            }
 
             // Mapper is instantiated based on string "Mapper" + mapperId
-            mapper = (IMapper)Activator.CreateInstance(Type.GetType($"project_nes.Mapper{mapperId}")); 
+            Type t = Type.GetType($"project_nes.Mapper{header.Mapper_id}");
+            mapper = (IMapper)Activator.CreateInstance(t); 
             mapper.PrgBanks = prgBanks;
             mapper.PrgRom = prgRom;
             mapper.ChrRom = chrRom;
            
             reader.Close();
-            Report();
+            //Report();
         }
 
         // 'V' or 'H' for mirroring mode
@@ -118,7 +123,7 @@ namespace project_nes
                 this.reader = reader;
             }
 
-            public string Identification { get; private set; }
+            public string HeaderFormat { get; private set; }
 
             public bool Nes_20 { get; private set; }
 
@@ -143,9 +148,9 @@ namespace project_nes
                     $"\n--------------------------------");
                 // Bytes 0 - 3
                 byte[] str = reader.ReadBytes(4);
-                Identification = Encoding.UTF8.GetString(str);
+                HeaderFormat = Encoding.UTF8.GetString(str);
                 if (v) Console.WriteLine(
-                    $"Identification:     {Identification}" +
+                    $"Identification:     {HeaderFormat}" +
                     $"\n--------------------------------");
                 // Bytes 4 - 5
                 p_rom_lsb = reader.ReadByte();

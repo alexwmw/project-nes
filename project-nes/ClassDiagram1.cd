@@ -1,0 +1,114 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="project_nes.Cartridge" Collapsed="true">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <NestedTypes>
+      <Class Name="project_nes.Cartridge.Header" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>Cartridge.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAIAAQAUAAIAAAABQBAAAAAAAACgEAAAUAgAAgQBAA=</HashCode>
+      <FileName>Cartridge.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="project_nes.CPU">
+    <Position X="2.25" Y="0.5" Width="1.5" />
+    <NestedTypes>
+      <Enum Name="project_nes.CPU.Flags" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>CPU.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Enum>
+      <Struct Name="project_nes.CPU.Instruction" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>CPU.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Struct Name="project_nes.CPU.State" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>CPU.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Struct>
+      <Class Name="project_nes.CPU.InstructionSet" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>CPU.cs</NewMemberFileName>
+        </TypeIdentifier>
+        <Lollipop Position="0.2" />
+      </Class>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAUATAA6FOSCZsQIgMHBABCgLUrqAECMQAAQIIFA9ug=</HashCode>
+      <FileName>CPU.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="project_nes.CpuBus" Collapsed="true">
+    <Position X="4" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAQAAAgAAAgAAAAAABBAAAASAEAAAI=</HashCode>
+      <FileName>CpuBus.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="project_nes.Events" Collapsed="true">
+    <Position X="5.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAACAAAA=</HashCode>
+      <FileName>Events.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="project_nes.IODevice" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="0.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEIAABAAAgAAAgAAAIAAAQAAAAAQAACIAABAQADBAAA=</HashCode>
+      <FileName>IODevice.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="project_nes.Mapper0" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="2.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAIAAAAIAAEAAAABQAAAAAAAAACgAAAAQAgAAAAAAA=</HashCode>
+      <FileName>Mapper.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="project_nes.Palette" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="4" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAAAAABAACAAAAAAAAAAgAACEAAAAAAAAAAA=</HashCode>
+      <FileName>Palette.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="project_nes.PPU" Collapsed="true">
+    <Position X="5.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAcIJAQo0GuBH8ICooUJCgAsBAACBHAMBIIAAAAVgjA=</HashCode>
+      <FileName>PPU.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="project_nes.PpuBus" Collapsed="true">
+    <Position X="0.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQAAAAAAAAABAAAAAAoAAAAQAAAAAEAAAEAAAA=</HashCode>
+      <FileName>PpuBus.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="project_nes.Program" Collapsed="true">
+    <Position X="2.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgABAQAAAA=</HashCode>
+      <FileName>Program.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Interface Name="project_nes.IMapper" Collapsed="true">
+    <Position X="0.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAIAAAAIAAEAAAAAQAAAAAAAAAAgAAAAQAAAAAAAAA=</HashCode>
+      <FileName>Mapper.cs</FileName>
+    </TypeIdentifier>
+  </Interface>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

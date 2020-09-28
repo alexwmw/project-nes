@@ -1,4 +1,4 @@
-﻿//#define LOGGING
+﻿#define LOGGING
 
 using System;
 using System.Collections;
@@ -48,6 +48,7 @@ namespace project_nes
         CultureInfo cultInfo;
         DateTime dateTime;
         DirectoryInfo csvLogs;
+        public int cpuClockCount;
 
         // Constructors
 
@@ -110,12 +111,29 @@ namespace project_nes
 
         // Public Methods
 
+        public string OfficialTestResult
+        {
+            get
+            {
+                return ReadBus((ushort)0x02).x();
+            }
+        }
+
+        public string UnofficialTestResult
+        {
+            get
+            {
+                return ReadBus((ushort)0x03).x();
+            }
+        }
+
         public void Clock()
         {
+            cpuClockCount++;
             if (cycles == 0)
             {
                 state = new State(this);
-                opcode = Read(PC++);
+                opcode = ReadBus(PC++);
                 currentInstr = instructionSet[opcode];
                 cycles += currentInstr.Cycles;
                 bool addrm = currentInstr.AddrMode();
@@ -132,51 +150,53 @@ namespace project_nes
             cycles--;
         }
 
+
+
         public void Irq()
         {
             if (GetFlag(Flags.I) == 0)
             {
                 //Push PC to stack
-                Write((ushort)(0x0100 + stkp--), PC.GetPage());
-                Write((ushort)(0x0100 + stkp--), PC.GetOffset());
+                WriteBus((ushort)(0x0100 + stkp--), PC.GetPage());
+                WriteBus((ushort)(0x0100 + stkp--), PC.GetOffset());
 
                 //Clear B, set I, U; and push status to stack
                 SetFlags(
                     Flags.B, false,
                     Flags.I, true,
                     Flags.U, true);
-                Write((ushort)(0x0100 + stkp--), status);
+                WriteBus((ushort)(0x0100 + stkp--), status);
 
                 //Load interrupt vector from $FFFE/F 
-                PC = LittleEndian(Read(0xFFFE), Read(0xFFFF));
+                PC = Address16Bit(ReadBus(0xFFFE), ReadBus(0xFFFF));
 
-                cycles += 7;
+                cycles = 7;
             }
         }
 
         public void Nmi()
         {
             //Push PC to stack
-            Write((ushort)(0x0100 + stkp--), PC.GetPage());
-            Write((ushort)(0x0100 + stkp--), PC.GetOffset());
+            WriteBus((ushort)(0x0100 + stkp--), PC.GetPage());
+            WriteBus((ushort)(0x0100 + stkp--), PC.GetOffset());
 
             //Clear B, set I, U; and push status to stack
             SetFlags(
                 Flags.B, false,
                 Flags.I, true,
                 Flags.U, true);
-            Write((ushort)(0x0100 + stkp--), status);
+            WriteBus((ushort)(0x0100 + stkp--), status);
 
-            //Load interrupt vector from $FFFE/F 
-            PC = LittleEndian(Read(0xFFFA), Read(0xFFFB));
+            //Load interrupt vector from $FFFA/B 
+            PC = Address16Bit(ReadBus(0xFFFA), ReadBus(0xFFFB));
 
-            cycles += 8;
+            cycles = 8;
         }
 
         public void Reset()
         {
             //Set PC
-            PC = LittleEndian(Read(0xFFFC), Read(0xFFFD));
+            PC = Address16Bit(ReadBus(0xFFFC), ReadBus(0xFFFD));
 
             //Reset registers
             A = X = Y = 0;
@@ -186,7 +206,7 @@ namespace project_nes
             //Reset variables
             address = branch = data = 0;
 
-            cycles += 7; // is it 7 or 8?
+            cycles = 7; 
 
             SetFlags(Flags.I, true);
         }
@@ -204,19 +224,19 @@ namespace project_nes
 
         // Private Methods
 
-        private byte Read(ushort address)
+        private byte ReadBus(ushort address)
         {
             return bus == null ? throw new NullReferenceException("CPU tried to read. Bus not connected.")
                        : bus.Read(address);
         }
 
-        private byte Read(int address)
+        private byte ReadBus(int address)
         {
             return bus == null ? throw new NullReferenceException("CPU tried to read. Bus not connected.")
                        : bus.Read((ushort)((ushort)address & 0xFFFF));
         }
 
-        private void Write(ushort address, byte data)
+        private void WriteBus(ushort address, byte data)
         {
             if (bus == null)
                 throw new Exception("CPU tried to write. Bus not connected.");
@@ -269,7 +289,7 @@ namespace project_nes
             if (CurrentModeImplicit())
                 data = A;
             else
-                data = Read(address);
+                data = ReadBus(address);
         }
 
         public void LogState()
@@ -301,18 +321,18 @@ namespace project_nes
         // Addresses are little-endian
         private bool Abs()
         {
-            byte lowByte = Read(PC++);
-            byte highByte = Read(PC++);
-            address = LittleEndian(lowByte, highByte);
+            byte lowByte = ReadBus(PC++);
+            byte highByte = ReadBus(PC++);
+            address = Address16Bit(lowByte, highByte);
             return false;
         }
 
         //Absolute Indexed  a,x     Cycles: 4+
         private bool AbX()
         {
-            byte lowByte = Read(PC++);
-            byte highByte = Read(PC++);
-            address = LittleEndian(lowByte, highByte);
+            byte lowByte = ReadBus(PC++);
+            byte highByte = ReadBus(PC++);
+            address = Address16Bit(lowByte, highByte);
             address += X;
             return address.GetPage() != highByte;
         }
@@ -320,9 +340,9 @@ namespace project_nes
         //Absolute Indexed  a,y     Cycles: 4+
         private bool AbY()
         {
-            byte lowByte = Read(PC++);
-            byte highByte = Read(PC++);
-            address = LittleEndian(lowByte, highByte);
+            byte lowByte = ReadBus(PC++);
+            byte highByte = ReadBus(PC++);
+            address = Address16Bit(lowByte, highByte);
             address += Y;
             return address.GetPage() != highByte;
         }
@@ -351,38 +371,45 @@ namespace project_nes
         //Indirect          (a)     Cycles:
         private bool Ind()
         {
-            byte lowByte = Read(PC++);
-            byte highByte = Read(PC++);
-            ushort temp = LittleEndian(lowByte, highByte);
-            address = lowByte == 0x00FF
-                //simulate hardware bug
-                ? LittleEndian(
-                    Read(temp),
-                    Read(temp & 0xFF00))
-                //otherwise, correct behaviour
-                : LittleEndian(
-                    Read(temp),
-                    Read(temp + 1));
+            //get address start location in two reads
+            byte lowByte = ReadBus(PC++);
+            byte highByte = ReadBus(PC++);
+
+            ushort target = Address16Bit(lowByte, highByte);
+
+            //construct address
+            ushort addrLoLocation = target;
+            ushort addrHiLocation = (ushort)
+                (lowByte == 0xFF
+                ? //simulate hardware bug
+                (target & 0xFF00)
+                : //otherwise, correct behaviour
+                (target + 1));
+
+            byte addrHi = ReadBus(addrHiLocation);
+            byte addrLo = ReadBus(addrLoLocation);
+
+            address = Address16Bit(addrLo, addrHi);
             return false;
         }
 
         //Indexed Indirect  (d,x)   Cycles: 6
         private bool InX()
         {
-            ushort temp = Read(PC++);
-            byte lowByte = Read(temp + X & 0x00FF);
-            byte highByte = Read(temp + X + 1 & 0x00FF);
-            address = LittleEndian(lowByte, highByte);
+            ushort temp = ReadBus(PC++);
+            byte lowByte = ReadBus(temp + X & 0x00FF);
+            byte highByte = ReadBus(temp + X + 1 & 0x00FF);
+            address = Address16Bit(lowByte, highByte);
             return false;
         }
 
         //Indirect Indexed  (d),y   Cycles: 5+
         private bool InY()
         {
-            byte temp = Read(PC++);
-            byte lowByte = Read(temp & 0x00FF);
-            byte highByte = Read(temp + 1 & 0x00FF);
-            address = LittleEndian(lowByte, highByte);
+            byte temp = ReadBus(PC++);
+            byte lowByte = ReadBus(temp & 0x00FF);
+            byte highByte = ReadBus(temp + 1 & 0x00FF);
+            address = Address16Bit(lowByte, highByte);
             address += Y;
             return address.GetPage() != highByte;
         }
@@ -402,7 +429,7 @@ namespace project_nes
         */
         private bool Rel()
         {
-            branch = Read(PC++);
+            branch = ReadBus(PC++);
             if (branch.IsNegative())
                 branch |= 0xFF00;
             return false;
@@ -411,7 +438,7 @@ namespace project_nes
         //Zero Page         d       Cycles:
         private bool Zpg()
         {
-            address = Read(PC++);
+            address = ReadBus(PC++);
             address &= 0x00FF;
             return false;
         }
@@ -419,7 +446,7 @@ namespace project_nes
         //Zero Page Indexed d,x     Cycles: 4
         private bool ZpX()
         {
-            address = (ushort)(Read(PC++) + X);
+            address = (ushort)(ReadBus(PC++) + X);
             address &= 0x00FF;
 
             return false;
@@ -428,7 +455,7 @@ namespace project_nes
         //Zero Page Indexed d,y     Cycles: 4
         private bool ZpY()
         {
-            address = (ushort)(Read(PC++) + Y);
+            address = (ushort)(ReadBus(PC++) + Y);
             address &= 0x00FF;
             return false;
         }
@@ -490,7 +517,7 @@ namespace project_nes
             if (CurrentModeImplicit())
                 A = (byte)(temp & 0x00FF);
             else
-                Write(address, (byte)(temp & 0x00FF));
+                WriteBus(address, (byte)(temp & 0x00FF));
 
             return false;
         }
@@ -629,14 +656,14 @@ namespace project_nes
             //Push PC to stack
             byte highByte = (byte)((PC & 0xFF00) >> 8);
             byte lowByte = (byte)(PC & 0x00FF);
-            Write(((ushort)(0x0100 + stkp--)), highByte);
-            Write(((ushort)(0x0100 + stkp--)), lowByte);
+            WriteBus(((ushort)(0x0100 + stkp--)), highByte);
+            WriteBus(((ushort)(0x0100 + stkp--)), lowByte);
 
             //Push status to stack
-            Write(((ushort)(0x0100 + stkp--)), status);
+            WriteBus(((ushort)(0x0100 + stkp--)), status);
 
             //Load interrupt vector from $FFFE/F 
-            PC = LittleEndian(Read(0xFFFE), Read(0xFFFF));
+            PC = Address16Bit(ReadBus(0xFFFE), ReadBus(0xFFFF));
 
             SetFlags(Flags.B, true);
             return false;
@@ -762,10 +789,10 @@ namespace project_nes
         private bool DEC()
         {
             Fetch();
-            Write(address, (byte)(data - 1));
+            WriteBus(address, (byte)(data - 1));
             SetFlags(
-                Flags.Z, Read(address).IsZero(),
-                Flags.N, Read(address).IsNegative());
+                Flags.Z, ReadBus(address).IsZero(),
+                Flags.N, ReadBus(address).IsNegative());
             return false;
         }
 
@@ -814,10 +841,10 @@ namespace project_nes
         private bool INC()
         {
             Fetch();
-            Write(address, (byte)(data + 1));
+            WriteBus(address, (byte)(data + 1));
             SetFlags(
-                Flags.Z, Read(address).IsZero(),
-                Flags.N, Read(address).IsNegative());
+                Flags.Z, ReadBus(address).IsZero(),
+                Flags.N, ReadBus(address).IsNegative());
             return false;
         }
 
@@ -869,8 +896,8 @@ namespace project_nes
             //Previous PC (or else this instruction will be stored)
             PC--;
 
-            Write((ushort)(0x0100 + stkp--), PC.GetPage());
-            Write((ushort)(0x0100 + stkp--), PC.GetOffset());
+            WriteBus((ushort)(0x0100 + stkp--), PC.GetPage());
+            WriteBus((ushort)(0x0100 + stkp--), PC.GetOffset());
             PC = address;
             return false;
         }
@@ -930,7 +957,7 @@ namespace project_nes
             if (CurrentModeImplicit())
                 A = temp;
             else
-                Write(address, temp);
+                WriteBus(address, temp);
             return false;
         }
 
@@ -989,7 +1016,7 @@ namespace project_nes
          */
         private bool PHA()
         {
-            Write((ushort)(0x0100 + stkp--), A);
+            WriteBus((ushort)(0x0100 + stkp--), A);
             return false;
         }
 
@@ -1000,7 +1027,7 @@ namespace project_nes
         private bool PHP()
         {
             SetFlags(Flags.B, true); 
-            Write((ushort)(0x0100 + stkp--), status);
+            WriteBus((ushort)(0x0100 + stkp--), status);
             SetFlags(Flags.B, false);
             return false;
         }
@@ -1012,7 +1039,7 @@ namespace project_nes
          */
         private bool PLA()
         {
-            A = Read(0x0100 + ++stkp);
+            A = ReadBus(0x0100 + ++stkp);
             SetFlags(
                 Flags.Z, A.IsZero(),
                 Flags.N, A.IsNegative(),
@@ -1028,7 +1055,7 @@ namespace project_nes
          */
         private bool PLP()
         {
-            status = Read(0x0100 + ++stkp);
+            status = ReadBus(0x0100 + ++stkp);
             SetFlags(Flags.U, true,
                      Flags.B, false);
             return false;
@@ -1052,7 +1079,7 @@ namespace project_nes
             if (CurrentModeImplicit())
                 A = (byte)(temp & 0x00FF);
             else
-                Write(address, (byte)(temp & 0x00FF));
+                WriteBus(address, (byte)(temp & 0x00FF));
             return false;
         }
 
@@ -1075,7 +1102,7 @@ namespace project_nes
             if (CurrentModeImplicit())
                 A = (byte)(temp & 0x00FF);
             else
-                Write(address, (byte)(temp & 0x00FF));
+                WriteBus(address, (byte)(temp & 0x00FF));
             return false;
         }
 
@@ -1086,9 +1113,9 @@ namespace project_nes
          */
         private bool RTI()
         {
-            status = Read(0x0100 + ++stkp);
-            PC = Read(0x0100 + ++stkp);
-            PC |= (ushort)(Read(0x0100 + ++stkp) << 8);
+            status = ReadBus(0x0100 + ++stkp);
+            PC = ReadBus(0x0100 + ++stkp);
+            PC |= (ushort)(ReadBus(0x0100 + ++stkp) << 8);
             SetFlags(Flags.U, true);
             return false;
         }
@@ -1101,8 +1128,8 @@ namespace project_nes
          */
         private bool RTS()
         {
-            PC = Read(0x0100 + ++stkp);
-            PC |= (ushort)(Read(0x0100 + ++stkp) << 8);
+            PC = ReadBus(0x0100 + ++stkp);
+            PC |= (ushort)(ReadBus(0x0100 + ++stkp) << 8);
             PC++;
             return false;
         }
@@ -1162,7 +1189,7 @@ namespace project_nes
          */
         private bool STA()
         {
-            Write(address, A);
+            WriteBus(address, A);
             return false;
         }
 
@@ -1171,7 +1198,7 @@ namespace project_nes
          */
         private bool STX()
         {
-            Write(address, X);
+            WriteBus(address, X);
             return false;
         }
 
@@ -1180,7 +1207,7 @@ namespace project_nes
          */
         private bool STY()
         {
-            Write(address, Y);
+            WriteBus(address, Y);
             return false;
         }
 
@@ -1293,11 +1320,11 @@ namespace project_nes
         {
             public ushort PC;
             public byte A, X, Y, stkp, status;
-            CPU post_fetch;
+            CPU cpuRef;
 
             public State(CPU cpu)
             {
-                post_fetch = cpu;
+                cpuRef = cpu;
                 PC = cpu.PC;
                 A = cpu.A;
                 X = cpu.X;
@@ -1309,18 +1336,18 @@ namespace project_nes
             public override string ToString()
                =>
                $"{PC.x()}," +
-               $"{post_fetch.opcode.x()}," +
-               $"{(post_fetch.address & 0x00FF).x()}," +
-               $"{(post_fetch.address & 0xFF00).x()}," +
-               $"{post_fetch.currentInstr.Name}," +
-               $"{post_fetch.address.x()}," +
+               $"{cpuRef.opcode.x()}," +
+               $"{(cpuRef.address & 0x00FF).x()}," +
+               $"{(cpuRef.address & 0xFF00).x()}," +
+               $"{cpuRef.currentInstr.Name}," +
+               $"{cpuRef.address.x()}," +
                $"{A.x()}," +
                $"{X.x()}," +
                $"{Y.x()}," +
                $"{status.x()}," +
                $"{stkp.x()}," +
                $"{0},{000}," +
-               $"{post_fetch.clock_count}";
+               $"{cpuRef.clock_count}";
         }
             
 
@@ -1331,10 +1358,8 @@ namespace project_nes
             public IEnumerator<Instruction> GetEnumerator()
                 => ins.GetEnumerator();
 
-
             IEnumerator IEnumerable.GetEnumerator()
                 => ins.GetEnumerator();
-
 
             public void Add(Func<bool> op, Func<bool> addrm, int cycles)
                 => ins.Add(new Instruction(op, addrm, cycles));

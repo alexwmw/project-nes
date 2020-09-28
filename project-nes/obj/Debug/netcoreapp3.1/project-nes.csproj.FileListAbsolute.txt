@@ -246,7 +246,6 @@ Z:/project-nes/bin/Debug/netcoreapp3.1/runtimes/win-x86/native/openal32.dll
 Z:/project-nes/bin/Debug/netcoreapp3.1/runtimes/win/lib/netcoreapp3.0/Microsoft.Win32.SystemEvents.dll
 Z:/project-nes/bin/Debug/netcoreapp3.1/runtimes/unix/lib/netcoreapp3.0/System.Drawing.Common.dll
 Z:/project-nes/bin/Debug/netcoreapp3.1/runtimes/win/lib/netcoreapp3.0/System.Drawing.Common.dll
-Z:/project-nes/obj/Debug/netcoreapp3.1/project-nes.csprojAssemblyReference.cache
 Z:/project-nes/obj/Debug/netcoreapp3.1/project-nes.AssemblyInfoInputs.cache
 Z:/project-nes/obj/Debug/netcoreapp3.1/project-nes.AssemblyInfo.cs
 Z:/project-nes/obj/Debug/netcoreapp3.1/project-nes.csproj.CoreCompileInputs.cache

@@ -4,13 +4,17 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
+using HelperMethods;
 
 namespace project_nes
 {
-    class Program
+    class Emulator
     {
+
+
         static void Main(string[] args)
         {
             uint systemClock = 0;
@@ -34,7 +38,7 @@ namespace project_nes
             CpuBus cpuBus = new CpuBus();
             PpuBus ppuBus = new PpuBus();
             CPU cpu = new CPU();
-            PPU ppu = new PPU();
+            PPU ppu = new PPU(cpu);
 
             // IO device setup         
             uint displayScale = 2;
@@ -55,6 +59,7 @@ namespace project_nes
 
             // Emulator init procedure
             cpu.Reset();
+            ppu.Reset();
 #if force_nestest_all_tests
             cpu.PC = 0xC000;
 #endif
@@ -119,9 +124,10 @@ namespace project_nes
                     IODevice.Display();
                 }
             }
+
+
+
 #endif
-
-
 
         }
     }

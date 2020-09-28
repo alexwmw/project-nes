@@ -32,7 +32,7 @@ namespace HelperMethods
 
     public static class StaticMethods
     {
-        public static ushort LittleEndian(byte lo, byte hi) => (ushort)((hi << 8) | lo);
+        public static ushort Address16Bit(byte lo, byte hi) => (ushort)((hi << 8) | lo);
 
 
         public static void Window_KeyPressed(object sender, SFML.Window.KeyEventArgs e)

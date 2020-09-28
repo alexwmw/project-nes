@@ -52,7 +52,8 @@ namespace project_nes
             chrRom = cart;
         }
 
-        public void Write(ushort addr, byte data)
+        //First attempt. Unused
+        public void Write1(ushort addr, byte data)
         {
             if (addr >= 0x0000 & addr <= 0x1FFF) // Pattern tables 0 (< 1000) and 1 (< 2000)
             {
@@ -64,7 +65,7 @@ namespace project_nes
                 if (chrRom.Mirroring == 'V')
                 {
                     addr -= 0x2000;
-                    i = (byte)((addr & 0xF000) >> 12);  // MS bit
+                    i = (byte)(addr >> 15);  // MS bit
                     j = (byte)(addr % 0x800);           // address % 1 kb
                 }
                 else if (chrRom.Mirroring == 'H')
@@ -73,8 +74,6 @@ namespace project_nes
                     i = (byte)(addr < 0x0800 ? 0 : 1);  // addr < 1 kb ?
                     j = (byte)(addr - (i * 0x800));     // addr - (0 kb or 1 kb)
                 }
-                else
-                    throw new SystemException("Cartridge.Mirroring was not V or H");
 
                 nameTables[i, j] = data;
             }
@@ -83,13 +82,12 @@ namespace project_nes
                 addr &= 0x001F;
                 if (addr % 4 == 0 & addr >= 0x10)
                     addr -= 0x10;
-
                 paletteRam[addr] = data;
             }
-            else throw new ArgumentOutOfRangeException("Address exceeds 0x3FFF");
         }
 
-        public byte Read(ushort addr)
+        //First attempt. Unused
+        public byte Read1(ushort addr)
         {
             if (addr >= 0x0000 & addr <= 0x1FFF) // Pattern tables 0 (< 1000) and 1 (< 2000)
             {
@@ -101,7 +99,7 @@ namespace project_nes
                 if (chrRom.Mirroring == 'V')
                 {
                     addr -= 0x2000;
-                    i = (byte)((addr & 0xF000) >> 12);
+                    i = (byte)(addr >> 15);
                     j = (byte)(addr % 0x800);
                 }
                 else if (chrRom.Mirroring == 'H')
@@ -124,5 +122,97 @@ namespace project_nes
             }
             throw new ArgumentOutOfRangeException($"Address {addr.x()} exceeds 0x3FFF");
         }
+
+
+
+
+        public void Write(ushort addr, byte data)
+        {
+            if (addr >= 0x0000 && addr <= 0x1FFF)
+            {
+                chrRom.PpuWrite(addr,  data);
+            }
+            else if (addr >= 0x2000 && addr <= 0x3EFF)
+            {
+                addr &= 0x0FFF;
+                if (chrRom.Mirroring == 'V')
+                {
+                    // Vertical
+                    if (addr >= 0x0000 && addr <= 0x03FF)
+                        nameTables[0, addr & 0x03FF] = data;
+                    if (addr >= 0x0400 && addr <= 0x07FF)
+                        nameTables[1, addr & 0x03FF] = data;
+                    if (addr >= 0x0800 && addr <= 0x0BFF)
+                        nameTables[0, addr & 0x03FF] = data;
+                    if (addr >= 0x0C00 && addr <= 0x0FFF)
+                        nameTables[1, addr & 0x03FF] = data;
+                }
+                else if (chrRom.Mirroring == 'H')
+                {
+                    // Horizontal
+                    if (addr >= 0x0000 && addr <= 0x03FF)
+                        nameTables[0, addr & 0x03FF] = data;
+                    if (addr >= 0x0400 && addr <= 0x07FF)
+                        nameTables[0, addr & 0x03FF] = data;
+                    if (addr >= 0x0800 && addr <= 0x0BFF)
+                        nameTables[1, addr & 0x03FF] = data;
+                    if (addr >= 0x0C00 && addr <= 0x0FFF)
+                        nameTables[1, addr & 0x03FF] = data;
+                }
+            }
+            else if (addr >= 0x3F00 && addr <= 0x3FFF)
+            {
+                addr &= 0x001F;
+                if (addr == 0x0010) addr = 0x0000;
+                if (addr == 0x0014) addr = 0x0004;
+                if (addr == 0x0018) addr = 0x0008;
+                if (addr == 0x001C) addr = 0x000C;
+                paletteRam[addr] = data;
+            }
+        }
+
+        public byte Read(ushort addr)
+        {
+            if (addr >= 0x0000 && addr <= 0x1FFF)
+            {
+                return chrRom.PpuRead(addr);
+            }
+            else if (addr >= 0x2000 && addr <= 0x3EFF)
+            {
+                addr &= 0x0FFF;
+                if (chrRom.Mirroring == 'V')
+                {
+                    if (addr >= 0x0000 && addr <= 0x03FF)
+                        return nameTables[0, addr & 0x03FF];
+                    if (addr >= 0x0400 && addr <= 0x07FF)
+                        return nameTables[1, addr & 0x03FF];
+                    if (addr >= 0x0800 && addr <= 0x0BFF)
+                        return nameTables[0, addr & 0x03FF];
+                    if (addr >= 0x0C00 && addr <= 0x0FFF)
+                        return nameTables[1, addr & 0x03FF];
+                }
+                else if (chrRom.Mirroring == 'H')
+                {
+                    if (addr >= 0x0000 && addr <= 0x03FF)
+                        return nameTables[0, addr & 0x03FF];
+                    if (addr >= 0x0400 && addr <= 0x07FF)
+                        return nameTables[0, addr & 0x03FF];
+                    if (addr >= 0x0800 && addr <= 0x0BFF)
+                        return nameTables[1, addr & 0x03FF];
+                    if (addr >= 0x0C00 && addr <= 0x0FFF)
+                        return nameTables[1, addr & 0x03FF];
+                }
+            }
+            else if (addr >= 0x3F00 && addr <= 0x3FFF)
+            {
+                addr &= 0x001F;
+                if (addr % 0x4 == 0)
+                    addr = 0x0000;
+                return paletteRam[addr];
+            }
+
+            throw new IndexOutOfRangeException();
+        }
+
     }
 }
