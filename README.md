@@ -38,7 +38,7 @@ While most emulators of this kind are written in C++, C# had the advantage of be
 A third party library was used for graphics processing, allowing ProjectNES’s graphical output to be visualised. Two such libraries were used during development. These were Simple DirectMedia Layer (SDL) [23], and Simple and Fast Multimedia Library (SFML) [24]. Both are developed in C or C++ but have C# bindings. Both were experimented with, but ultimately SFML was found to be easier to use. 
 
 
-Implementation
+## Implementation
 5.6	Emulator Class
 An Emulator class holds the Main method that is the entry point into the application. Here, each component class is instantiated, and basic parameters are set:
 
